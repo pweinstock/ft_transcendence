@@ -1,40 +1,37 @@
 version: "3.6"
 
-networks:
-  transcendnce:
-    driver: bridge
+#networks:
+#  transcendnce:
+#    driver: bridge
 
 services:
 
-  nginx:
-    image: nginx
-    volumes:
-      - ./templates:/etc/nginx/templates
-    ports:
-      - "8080:80"
-    environment:
-#      - NGINX_HOST=foobar.com
-#      - NGINX_PORT=80
-#      - NGINX_ENVSUBST_TEMPLATE_SUFFIX
-#      - NGINX_ENVSUBST_OUTPUT_DIR
-#      - NGINX_ENVSUBST_TEMPLATE_DIR
-    restart: always
+#  nginx:
+#    image: nginx
+#    volumes:
+#      - ./templates:/etc/nginx/templates
+#    ports:
+#      - "8080:80"
+#    environment:
+##      - NGINX_HOST=foobar.com
+##      - NGINX_PORT=80
+##      - NGINX_ENVSUBST_TEMPLATE_SUFFIX
+##      - NGINX_ENVSUBST_OUTPUT_DIR
+##      - NGINX_ENVSUBST_TEMPLATE_DIR
+#    network:
+#      - transcendnce
+#    restart: always
 
     db:
       image: postgres
-      restart: always
+      volumes:
+        - ./db_files:/var/lib/postgresql/data
       environment:
         POSTGRES_DB: $POSTGRES_DB
         POSTGRES_USER: $POSTGRES_USER
         POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-#        PGDATA
-#        POSTGRES_HOST_AUTH_METHOD:
-#        POSTGRES_INITDB_ARGS:
-#        POSTGRES_INITDB_WALDIR:
-
-
-    adminer:
-      image: adminer
-      restart: always
       ports:
-      - 8080:8080
+        - 5432:5432
+#      network:
+#        - transcendnce
+      restart: always

@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 
 
 
-//TODO change to ENV
+//TODO change to ENV!!!!!!!!!!!
 
 @Module({
     controllers: [AppController],
@@ -15,8 +15,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
             dialect: 'postgres',
             host: 'localhost',
             port: 5432,
-            username: 'postgres',
-            password: 'root',
+            username: 'doreshev',
+            password: '42pass',
             database: 'transcendence',
             models: [],
             autoLoadModels: true

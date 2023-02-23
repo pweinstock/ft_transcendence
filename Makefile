@@ -3,12 +3,12 @@ NAME = ft_transcendence
 .PHONY : all clean fclean re down
 
 $(NAME) : 
-	@cd srcs && docker compose up --build
+	docker compose up --build
 
 all : $(NAME)
 
 down:
-	@docker compose -f srcs/docker-compose.yml down
+	@docker compose -f docker compose.yml down
 
 clean: down
 	@docker system prune -a --force
