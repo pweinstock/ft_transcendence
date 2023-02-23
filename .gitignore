@@ -104,11 +104,11 @@ dist
 .tern-port
 
 *.env
-./db_files
+db_files/
 
 # compiled output
-backend/dist
-backend/node_modules
+*dist
+*node_modules
 
 # Logs
 logs
@@ -120,7 +120,7 @@ yarn-error.log*
 lerna-debug.log*
 
 # OS
-.DS_Store
+*.DS_Store
 
 # Tests
 backend/coverage
@@ -128,16 +128,16 @@ backend/.nyc_output
 
 # IDEs and editors
 *.idea
-backend/.project
-backend/.classpath
-backend/.c9/
-backend/*.launch
-backend/.settings/
-backend/*.sublime-workspace
+*.project
+*.classpath
+*.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
 # IDE - VSCode
-backend/.vscode/*
-backend/!.vscode/settings.json
-backend/!.vscode/tasks.json
-backend/!.vscode/launch.json
-backend/!.vscode/extensions.json
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
