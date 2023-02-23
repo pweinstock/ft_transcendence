@@ -104,7 +104,7 @@ dist
 .tern-port
 
 *.env
-./db_files/*
+./db_files
 
 # compiled output
 backend/dist
