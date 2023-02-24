@@ -7,15 +7,10 @@ import { ConfigModule } from "@nestjs/config";
 
 
 
-//TODO change to ENV!!!!!!!!!!!
-
 @Module({
     controllers: [AppController],
     providers: [AppService],
     imports: [
-        ConfigModule.forRoot({
-            envFilePath: '../.env'
-        }),
         SequelizeModule.forRoot({
             dialect: 'postgres',
             host: process.env.POSTGRES_HOST,
