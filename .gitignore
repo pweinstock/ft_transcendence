@@ -103,9 +103,6 @@ dist
 # TernJS port file
 .tern-port
 
-*.env
-db_files/
-
 # compiled output
 *dist
 *node_modules
@@ -141,3 +138,6 @@ backend/.nyc_output
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+*.env
+*db_files
