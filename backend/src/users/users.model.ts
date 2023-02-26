@@ -21,11 +21,11 @@ export class User extends Model<User, UserCreation>{
     password: string;
 
     @Column({type: DataType.INTEGER, unique: true})
-    friends: number;
+    friends: number[];
 
     @Column({type: DataType.INTEGER, unique: true})
-    pendingFriends: number;
+    pendingFriends: number[];
 
     @Column({type: DataType.INTEGER, unique: true})
-    bannedUsers: number;
+    bannedUsers: number[];
 }

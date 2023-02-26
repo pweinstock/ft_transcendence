@@ -8,7 +8,7 @@ async function start() {
 
     // const config = new DocumentBuilder()
 
-    await app.listen(PORT, () => console.log('Server started on port = ${PORT}'))
+    await app.listen(PORT, () => console.log('Server started on port = ', PORT))
 }
 
 start()

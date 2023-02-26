@@ -13,7 +13,7 @@ down:
 clean: down
 	@docker system prune -a --force
 
-fclean:
+fclean: rm
 	@docker stop $$(docker ps -qa)
 	@docker system prune --all --force --volumes
 	@docker network prune --force
