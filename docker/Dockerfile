@@ -13,7 +13,6 @@ WORKDIR nest
 #npm install --save-dev @types/sequelize
 #npm install --save pg pg-hstore
 #npm i @nestjs/config
-#npm install next-auth
 
 
 ENTRYPOINT ["npm", "run", "start:dev"]
