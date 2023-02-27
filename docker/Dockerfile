@@ -13,6 +13,7 @@ WORKDIR nest
 #npm install --save-dev @types/sequelize
 #npm install --save pg pg-hstore
 #npm i @nestjs/config
+#npm i @nestjs/passport passport passport-42
 
 
 ENTRYPOINT ["npm", "run", "start:dev"]
