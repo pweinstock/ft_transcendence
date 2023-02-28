@@ -1,15 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { createUserDTO } from 'src/users/dto/create-useer.dto';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { FortyTwoAuthGuard } from './Guards';
 
-@Controller('auth')
+@Controller('auth/42')
 export class AuthController {
 
-    @Get('42')
+    @Get('login')
+    @UseGuards(FortyTwoAuthGuard)
     login() {
         return { msg: 'Login' };
     }
 
-    @Get('/')
+    @Get('/redirect')
+    @UseGuards(FortyTwoAuthGuard)
     redirect() {
      return { msg: 'Redirect' };
     }

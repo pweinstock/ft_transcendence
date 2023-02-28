@@ -41,6 +41,9 @@ services:
         POSTGRES_PASSWORD: $POSTGRES_PASSWORD
         POSTGRES_HOST: postgres_db
         PORT: $PORT
+        FORTYTWO_APP_ID: $FORTYTWO_APP_ID
+        FORTYTWO_APP_SECRET: $FORTYTWO_APP_SECRET
+        FORTYTWO_CALLBACK_URL: $FORTYTWO_CALLBACK_URL
       volumes:
       - volnest:/nest/
       ports:
