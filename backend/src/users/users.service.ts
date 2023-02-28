@@ -18,14 +18,15 @@ export class UsersService {
         return users;
     }
 
-    findOne(id: string): Promise<User> {
+    findOne(userEmail: string): Promise<User> {
         return this.userModel.findOne({
-          where: { id },
+          where: { email: userEmail },
         });
     }
 
-    async remove(id: string): Promise<void> {
-        const user = await this.findOne(id);
-        await user.destroy();
+    async remove(email: string): Promise<void> {
+        const user = await this.findOne(email);
+        if (user)
+            await user.destroy();
     }
 }

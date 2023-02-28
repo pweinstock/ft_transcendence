@@ -8,7 +8,6 @@ export class UsersController {
     constructor(private usersService: UsersService) {}
 
     @Get()
-    @UseGuards(FortyTwoAuthGuard)
     getAll() {
         return this.usersService.getAllUsers();
     }

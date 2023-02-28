@@ -12,7 +12,7 @@ export class User extends Model<User, UserCreation>{
     id: number;
 
     // @Column({type: DataType.STRING, unique: true, allowNull: false})
-    // name: string;
+    // displayName: string;
 
     @Column({type: DataType.STRING, unique: true, allowNull: false})
     email: string;

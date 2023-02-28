@@ -8,9 +8,10 @@ export class AuthService {
 
     async validateUser(details: UserDTO) {
         const user = await this.usersService.findOne(details.email);
-        if (!user) {
-            
-        }
+        if (user)
+            return user;
 
+        const newUser = this.usersService.createUser(details);
+        return newUser;
     }
 }
