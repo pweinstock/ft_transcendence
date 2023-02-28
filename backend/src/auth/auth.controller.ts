@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { FortyTwoAuthGuard } from './Guards';
+import { FortyTwoAuthGuard } from './auth.guard';
 
 @Controller('auth/42')
 export class AuthController {

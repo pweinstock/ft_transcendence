@@ -7,7 +7,10 @@ export class AuthService {
     constructor(private usersService: UsersService) {}
 
     async validateUser(details: UserDTO) {
-        const user = await this.usersService;
-    }
+        const user = await this.usersService.findOne(details.email);
+        if (!user) {
+            
+        }
 
+    }
 }

@@ -27,5 +27,5 @@ export class UsersService {
     async remove(id: string): Promise<void> {
         const user = await this.findOne(id);
         await user.destroy();
-      }
+    }
 }
