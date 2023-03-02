@@ -140,4 +140,4 @@ backend/.nyc_output
 !.vscode/extensions.json
 
 *.env
-*db_files
+docker/db_files/**
