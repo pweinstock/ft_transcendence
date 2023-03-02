@@ -9,10 +9,13 @@ WORKDIR nest
 #npm install
 #npm i -g @nestjs/cli
 #nest new .
-#npm install --save @nestjs/seuelize sequelize-typescript
+##sequlize
+#npm install --save @nestjs/sequelize sequelize-typescript
 #npm install --save-dev @types/sequelize
 #npm install --save pg pg-hstore
 #npm i @nestjs/config
+##typeorm
+#npm install --save @nestjs/typeorm typeorm pg
 #npm i @nestjs/passport passport passport-42
 
 

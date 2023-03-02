@@ -22,7 +22,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
             id: profile.id,
             displayName: profile.displayName,
             photo: profile.photo
-        });    //todo add more values
+        });
         return user || null;
     }
 }

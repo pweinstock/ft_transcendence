@@ -1,32 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { UserDTO } from './dto/user.dto';
-import {User} from "./users.model";
+import {User} from "./users.entity";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+
 
 @Injectable()
 export class UsersService {
 
-    constructor(@InjectModel(User) private userModel: typeof User) {}
+    constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {}
 
     async createUser(dto: UserDTO) {
-        const user = await this.userModel.create(dto);
+        const user = this.usersRepository.create(dto);
         return user;
     }
 
-    async getAllUsers() {
-        const users = await this.userModel.findAll();
+    async findAll(): Promise<User[]> {
+        const users = await this.usersRepository.find()
         return users;
     }
 
-    findOne(userEmail: string): Promise<User> {
-        return this.userModel.findOne({
-          where: { email: userEmail },
-        });
+    async findOne(email: string): Promise<User> {
+        const user = await this.usersRepository.findOneBy({ email });
+        return user;
     }
 
     async remove(email: string): Promise<void> {
-        const user = await this.findOne(email);
-        if (user)
-            await user.destroy();
+        await this.usersRepository.delete(email);
     }
 }

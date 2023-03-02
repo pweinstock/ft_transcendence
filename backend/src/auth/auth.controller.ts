@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { FortyTwoAuthGuard } from './auth.guard';
 
-@Controller('auth/42')
+@Controller('auth')
 export class AuthController {
 
     @Get('login')
@@ -10,7 +10,7 @@ export class AuthController {
         return { msg: 'Login' };
     }
 
-    @Get('/redirect')
+    @Get('redirect')
     @UseGuards(FortyTwoAuthGuard)
     redirect() {
      return { msg: 'Redirect' };
