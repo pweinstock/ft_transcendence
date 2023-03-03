@@ -3,12 +3,16 @@ import { UsersModule } from './users/users.module';
 import {User} from "./users/users.entity";
 import { AuthController } from './auth/auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RolesModule } from './roles/roles.module';
+import { ChatController } from './chat/chat.controller';
+import { ChatService } from './chat/chat.service';
+import { ChatModule } from './chat/chat.module';
 
 
 
 @Module({
-    controllers: [AuthController],
-    providers: [],
+    controllers: [AuthController, ChatController],
+    providers: [ChatService],
     imports: [
         TypeOrmModule.forRoot({
             type: 'postgres',
@@ -21,6 +25,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
             synchronize: true,
         }),
         UsersModule,
+        RolesModule,
+        ChatModule,
         // AuthModule,
     ],
 })
