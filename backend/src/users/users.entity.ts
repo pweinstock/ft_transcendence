@@ -1,4 +1,6 @@
-import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
+import { Chat } from "src/chat/chat.entity";
+import { UserChats } from "src/chat/user-chats.entity";
+import {Column, PrimaryGeneratedColumn, Entity, ManyToMany} from "typeorm";
 
 @Entity({name: 'users'})
 export class User {
@@ -25,4 +27,7 @@ export class User {
 
     @Column({ default: true })
     isActive: boolean;
+
+    @ManyToMany(() => Chat, () => UserChats)
+    chats: Chat[];
 }

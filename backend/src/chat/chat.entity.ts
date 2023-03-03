@@ -1,28 +1,44 @@
-import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
+import { User } from "src/users/users.entity";
+import {Column, PrimaryGeneratedColumn, Entity, ManyToMany} from "typeorm";
+import { UserChats } from "./user-chats.entity";
 
-@Entity({name: 'roles'})
-export class Role {
+export enum ChatType {
+    PUBLIC = "public",
+    PRIVATE = "private",
+    PROTECTED = "protected",
+    DIRECT = "direct",
+};
+
+@Entity({name: 'chat'})
+export class Chat {
    @PrimaryGeneratedColumn()
-    id: string;
+    id: number;
 
     @Column()
-    email: string;
+    name: string;
 
     @Column()
-    displayName: string;    
+    password: string;
 
-    @Column()
-    photo: string;
+    @Column({
+        type: "enum",
+        enum: ChatType,
+        default: [ChatType.PUBLIC]
+    })
+    type: ChatType;
 
-    @Column('integer', {array: true, nullable: true, default: null})
-    friends: number[];
+    @Column('integer', {array: true})
+    admins: number[];
 
-    @Column('integer', {array: true, nullable: true, default: null})
-    pendingFriends: number[];
-
-    @Column('integer', {array: true, nullable: true, default: null})
+    @Column('integer', {array: true, default: null, nullable: true})
     bannedUsers: number[];
 
-    @Column({ default: true })
-    isActive: boolean;
+    @Column('integer', {array: true, default: null, nullable: true})
+    mutedUsers: number[];
+
+    @Column()
+    owner: number;
+
+    @ManyToMany(() => User, () => UserChats)
+    users: User[];
 }

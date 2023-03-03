@@ -1,18 +1,17 @@
 import {Module} from "@nestjs/common";
 import { UsersModule } from './users/users.module';
 import {User} from "./users/users.entity";
-import { AuthController } from './auth/auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RolesModule } from './roles/roles.module';
-import { ChatController } from './chat/chat.controller';
-import { ChatService } from './chat/chat.service';
 import { ChatModule } from './chat/chat.module';
+import { Chat } from "./chat/chat.entity";
+import { UserChats } from "./chat/user-chats.entity";
+import { AuthModule } from "./auth/auth.module";
 
 
 
 @Module({
-    controllers: [AuthController, ChatController],
-    providers: [ChatService],
+    controllers: [],
+    providers: [],
     imports: [
         TypeOrmModule.forRoot({
             type: 'postgres',
@@ -21,11 +20,10 @@ import { ChatModule } from './chat/chat.module';
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            entities: [User],
+            entities: [User, Chat, UserChats],
             synchronize: true,
         }),
         UsersModule,
-        RolesModule,
         ChatModule,
         // AuthModule,
     ],
