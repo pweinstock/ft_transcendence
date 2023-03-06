@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './chat/chat.module';
 import { Chat } from "./chat/chat.entity";
 import { UserChats } from "./chat/user-chats.entity";
-import { AuthModule } from "./auth/auth.module";
+import {AuthModule} from "../dist/auth/auth.module";
 
 
 
@@ -25,7 +25,7 @@ import { AuthModule } from "./auth/auth.module";
         }),
         UsersModule,
         ChatModule,
-        // AuthModule,
+        AuthModule,
     ],
 })
 

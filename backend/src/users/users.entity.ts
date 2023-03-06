@@ -1,5 +1,5 @@
 import { Chat } from "src/chat/chat.entity";
-import {Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable} from "typeorm";
+import {Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable, ManyToOne} from "typeorm";
 
 @Entity({name: 'users'})
 export class User {
@@ -27,7 +27,6 @@ export class User {
     @Column({ default: true })
     isActive: boolean;
 
-    @ManyToMany(() => Chat)
-    @JoinTable()
+    @ManyToOne(() => Chat)
     chats: Chat[];
 }
