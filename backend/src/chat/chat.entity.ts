@@ -41,6 +41,6 @@ export class Chat {
     @OneToMany(() => User, (user) => user.chats)
     users: User[];
 
-    @Column()
+    @Column('json', {array: true, default: null, nullable: true})
     messages: [{userId : number, text : string}];
 }
