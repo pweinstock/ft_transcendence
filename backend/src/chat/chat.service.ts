@@ -11,6 +11,7 @@ export class ChatService {
 
     async createChat(dto: CreateChatDTO) {
         const chat = await this.chatRepository.create(dto);
+        chat.owner = dto.userId;
         return this.chatRepository.save(chat);
     }
 
@@ -23,14 +24,24 @@ export class ChatService {
         const chat = await this.chatRepository.findOneBy({id : dto.chatId});
         if (!chat)
             return null;
-        const user = chat.admins.find(dto.userId, );
-        if (!user)
-            
-        return user;
+        const userExists = chat.admins.includes(dto.userId);
+        if (!userExists) {
+          chat.admins.push(dto.userId);
+          return 'added';
+        }
+        return 'exists';
     }
 
-    async banUser(userId : number) {
-        
+    async banUser(dto: ChangeStatusDTO) {
+        const chat = await this.chatRepository.findOneBy({id : dto.chatId});
+        if (!chat)
+            return null;
+        const userExists = chat.bannedUsers.includes(dto.userId);
+        if (!userExists) {
+          chat.admins.push(dto.userId);
+          return 'added';
+        }
+        return 'exists';
     }
 
     async muteUser(userId : number) {

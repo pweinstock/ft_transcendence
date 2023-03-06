@@ -1,6 +1,5 @@
 import { User } from "src/users/users.entity";
-import {Column, PrimaryGeneratedColumn, Entity, ManyToMany} from "typeorm";
-import { UserChats } from "./user-chats.entity";
+import {Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable} from "typeorm";
 
 export enum ChatType {
     PUBLIC = "public",
@@ -17,7 +16,7 @@ export class Chat {
     @Column()
     name: string;
 
-    @Column()
+    @Column({nullable: true})
     password: string;
 
     @Column({
@@ -27,7 +26,7 @@ export class Chat {
     })
     type: ChatType;
 
-    @Column('integer', {array: true})
+    @Column('integer', {array: true, default: null, nullable: true})
     admins: number[];
 
     @Column('integer', {array: true, default: null, nullable: true})
@@ -39,6 +38,7 @@ export class Chat {
     @Column()
     owner: number;
 
-    @ManyToMany(() => User, () => UserChats)
+    @ManyToMany(() => User)
+    @JoinTable()
     users: User[];
 }
