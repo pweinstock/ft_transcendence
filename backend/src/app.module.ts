@@ -1,17 +1,18 @@
 import {Module} from "@nestjs/common";
-import { UsersModule } from './users/users.module';
-import {User} from "./users/users.entity";
+import { UsersModule } from './users/user.module';
+import {User} from "./users/user.entity";
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './chat/chat.module';
 import { Chat } from "./chat/chat.entity";
 import { UserChats } from "./chat/user-chats.entity";
 import { AuthModule } from "./auth/auth.module";
+import { AppGateway } from './app/app.gateway';
 
 
 
 @Module({
     controllers: [],
-    providers: [],
+    providers: [AppGateway],
     imports: [
         TypeOrmModule.forRoot({
             type: 'postgres',

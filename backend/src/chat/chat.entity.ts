@@ -1,5 +1,6 @@
-import { User } from "src/users/users.entity";
-import {Column, PrimaryGeneratedColumn, Entity, OneToMany} from "typeorm";
+import { User } from "src/users/user.entity";
+import {Column, PrimaryGeneratedColumn, Entity, OneToMany, ManyToMany, JoinTable, ManyToOne} from "typeorm";
+import { Message } from "./message.entity";
 
 export enum ChatType {
     PUBLIC = "public",
@@ -10,14 +11,14 @@ export enum ChatType {
 
 @Entity({name: 'chat'})
 export class Chat {
-   @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
     name: string;
 
     @Column({nullable: true})
-    password: string;
+    password?: string;
 
     @Column({
         type: "enum",
@@ -35,12 +36,13 @@ export class Chat {
     @Column('integer', {array: true, default: null, nullable: true})
     mutedUsers: number[];
 
-    @Column({nullable: true}) //todo change to nullable false
-    owner: number;
+    @ManyToOne(() => User)
+    owner: User;
 
-    @OneToMany(() => User, (user) => user.chats)
+    @ManyToMany(() => User)
+    @JoinTable()
     users: User[];
 
-    @Column('json', {array: true, default: null, nullable: true})
-    messages: [{userId : number, text : string}];
+    @OneToMany(() => Message, (message) => message.chat)
+    messages: Message[];
 }

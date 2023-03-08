@@ -15,8 +15,8 @@ export class ChatService {
         return this.chatRepository.save(chat);
     }
 
-    async getUserChat(id : number) : Promise<Chat> {
-        const chat = await this.chatRepository.findOneBy({id : id});
+    async getUserChat(chatId : number) : Promise<Chat> {
+        const chat = await this.chatRepository.findOneBy({id : chatId});
         return chat;
     }
 

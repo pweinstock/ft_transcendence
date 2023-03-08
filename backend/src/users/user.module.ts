@@ -1,8 +1,8 @@
 import {Module} from "@nestjs/common";
-import {UsersService} from "./users.service";
+import {UsersService} from "./user.service";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {UsersController} from "./users.controller";
-import {User} from "./users.entity";
+import {UsersController} from "./user.controller";
+import {User} from "./user.entity";
 import { Chat } from "src/chat/chat.entity";
 import { ChatModule } from "src/chat/chat.module";
 
