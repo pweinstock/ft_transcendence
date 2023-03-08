@@ -1,17 +1,24 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserService } from 'src/users/user.service';
 import { Repository } from 'typeorm';
-import { Chat } from './chat.entity';
+import { Chat, ChatType } from './chat.entity';
 import { ChangeStatusDTO } from './dto/change-status.dto';
 import { CreateChatDTO } from './dto/create-chat.dto';
 
 @Injectable()
 export class ChatService {
-    constructor(@InjectRepository(Chat) private chatRepository: Repository<Chat>) {}
+    constructor(@InjectRepository(Chat) private chatRepository: Repository<Chat>,
+                private usersServices : UserService) {}
 
     async createChat(dto: CreateChatDTO) {
-        const chat = await this.chatRepository.create(dto);
-        chat.owner = dto.userId;
+        if (dto.type === ChatType.PROTECTED && !dto.password)
+            throw new HttpException('Password not provided!', HttpStatus.BAD_REQUEST);
+        const owner = await this.usersServices.findById(dto.owner);
+        if (!owner)
+            throw new HttpException('User not found!', HttpStatus.BAD_REQUEST);
+        const chat = this.chatRepository.create(dto);
+        chat.users.push(owner);
         return this.chatRepository.save(chat);
     }
 

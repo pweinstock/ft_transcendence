@@ -1,7 +1,7 @@
 import { ChatType } from "../chat.entity";
 
 export class CreateChatDTO {
-    readonly userId: number;
+    readonly owner: number;
     readonly type: ChatType;
     readonly name: string;
     readonly password: string;

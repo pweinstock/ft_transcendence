@@ -1,14 +1,13 @@
 import {Module} from "@nestjs/common";
-import { UsersModule } from './users/user.module';
+import { UserModule } from './users/user.module';
 import {User} from "./users/user.entity";
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './chat/chat.module';
 import { Chat } from "./chat/chat.entity";
-import { UserChats } from "./chat/user-chats.entity";
 import { AuthModule } from "./auth/auth.module";
 import { AppGateway } from './app/app.gateway';
-
-
+import { Message } from "./chat/message/message.entity";
+import { MessageModule } from "./chat/message/message.module";
 
 @Module({
     controllers: [],
@@ -21,12 +20,13 @@ import { AppGateway } from './app/app.gateway';
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            entities: [User, Chat, UserChats],
+            entities: [User, Chat, Message],
             synchronize: true,
         }),
-        UsersModule,
+        UserModule,
         ChatModule,
         AuthModule,
+        MessageModule
     ],
 })
 
