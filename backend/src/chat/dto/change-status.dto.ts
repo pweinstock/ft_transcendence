@@ -1,4 +1,5 @@
 export class ChangeStatusDTO {
-    readonly userId: number;
+    readonly adminId: number;
     readonly chatId: number;
+    readonly userId: number;
 }
