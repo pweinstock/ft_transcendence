@@ -9,6 +9,11 @@ export enum ChatType {
     DIRECT = "direct",
 };
 
+export interface MutedUser {
+    userId: number;
+    unmuteDate: Date;
+}
+
 @Entity({name: 'chat'})
 export class Chat {
     @PrimaryGeneratedColumn()
@@ -20,11 +25,7 @@ export class Chat {
     @Column({nullable: true})
     password?: string;
 
-    @Column({
-        type: "enum",
-        enum: ChatType,
-        default: [ChatType.PUBLIC]
-    })
+    @Column({type: 'enum', enum: ChatType, default: [ChatType.PUBLIC]})
     type: ChatType;
 
     @Column('integer', {array: true, default: null, nullable: true})
@@ -33,8 +34,8 @@ export class Chat {
     @Column('integer', {array: true, default: null, nullable: true})
     bannedUsers: number[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    mutedUsers: number[];
+    @Column('simple-json', {array: true, default: null, nullable: true})
+    mutedUsers: MutedUser[];
 
     @Column('integer')
     owner: number;
