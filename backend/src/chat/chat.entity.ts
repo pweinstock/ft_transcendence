@@ -40,7 +40,7 @@ export class Chat {
     @Column('integer')
     owner: number;
 
-    @ManyToMany(() => User, (user) => user.chats)
+    @ManyToMany(() => User)
     @JoinTable()
     users: User[];
 
