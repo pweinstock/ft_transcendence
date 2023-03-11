@@ -6,7 +6,6 @@ export enum ChatType {
     PUBLIC = "public",
     PRIVATE = "private",
     PROTECTED = "protected",
-    DIRECT = "direct",
 };
 
 export interface MutedUser {
@@ -37,7 +36,7 @@ export class Chat {
     @Column('simple-json', {array: true, default: null, nullable: true})
     mutedUsers: MutedUser[];
 
-    @Column('integer')
+    @Column('integer', {nullable: true})
     owner: number;
 
     @ManyToMany(() => User)

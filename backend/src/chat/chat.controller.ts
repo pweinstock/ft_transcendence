@@ -23,10 +23,10 @@ export class ChatController {
         return this.chatService.findUserChats(id);
     }
 
-    @Get()
-    getAllchats(){
-        return this.chatService.findAllChats();
-    }
+    // @Get()
+    // getAllchats(){
+    //     return this.chatService.findAllChats();
+    // }
 
     @Post('admin')
     addAdmin(@Body() dto: ChangeStatusDTO) {
