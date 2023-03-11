@@ -6,7 +6,6 @@ import { Chat, ChatType, MutedUser } from './chat.entity';
 import { ChangeStatusDTO } from './dto/change-status.dto';
 import { CreateChatDTO } from './dto/create-chat.dto';
 import {DeleteChatDTO} from "./dto/delete-chat.dto";
-import {User} from "../users/user.entity";
 
 @Injectable()
 export class ChatService {
@@ -30,9 +29,11 @@ export class ChatService {
         const chat = await this.chatRepository.findOneBy({id: dto.chatId});
         if (!chat)
             throw new HttpException('Chat not found!', HttpStatus.NOT_FOUND);
+        if (dto.userId === chat.owner)
+            throw new HttpException('Access denied!', HttpStatus.FORBIDDEN);
         const isAdmin = chat.admins.includes(dto.adminId);
         if (chat.owner !== dto.adminId && !isAdmin)
-            throw new HttpException('Access denied!', HttpStatus.FORBIDDEN);
+            throw new HttpException('Only for Admins of the chat!', HttpStatus.FORBIDDEN);
         if (chat.bannedUsers.includes(dto.userId))
             chat.bannedUsers.push(dto.userId);
     }
@@ -80,6 +81,8 @@ export class ChatService {
         const chat = this.chatRepository.create(dto);
         chat.users = chat.users || [];
         chat.users.push(owner);
+        chat.admins = chat.admins || [];
+        chat.admins.push(owner.id);
         return this.chatRepository.save(chat);
     }
 
