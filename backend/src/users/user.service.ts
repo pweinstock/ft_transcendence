@@ -3,6 +3,7 @@ import { UserDTO } from './dto/user.dto';
 import {User} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
+import {Chat} from "../chat/chat.entity";
 
 
 @Injectable()
@@ -33,5 +34,15 @@ export class UserService {
         await this.userRepository.delete(email);
     }
 
-
+    async deleteChat(chat: Chat): Promise<void> {
+        await Promise.all(
+            chat.users.map(async (user) => {
+                const index = user.chats.findIndex((c) => c.id === chat.id);
+                if (index !== -1) {
+                    user.chats.splice(index, 1);
+                    await this.userRepository.save(user);
+                }
+            }),
+        );
+    }
 }

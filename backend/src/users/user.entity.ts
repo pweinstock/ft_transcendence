@@ -30,7 +30,6 @@ export class User {
     friends: User[];
 
     @ManyToMany(() => Chat, chat => chat.users)
-    @JoinTable()
     chats: Chat[];
 
     @OneToMany(() => Message, message => message.sender)

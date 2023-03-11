@@ -25,7 +25,7 @@ import { MessageModule } from "./chat/message/message.module";
         }),
         UserModule,
         ChatModule,
-        AuthModule,
+        // AuthModule,
         MessageModule
     ],
 })
