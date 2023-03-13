@@ -14,10 +14,14 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(accessToken: string, refreshToken: string, profile: Profile) {    
+        console.log(accessToken);
+        console.log(refreshToken);
+        console.log(Profile);
         const user = await this.authService.validateUser({
-            email: profile.email,
-            id: profile.id
-        });    //todo add more values
+            email: profile.emails[0].value,
+            displayName: profile.displayName,
+            photo: profile.photo
+        });
         return user || null;
     }
 }

@@ -8,7 +8,7 @@ $(NAME) :
 all : $(NAME)
 
 down:
-	@docker-compose -f docker compose.yml down
+	@docker-compose -f docker-compose.yml down
 
 clean: down
 	@docker system prune -a --force
