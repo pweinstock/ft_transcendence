@@ -3,6 +3,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import { User } from 'src/users/user.entity';
 import { Chat } from '../chat.entity';
 import { Message } from './message.entity';
+import {MessageService} from "./message.service";
 
 @Module({
     controllers: [],
@@ -10,6 +11,6 @@ import { Message } from './message.entity';
     imports: [
         TypeOrmModule.forFeature([Chat, User, Message])
     ],
-    exports: []
+    exports: [MessageService]
 })
 export class MessageModule {}

@@ -11,7 +11,7 @@ export class Message {
   content: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  timestamp: Date;
+  createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.messages)
   sender: User;

@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './chat/chat.module';
 import { Chat } from "./chat/chat.entity";
 import { AuthModule } from "./auth/auth.module";
-import { AppGateway } from './chat/app/app.gateway';
+import { ChatGateway } from './chat/chat.gateway';
 import { Message } from "./chat/message/message.entity";
 import { MessageModule } from "./chat/message/message.module";
 
 @Module({
     controllers: [],
-    providers: [AppGateway],
+    providers: [ChatGateway],
     imports: [
         TypeOrmModule.forRoot({
             type: 'postgres',

@@ -7,6 +7,7 @@ import {ChangeStatusDTO} from './dto/change-status.dto';
 import {CreateChatDTO} from './dto/create-chat.dto';
 import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
+import {CreateMessageDto} from "./dto/create-message.dto";
 
 @Injectable()
 export class ChatService {
@@ -183,5 +184,10 @@ export class ChatService {
     async findUserChats(userId : number): Promise<Chat[]> {
         const chats = await this.chatRepository.find();
         return chats.filter((user) => user.id == userId);
+    }
+
+    //Message Interraction
+    async createMessage(dto : CreateMessageDto) {
+
     }
 }
