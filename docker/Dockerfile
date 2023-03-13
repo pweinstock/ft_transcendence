@@ -2,8 +2,8 @@ FROM node:18
 
 WORKDIR nest
 
-#CMD ["npm", "install"]
-#CMD ["npm", "run", "build"]
+CMD ["npm", "install"]
+# CMD ["npm", "run", "build"]
 
 #########
 #npm install
@@ -16,4 +16,4 @@ WORKDIR nest
 #npm i @nestjs/passport passport passport-42
 
 
-ENTRYPOINT ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:dev"]
