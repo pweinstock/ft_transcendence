@@ -2,7 +2,7 @@ FROM node:18
 
 WORKDIR nest
 
-CMD ["npm", "install"]
+CMD npm install && npm run start:dev
 # CMD ["npm", "run", "build"]
 
 #########
@@ -17,6 +17,3 @@ CMD ["npm", "install"]
 ##typeorm
 #npm install --save @nestjs/typeorm typeorm pg
 #npm i @nestjs/passport passport passport-42
-
-
-CMD ["npm", "run", "start:dev"]
