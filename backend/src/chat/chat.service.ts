@@ -155,7 +155,7 @@ export class ChatService {
         const chat = this.chatRepository.create(dto);
         chat.users = chat.users || [];
         chat.admins = chat.admins || [];
-        chat.mutedUsers = [];
+        // chat.mutedUsers = []; /todo find solution for this
         chat.bannedUsers = [];
         chat.messages = [];
         chat.users.push(owner);

@@ -6,6 +6,7 @@ export enum ChatType {
     PUBLIC = "public",
     PRIVATE = "private",
     PROTECTED = "protected",
+    DIRECT = "direct",
 };
 
 export interface MutedUser {

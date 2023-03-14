@@ -11,6 +11,11 @@ export class UserService {
     }
 
     async createUser(dto: UserDTO): Promise<User> {
+        if (!dto.email || !dto.displayName)
+            throw new HttpException('Required information was not provided!', HttpStatus.BAD_REQUEST);
+        const existingUser = await this.userRepository.findOneBy({email: dto.email});
+        if (existingUser)
+            return existingUser;
         const user = this.userRepository.create(dto);
         return this.userRepository.save(user);
     }
