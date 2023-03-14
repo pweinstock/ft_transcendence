@@ -2,18 +2,21 @@ FROM node:18
 
 WORKDIR nest
 
-#CMD ["npm", "install"]
-#CMD ["npm", "run", "build"]
+CMD ["npm", "install"]
+# CMD ["npm", "run", "build"]
 
 #########
 #npm install
 #npm i -g @nestjs/cli
 #nest new .
-#npm install --save @nestjs/seuelize sequelize-typescript
+##sequlize
+#npm install --save @nestjs/sequelize sequelize-typescript
 #npm install --save-dev @types/sequelize
 #npm install --save pg pg-hstore
 #npm i @nestjs/config
-#
+##typeorm
+#npm install --save @nestjs/typeorm typeorm pg
+#npm i @nestjs/passport passport passport-42
 
 
-ENTRYPOINT ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:dev"]

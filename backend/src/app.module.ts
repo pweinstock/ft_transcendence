@@ -1,28 +1,33 @@
 import {Module} from "@nestjs/common";
-import {AppController} from "./app.controller";
-import {AppService} from "./app.service";
-import { SequelizeModule } from '@nestjs/sequelize';
-import { UsersModule } from './users/users.module';
-import { ConfigModule } from "@nestjs/config";
-import {User} from "./users/users.model";
-
-
+import { UserModule } from './users/user.module';
+import {User} from "./users/user.entity";
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatModule } from './chat/chat.module';
+import { Chat } from "./chat/chat.entity";
+import { AuthModule } from "./auth/auth.module";
+import { ChatGateway } from './chat/chat.gateway';
+import { Message } from "./chat/message/message.entity";
+import { MessageModule } from "./chat/message/message.module";
 
 @Module({
-    controllers: [AppController],
-    providers: [AppService],
+    controllers: [],
+    providers: [],
     imports: [
-        SequelizeModule.forRoot({
-            dialect: 'postgres',
+        TypeOrmModule.forRoot({
+            type: 'postgres',
             host: process.env.POSTGRES_HOST,
             port: Number(process.env.POSTGRES_PORT),
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User],
-            autoLoadModels: true
+            entities: [User, Chat, Message],
+            synchronize: true,
         }),
-        UsersModule,
+        UserModule,
+        ChatModule,
+        // AuthModule,
+        MessageModule
     ],
 })
+
 export class AppModule {}
