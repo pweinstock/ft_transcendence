@@ -16,8 +16,4 @@ export class SocketIoAdapter extends IoAdapter {
         const clientPort = Number();
         return super.createIOServer(port, options);
     }
-
-
-
-
 }
