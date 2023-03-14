@@ -34,7 +34,18 @@ export class UserService {
         return user;
     }
 
-    async remove(userId: number): Promise<void> {
+    async remove(userId: number) : Promise<void> {
         await this.userRepository.delete(userId);
     }
+
+    addMessage(messageId: number, user : User) : void {
+        user.messages.push(messageId);
+        this.userRepository.save(user);
+    }
+
+    deleteMessage(messageId: number, user : User) : void {
+        user.messages = user.messages.filter((message) => message != messageId);
+        this.userRepository.save(user);
+    }
 }
+

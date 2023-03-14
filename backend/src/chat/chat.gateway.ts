@@ -1,6 +1,10 @@
-import {OnGatewayInit, SubscribeMessage, WebSocketGateway} from '@nestjs/websockets';
+import {ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
 import {ChatService} from "./chat.service";
 import { CreateMessageDto } from './dto/create-message.dto';
+import { Server, Socket } from 'socket.io';
+import {Message} from "./message/message.entity";
+import {DeleteMessageDto} from "./dto/delete-message.dto";
+
 
 @WebSocketGateway({
 	namespace: 'chat',
@@ -8,51 +12,39 @@ import { CreateMessageDto } from './dto/create-message.dto';
 		origin: '*',
 	},
 })
+
 export class ChatGateway {
-	@WebSocketServer
-	server : Server;
-  constructor(private readonly chatService : ChatService) {}
+	@WebSocketServer()
+    server : Server;
 
-  @SubscribeMessage('createMessage')
-  create(
-	@MessageBody() dto : CreateMessageDto,
-	@ConnectedSocket() client : Socket
-  ) {
-	const message = await this.chatService.create(dto, client.id);
-	this.server.emit('message', message);
-	return message;
-  }
+    constructor(private readonly chatService : ChatService) {}
 
-  @SubscribeMessage('findAllMessages')
-  findAll() {
-	return this.chatService.findAll();
-  }
+    @SubscribeMessage('createMessage')
+    async create(
+  	    @MessageBody() dto : CreateMessageDto,
+  	    @ConnectedSocket() client : Socket
+        ) {
+  	    const message = await this.chatService.createMessage(dto, client.id);
+  	    this.server.emit('message', message);
+  	    return message;
+    }
 
-//   @SubscribeMessage('updateMessage')
-//   update(@MessageBody() dto : UpdateMessageDto) {
-// 	return this.chatService.update(dto)
-//   }
+    @SubscribeMessage('findChatMessages')
+    async findChatMessages(@MessageBody('chatId') chatId : number) : Promise<Message[]>{
+  	    const chat = await this.chatService.getChatById(chatId);
+  	    return chat.messages;
+    }
 
-  @SubscribeMessage('removeMessage')
-  remove(@MessageBody() id : number) {
-	return this.chatService.remove(id);
-  }
+    @SubscribeMessage('removeMessage')
+    remove( @MessageBody() dto : DeleteMessageDto ) {
+  	    this.chatService.removeMessage(dto);
+    }
 
-  @SubscribeMessage('join')
-  joinRoom(
-	@MessageBody('name') name : string,
-  	@ConnectedSocket() client : Socket
-  ) {
-	return this.chatService.identify(name, client.id);
-  }
-
-  @SubscribeMessage('typing')
-  async typing(
-	@MessageBody('isTyping') isTyping : boolean,
-    @ConnectedSocket() client : Socket
-  ) {
-	const name = await this.chatService.getChatById(client.id);
-
-	client.brodcast.emit('typing', {name, isTyping});
-  }
+    @SubscribeMessage('join')
+    joinRoom(
+  	    @MessageBody('user') userId : number,
+    	@ConnectedSocket() client : Socket
+        ) {
+  	    return this.chatService.identify(userId, client.id);
+    }
 }

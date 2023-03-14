@@ -1,5 +1,10 @@
-import { Message } from "src/chat/message/message.entity";
-import {Column, PrimaryGeneratedColumn, Entity, ManyToMany, JoinTable, OneToMany} from "typeorm";
+import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
+
+export enum UserStatus {
+    ONLINE = "online",
+    INGAME = "ingame",
+    OFFLINE = "offline",
+};
 
 @Entity({name: 'user'})
 export class User {
@@ -15,8 +20,8 @@ export class User {
     @Column({ nullable: true })
     photo?: string;
 
-    @Column({ default: true })
-    isOnline: boolean;
+    @Column({type: 'enum', enum: UserStatus, default: [UserStatus.ONLINE]})
+    status: UserStatus;
 
     @Column('integer', {array: true, default: null, nullable: true})
     pendingFriends: number[];
@@ -24,10 +29,12 @@ export class User {
     @Column('integer', {array: true, default: null, nullable: true})
     bannedUsers: number[];
 
-    @ManyToMany(() => User)
-    @JoinTable()
-    friends: User[];
+    @Column('integer', {array: true, default: null, nullable: true})
+    friends: number[];
 
-    @OneToMany(() => Message, message => message.sender)
-    messages: Message[];
+    @Column('integer', {array: true, default: null, nullable: true})
+    messages: number[];
+
+    @Column('integer', {array: true, default: null, nullable: true})
+    chats: number[];
 }

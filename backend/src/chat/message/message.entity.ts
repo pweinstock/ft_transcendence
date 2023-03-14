@@ -10,12 +10,15 @@ export class Message {
   @Column()
   content: string;
 
+  @Column()
+  displayName: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.messages)
-  sender: User;
+  @Column({type: "integer", nullable:true})
+  user: number;
 
-  @ManyToOne(() => Chat, (chat) => chat.messages)
-  chat: Chat;
+  @Column({type: "integer", array: true, nullable:true})
+  chat: number[];
 }

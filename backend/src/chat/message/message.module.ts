@@ -7,7 +7,7 @@ import {MessageService} from "./message.service";
 
 @Module({
     controllers: [],
-    providers: [],
+    providers: [MessageService],
     imports: [
         TypeOrmModule.forFeature([Chat, User, Message])
     ],

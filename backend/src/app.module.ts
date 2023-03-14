@@ -11,7 +11,7 @@ import { MessageModule } from "./chat/message/message.module";
 
 @Module({
     controllers: [],
-    providers: [ChatGateway],
+    providers: [],
     imports: [
         TypeOrmModule.forRoot({
             type: 'postgres',
