@@ -1,4 +1,5 @@
-import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
+import {Column, PrimaryGeneratedColumn, Entity, OneToMany} from "typeorm";
+import {MatchHistory} from "./match-history.entity";
 
 export enum UserStatus {
     ONLINE = "online",
@@ -37,4 +38,14 @@ export class User {
 
     @Column('integer', {array: true, default: null, nullable: true})
     chats: number[];
+
+    @Column()
+    wins : number;
+
+    @Column()
+    losses : number;
+
+    @Column({array: true, default: null, nullable: true})
+    @OneToMany(() => MatchHistory, (history) => history)
+    history : MatchHistory[];
 }
