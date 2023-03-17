@@ -4,7 +4,7 @@ import {MatchHistory} from "./match-history.entity";
 export enum UserStatus {
     ONLINE = "online",
     INGAME = "ingame",
-    OFFLINE = "offline",
+    OFFLINE = "offline"
 };
 
 @Entity({name: 'user'})
