@@ -45,7 +45,7 @@ export class User {
     @Column()
     losses : number;
 
-    @Column({array: true, default: null, nullable: true})
-    @OneToMany(() => MatchHistory, (history) => history)
-    history : MatchHistory[];
+    // @Column({array: true, default: null, nullable: true})
+    // @OneToMany(() => MatchHistory, (history) => history)
+    // history : MatchHistory[];
 }
