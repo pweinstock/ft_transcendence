@@ -5,6 +5,7 @@ import {UserController} from "./user.controller";
 import {User} from "./entity/user.entity";
 import { Chat } from "src/chat/chat.entity";
 import { Message } from "src/chat/message/message.entity";
+import {MatchHistory} from "./entity/match-history.entity";
 
 @Module({
     controllers: [UserController],

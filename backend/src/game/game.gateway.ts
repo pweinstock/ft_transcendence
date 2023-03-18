@@ -1,50 +1,55 @@
-// import {ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
-// import {ChatService} from "./chat.service";
-// import { CreateMessageDto } from './dto/create-message.dto';
-// import { Server, Socket } from 'socket.io';
-// import {Message} from "./message/message.entity";
-// import {DeleteMessageDto} from "./dto/delete-message.dto";
-//
-//
-// @WebSocketGateway({
-// 	namespace: 'chat',
-// 	cors: {
-// 		origin: '*',
-// 	},
-// })
-//
-// export class ChatGateway {
-// 	@WebSocketServer()
-//     server : Server;
-//
-//     constructor(private readonly chatService : ChatService) {}
-//
-//     @SubscribeMessage('createMessage')
-//     async create(
-//   	    @MessageBody() dto : CreateMessageDto,
-//   	    @ConnectedSocket() client : Socket
-//         ) {
-//   	    const message = await this.chatService.createMessage(dto, client.id);
-//   	    this.server.emit('message', message);
-//   	    return message;
-//     }
-//
-//     @SubscribeMessage('findChatMessages')
-//     async findChatMessages(@MessageBody('chatId') chatId : number) : Promise<Message[]>{
-//   	    const chat = await this.chatService.getChatById(chatId);
-//   	    return chat.messages;
-//     }
-//
-//     @SubscribeMessage('removeMessage')
-//     remove( @MessageBody() dto : DeleteMessageDto ) {
-//   	    this.chatService.removeMessage(dto);
-//     }
-//
-//     @SubscribeMessage('join')
-//     joinRoom(
-//   	    @MessageBody('user') userId : number,
-//     	@ConnectedSocket() client : Socket
-//         ) {
-//   	    return this.chatService.identify(userId, client.id);
-//     }
-// }
+import {
+    WebSocketGateway,
+    WebSocketServer,
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    SubscribeMessage
+} from '@nestjs/websockets';
+import { Server } from 'socket.io';
+
+@WebSocketGateway()
+export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+    @WebSocketServer() server: Server;
+    players: any[] = [];
+
+    afterInit(server: Server) {
+        console.log('Pong game initialized');
+    }
+
+    handleConnection(client: any, ...args: any[]) {
+        console.log(`Player ${client.id} connected`);
+        this.players.push(client);
+        client.emit('connectSuccess', `Connected to Pong game as Player ${this.players.length}`);
+    }
+
+    handleDisconnect(client: any) {
+        console.log(`Player ${client.id} disconnected`);
+        this.players.splice(this.players.indexOf(client), 1);
+        this.players.forEach((player, index) => {
+            player.emit('playerLeft', `Player ${client.id} left the game`);
+        });
+    }
+
+    @SubscribeMessage('movePaddle')
+    handleMovePaddle(client: any, data: any) {
+        console.log(`Player ${client.id} moved paddle: ${data.direction}`);
+        this.players.forEach((player, index) => {
+            if (player.id !== client.id) {
+                player.emit('opponentMove', { direction: data.direction });
+            }
+        });
+    }
+
+    @SubscribeMessage('scorePoint')
+    handleScorePoint(client: any) {
+        console.log(`Player ${client.id} scored a point`);
+        this.players.forEach((player, index) => {
+            if (player.id !== client.id) {
+                player.emit('opponentScored', 'Your opponent scored a point!');
+            } else {
+                player.emit('youScored', 'You scored a point!');
+            }
+        });
+    }
+}

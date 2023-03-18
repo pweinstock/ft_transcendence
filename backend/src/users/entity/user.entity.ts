@@ -4,7 +4,7 @@ import {MatchHistory} from "./match-history.entity";
 export enum UserStatus {
     ONLINE = "online",
     INGAME = "ingame",
-    OFFLINE = "offline",
+    OFFLINE = "offline"
 };
 
 @Entity({name: 'user'})
@@ -45,7 +45,7 @@ export class User {
     @Column()
     losses : number;
 
-    @Column({array: true, default: null, nullable: true})
-    @OneToMany(() => MatchHistory, (history) => history)
-    history : MatchHistory[];
+    // @Column({array: true, default: null, nullable: true})
+    // @OneToMany(() => MatchHistory, (history) => history)
+    // history : MatchHistory[];
 }
