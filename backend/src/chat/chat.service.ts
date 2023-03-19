@@ -7,7 +7,7 @@ import {ChangeStatusDTO} from './dto/change-status.dto';
 import {CreateChatDTO} from './dto/create-chat.dto';
 import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
-import {CreateMessageDto} from "./dto/create-message.dto";
+import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 

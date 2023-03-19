@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {Message} from "./message.entity";
-import {CreateMessageDto} from "../dto/create-message.dto";
+import {CreateMessageDto} from "./dto/create-message.dto";
 
 @Injectable()
 export class MessageService {
