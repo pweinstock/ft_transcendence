@@ -31,7 +31,7 @@ export class ChatGateway {
 
     @SubscribeMessage('findChatMessages')
     async findChatMessages(@MessageBody('chatId') chatId : number) : Promise<Message[]>{
-  	    const chat = await this.chatService.getChatById(chatId);
+  	    const chat = await this.chatService.findChatById(chatId);
   	    return chat.messages;
     }
 
