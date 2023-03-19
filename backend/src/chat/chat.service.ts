@@ -66,16 +66,13 @@ export class ChatService {
     }
 
     //USER INTERRACTION
-    checkRights(chat : Chat, userId : number) {
-        if (chat.owner !== userId && !chat.admins.includes(userId))
-            throw new HttpException('For Admins only!', HttpStatus.FORBIDDEN);
-    }
 
     async addUser(dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if(chat.type === ChatType.DIRECT && chat.users.length > 1)
             throw new HttpException('Max 2 users is allowed in DM!', HttpStatus.FORBIDDEN);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
+        this.checkBan(chat, dto.userId);
         const user = await this.userServices.findById(dto.userId);
         if (!chat.users.includes(user)) {
             this.userServices.addChat(user, chat.id);
@@ -89,20 +86,23 @@ export class ChatService {
         const chat = await this.findChatById(dto.chatId);
         if (chat.users.includes(user))
             return chat;
-        if (chat.bannedUsers.includes(user.id))
-            throw new HttpException('No access rights!', HttpStatus.FORBIDDEN);
-        switch (chat.type) {
-            case ChatType.PUBLIC:
-                chat.users.push(user);
-                break;
-            case ChatType.PROTECTED:
-                if (chat.password === dto.password)
+        if (chat.admins.includes(user.id))
+            chat.users.push(user);
+        else {
+            this.checkBan(chat, user.id);
+            switch (chat.type) {
+                case ChatType.PUBLIC:
                     chat.users.push(user);
-                else
-                    throw new HttpException('Wrong Password!', HttpStatus.FORBIDDEN);
-                break;
-            default:
-                throw new HttpException('No access rights!', HttpStatus.FORBIDDEN);
+                    break;
+                case ChatType.PROTECTED:
+                    if (chat.password === dto.password)
+                        chat.users.push(user);
+                    else
+                        throw new HttpException('Wrong Password!', HttpStatus.FORBIDDEN);
+                    break;
+                default:
+                    throw new HttpException('No access rights!', HttpStatus.FORBIDDEN);
+            }
         }
         this.userServices.addChat(user, chat.id);
         return this.chatRepository.save(chat);
@@ -110,7 +110,7 @@ export class ChatService {
 
     async addAdmin(dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
         const user = await this.userServices.findById(dto.userId);
         if (chat.users.includes(user) && !chat.admins.includes(user.id)) {
             chat.admins.push(user.id);
@@ -120,7 +120,7 @@ export class ChatService {
 
     async removeAdmin(dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
         if (chat.owner === dto.userId)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
         chat.admins = chat.admins.filter((admin) => admin != dto.userId);
@@ -141,7 +141,7 @@ export class ChatService {
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
         const user = await this.userServices.findById(dto.userId);
         if (!chat.bannedUsers.includes(user.id)) {
             chat.bannedUsers.push(user.id);
@@ -151,7 +151,7 @@ export class ChatService {
 
     async unbanUser(dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
         chat.bannedUsers = chat.bannedUsers.filter(user => user != dto.userId);
         this.chatRepository.save(chat);
     }
@@ -162,7 +162,7 @@ export class ChatService {
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
         const user = await this.userServices.findById(dto.userId);
         const mutedUser = chat.mutedUsers.find((mutedUsr) => mutedUsr.userId === user.id);
         if (mutedUser)
@@ -179,7 +179,7 @@ export class ChatService {
 
     async unmuteUser(dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkRights(chat, dto.adminId);
+        this.checkAdmin(chat, dto.adminId);
         const user = await this.userServices.findById(dto.userId);
         const mutedUser = chat.mutedUsers.find((mutedUsr) => mutedUsr.userId === user.id);
         if (mutedUser) {
@@ -235,4 +235,50 @@ export class ChatService {
         this.userServices.deleteMessage(message.id, user);
         return message;
     }
+
+    //Helpers
+    checkAdmin(chat : Chat, userId : number) {
+        if (chat.owner !== userId && !chat.admins.includes(userId))
+            throw new HttpException('For Admins only!', HttpStatus.FORBIDDEN);
+    }
+
+    checkBan(chat : Chat, userId : number) {
+        if (chat.bannedUsers.includes(userId))
+            throw new HttpException('User Banned in this chat!', HttpStatus.FORBIDDEN);
+    }
+
+    addBan(chat : Chat, userId : number) {
+        if (!chat.bannedUsers.includes(userId)) {
+            chat.bannedUsers.push(userId);
+            this.chatRepository.save(chat);
+        }
+    }
+
+    removeBan(chat : Chat, userId: number) {
+        if (chat.bannedUsers.includes(userId)) {
+            chat.bannedUsers.filter(user => user !== userId);
+            this.chatRepository.save(chat);
+        }
+    }
+
+    addMute(chat : Chat, userId: number, timeoutMinutes : number) {
+        const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
+        if (mutedUser) {
+            chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
+            const newMutedUser: MutedUser = {
+                userId: userId,
+                unmuteDate: new Date(Date.now() + timeoutMinutes * 60000),
+            };
+            chat.mutedUsers.push(newMutedUser);
+        }
+    }
+
+    removeMute(chat : Chat, userId: number) {
+        const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
+        if (mutedUser) {
+            chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
+            this.chatRepository.save(chat);
+        }
+    }
 }
+
