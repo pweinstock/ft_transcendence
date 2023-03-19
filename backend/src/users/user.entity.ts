@@ -38,6 +38,9 @@ export class User {
     @Column('integer', {array: true, default: null, nullable: true})
     chats: number[];
 
+    @Column('integer', {array: true, default: null, nullable: true})
+    matchHistory : number[];
+
     @Column({default: 0})
     wins : number;
 
@@ -49,7 +52,4 @@ export class User {
 
     @Column({default: 0})
     score : number;
-
-    @Column('integer', {array: true, default: null, nullable: true})
-    matchHistory : number[];
 }

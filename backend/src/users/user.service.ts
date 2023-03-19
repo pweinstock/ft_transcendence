@@ -91,7 +91,7 @@ export class UserService {
         }
     }
 
-    deleteFriend(user : User, friend : User) : void {
+    deleteFriend(user : User, friend : User) {
         if (user.friends.includes(friend.id)) {
             user.friends = user.friends.filter((id) => id !== friend.id);
             friend.friends = friend.friends.filter((id) => id !== user.id);
@@ -101,30 +101,33 @@ export class UserService {
     }
 
     sendFriendRequest(user : User, friend : User) : void {
-        if (friend.bannedUsers.includes(user.id) || user.friends.includes(friend.id))
+        if (user.id === friend.id || friend.bannedUsers.includes(user.id) ||
+            user.friends.includes(friend.id) || friend.pendingFriends.includes(user.id))
             return;
 
-        if (!friend.pendingFriends.includes(user.id)) {
-            friend.pendingFriends.push(user.id);
-            this.userRepository.save(friend);
-        }
+        friend.pendingFriends.push(user.id);
+        this.userRepository.save(friend);
     }
 
     //Black List
+    isBanned(user : User, userToCheck : User) : boolean {
+        if (user.bannedUsers.includes(userToCheck.id))
+            return true;
+        return false;
+    }
+
     banUser(user : User, userToBan : User) : void {
-        if (!user.bannedUsers.includes(userToBan.id)) {
-            if (user.friends.includes(userToBan.id)) {
-                user.friends = user.friends.filter((friend) => friend !== userToBan.id);
-                userToBan.friends = user.friends.filter((friend) => friend !== user.id);
-                this.userRepository.save(userToBan);
-            }
-            user.bannedUsers.push(userToBan.id);
-            this.userRepository.save(user);
-        }
+        if (user.id === userToBan.id || this.isBanned(user, userToBan))
+            return;
+        this.declineFriendRequest(user, userToBan);
+        this.declineFriendRequest(userToBan, user);
+        this.deleteFriend(user, userToBan);
+        user.bannedUsers.push(userToBan.id);
+        this.userRepository.save(user);
     }
 
     unbanUser(user : User, userToUnban : User) : void {
-        if (user.bannedUsers.includes(userToUnban.id)) {
+        if (this.isBanned(user, userToUnban)) {
             user.bannedUsers = user.bannedUsers.filter((banneduser) => banneduser !== userToUnban.id);
             this.userRepository.save(user);
         }
