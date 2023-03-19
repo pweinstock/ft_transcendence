@@ -5,6 +5,4 @@ import {UserService} from "../users/user.service";
 export class GameService {
     constructor(private userServices: UserService) {}
 
-    //USER INTERRACTION
-
 }

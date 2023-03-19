@@ -1,6 +1,6 @@
 import {Module} from "@nestjs/common";
 import { UserModule } from './users/user.module';
-import {User} from "./users/entity/user.entity";
+import {User} from "./users/user.entity";
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatModule } from './chat/chat.module';
 import { Chat } from "./chat/chat.entity";
