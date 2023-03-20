@@ -3,6 +3,8 @@ import { UserDTO } from './dto/user.dto';
 import {User, UserStatus} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
+import {ChangeDataDTO} from "./dto/change-data.dto";
+import {FriendDto} from "./dto/friend.dto";
 
 
 @Injectable()
@@ -51,19 +53,22 @@ export class UserService {
     }
 
     //USER INFO
-    changeName(user : User, newName : string) : void {
-        user.displayName = newName;
-        this.userRepository.save(user);
+    async changeName(changeDataDTO : ChangeDataDTO) : Promise<User> {
+        const user = await this.findById(changeDataDTO.userId);
+        user.displayName = changeDataDTO.value;
+        return this.userRepository.save(user);
     }
 
-    changePhoto(user : User, newPhoto : string) : void {
-        user.photo = newPhoto;
-        this.userRepository.save(user);
+    async changePhoto(changeDataDTO : ChangeDataDTO) : Promise<User> {
+        const user = await this.findById(changeDataDTO.userId);
+        user.photo = changeDataDTO.value;
+        return this.userRepository.save(user);
     }
 
-    changeStatus(user : User, newStatus : UserStatus) : void {
-        user.status = newStatus;
-        this.userRepository.save(user);
+    async changeStatus(changeDataDTO : ChangeDataDTO) : Promise<User> {
+        const user = await this.findById(changeDataDTO.userId);
+        user.status = changeDataDTO.status;
+        return this.userRepository.save(user);
     }
 
     //MESSAGES
@@ -78,7 +83,9 @@ export class UserService {
     }
 
     //FRIEND LIST
-    acceptFriendRequest(user : User, friend : User) : void {
+    async acceptFriendRequest(dto : FriendDto) : Promise<void> {
+        const friend = await this.findById(dto.friendId);
+        const user = await this.findById(dto.userId);
         if (user.pendingFriends.includes(friend.id)) {
             user.friends.push(friend.id);
             friend.friends.push(user.id);
