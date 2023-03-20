@@ -24,7 +24,7 @@ export class ChatController {
     }
 
     @Get()
-    getAllchats(){
+    getAllchats() {
         return this.chatService.findAllChats();
     }
 

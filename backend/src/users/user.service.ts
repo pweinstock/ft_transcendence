@@ -51,6 +51,11 @@ export class UserService {
     }
 
     //USER INFO
+    changeName(user : User, newName : string) : void {
+        user.displayName = newName;
+        this.userRepository.save(user);
+    }
+
     changePhoto(user : User, newPhoto : string) : void {
         user.photo = newPhoto;
         this.userRepository.save(user);
