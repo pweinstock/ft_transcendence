@@ -62,7 +62,6 @@ export class UserService {
     }
 
     //MESSAGES
-
     addMessage(messageId: number, user : User) : void {
         user.messages.push(messageId);
         this.userRepository.save(user);

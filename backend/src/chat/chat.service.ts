@@ -10,6 +10,7 @@ import {JoinChatDto} from "./dto/join-chat.dto";
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
+import {Message} from "./message/message.entity";
 
 @Injectable()
 export class ChatService {
@@ -193,15 +194,13 @@ export class ChatService {
         return this.clienttoUser[clientId];
     }
 
-    async createMessage(dto : CreateMessageDto, socketId : string) {
+    async createMessage(dto : CreateMessageDto, socketId : string) : Promise<Message> {
         const user = await this.userServices.findById(dto.userId);
-        if (!user)
-            throw new HttpException('User not found!', HttpStatus.BAD_REQUEST);
-
         const chat = await this.findChatById(dto.chatId);
-        if(!chat)
-            throw new HttpException('Chat not found!', HttpStatus.NOT_FOUND);
-
+        if (chat.bannedUsers.includes(user.id))
+            throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
+        if (this.isMuted(chat, user.id))
+            throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
         const message = await this.messageServices.createMessage(dto);
         message.displayName = user.displayName;
         chat.messages.push(message);
@@ -210,23 +209,15 @@ export class ChatService {
         return message;
     }
 
-    async removeMessage(dto : DeleteMessageDto) {
+    async removeMessage(dto : DeleteMessageDto) : Promise<void> {
         const message = await this.messageServices.findMessageById(dto.messageId);
-        if (!message)
-            throw new HttpException('Message not found!', HttpStatus.NOT_FOUND);
         if (message.user != dto.userId)
-            throw new HttpException('Message not belongs to you!', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Message not belongs to user!', HttpStatus.BAD_REQUEST);
         const user = await this.userServices.findById(dto.userId);
-        if (!user)
-            throw new HttpException('User not found!', HttpStatus.BAD_REQUEST);
         const chat = await this.findChatById(dto.chatId);
-        if(!chat)
-            throw new HttpException('Chat not found!', HttpStatus.NOT_FOUND);
-
         chat.messages = chat.messages.filter((msg) => msg.id != dto.messageId);
         this.chatRepository.save(message);
         this.userServices.deleteMessage(message.id, user);
-        return message;
     }
 
     //Helpers
