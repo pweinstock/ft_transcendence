@@ -8,9 +8,7 @@ import {DeleteMessageDto} from "./dto/delete-message.dto";
 
 @WebSocketGateway({
 	namespace: 'chat',
-	cors: {
-		origin: '*',
-	},
+	cors: {	origin: '*' },
 })
 
 export class ChatGateway {
@@ -19,7 +17,7 @@ export class ChatGateway {
 
     constructor(private readonly chatService : ChatService) {}
 
-    @SubscribeMessage('createMessage')
+    @SubscribeMessage('message')
     async create(
   	    @MessageBody() dto : CreateMessageDto,
   	    @ConnectedSocket() client : Socket
