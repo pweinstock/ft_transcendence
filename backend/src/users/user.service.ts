@@ -65,9 +65,8 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    async changeStatus(changeDataDTO : ChangeDataDTO) : Promise<User> {
-        const user = await this.findById(changeDataDTO.userId);
-        user.status = changeDataDTO.status;
+    async changeStatus(user : User, status : UserStatus) : Promise<User> {
+        user.status = status;
         return this.userRepository.save(user);
     }
 

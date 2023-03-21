@@ -32,8 +32,7 @@ export default function App() {
         console.log(socket);
     }
     useEffect(() => {
-        // const URL = process.env.URL || 'http://localhost:3000';
-        const newSocket = io("http://localhost:5001");
+        const newSocket = io("http://localhost:5001/chat");
         setSocket(newSocket);
     }, [setSocket]);
 

@@ -4,9 +4,9 @@ import {
     OnGatewayInit,
     OnGatewayConnection,
     OnGatewayDisconnect,
-    SubscribeMessage
+    SubscribeMessage, MessageBody, ConnectedSocket
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import {GameService} from "./game.service";
 
 
@@ -23,6 +23,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     constructor(private readonly gameService : GameService) {}
 
     players: any[] = [];
+
+    // @SubscribeMessage('join')
+    // joinGame(
+    //     @MessageBody('user') userId : number,
+    //     @ConnectedSocket() client : Socket
+    // ) {
+    //     return this.gameService.identify(userId, client.id);
+    // }
 
     afterInit(server: Server) {
         console.log('Pong game initialized');
