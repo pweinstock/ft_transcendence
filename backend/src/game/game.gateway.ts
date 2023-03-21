@@ -7,10 +7,21 @@ import {
     SubscribeMessage
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import {GameService} from "./game.service";
 
-@WebSocketGateway()
+
+const GAME_PORT = Number(process.env.GAME_PORT) || 5001;
+@WebSocketGateway(GAME_PORT, {
+    namespace: 'game',
+    cors: {	origin: '*' },
+})
+
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-    @WebSocketServer() server: Server;
+    @WebSocketServer()
+    server: Server;
+
+    constructor(private readonly gameService : GameService) {}
+
     players: any[] = [];
 
     afterInit(server: Server) {
@@ -52,4 +63,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             }
         });
     }
+
+
 }

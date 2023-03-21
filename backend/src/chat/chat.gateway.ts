@@ -25,7 +25,7 @@ export class ChatGateway {
         ) {
   	    const message = await this.chatService.createMessage(dto, client.id);
   	    this.server.emit('message', dto);
-  	    return dto;
+  	    return message;
     }
 
     @SubscribeMessage('findChatMessages')
