@@ -5,8 +5,8 @@ import { Server, Socket } from 'socket.io';
 import {Message} from "./message/message.entity";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 
-
-@WebSocketGateway({
+const CHAT_PORT = Number(process.env.CHAT_PORT) || 5001;
+@WebSocketGateway(CHAT_PORT, {
 	namespace: 'chat',
 	cors: {	origin: '*' },
 })
@@ -19,12 +19,13 @@ export class ChatGateway {
 
     @SubscribeMessage('message')
     async create(
-  	    @MessageBody() dto : CreateMessageDto,
+        // @MessageBody() dto : string,
+        @MessageBody() dto : CreateMessageDto,
   	    @ConnectedSocket() client : Socket
         ) {
   	    const message = await this.chatService.createMessage(dto, client.id);
-  	    this.server.emit('message', message);
-  	    return message;
+  	    this.server.emit('message', dto);
+  	    return dto;
     }
 
     @SubscribeMessage('findChatMessages')

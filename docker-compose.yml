@@ -34,13 +34,14 @@ services:
 
     nestjs:
       container_name: nestjs
-      build: ./docker/
+      build: ./docker/backend
       environment:
         POSTGRES_DB: $POSTGRES_DB
         POSTGRES_USER: $POSTGRES_USER
         POSTGRES_PASSWORD: $POSTGRES_PASSWORD
         POSTGRES_HOST: postgres_db
         PORT: $PORT
+        CHAT_PORT: $CHAT_PORT
         FORTYTWO_APP_ID: $FORTYTWO_APP_ID
         FORTYTWO_APP_SECRET: $FORTYTWO_APP_SECRET
         FORTYTWO_CALLBACK_URL: $FORTYTWO_CALLBACK_URL
@@ -48,6 +49,8 @@ services:
       - volnest:/nest/
       ports:
       - ${PORT}:${PORT}
+      - ${CHAT_PORT}:${CHAT_PORT}
+      - ${GAME_PORT}:${GAME_PORT}
       networks:
       - transcendence
       depends_on:
