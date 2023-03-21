@@ -143,3 +143,5 @@ backend/.nyc_output
 docker/db_files/*
 
 *DS_Store
+
+tmp/*

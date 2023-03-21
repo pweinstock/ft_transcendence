@@ -9,7 +9,7 @@ import {FriendDto} from "./dto/friend.dto";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private userRepository: Repository<User>,) {
+    constructor(@InjectRepository(User) private userRepository : Repository<User>) {
     }
 
     async createUser(dto: UserDTO): Promise<User> {

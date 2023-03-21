@@ -4,7 +4,6 @@ import { CreateMessageDto } from './message/dto/create-message.dto';
 import { Server, Socket } from 'socket.io';
 import {Message} from "./message/message.entity";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
-import {UserService} from "../users/user.service";
 import {JoinChatDto} from "./dto/join-chat.dto";
 import {User} from "../users/user.entity";
 
