@@ -4,33 +4,6 @@ import Messages from "../chat/messages";
 import MesageInput from "../chat/messageInput"
 
 
-// export default function PingPong() {
-//     const [socket, setSocket] = useState<Socket>();
-//     const [messages, setMessages] = useState<string[]>([]);
-//
-//     const send = (value : string) => {
-//         socket?.emit("join", value);
-//         console.log(socket);
-//     }
-//     useEffect(() => {
-//         const newSocket = io("http://localhost:5002/game");
-//         setSocket(newSocket);
-//     }, [setSocket]);
-//
-//     const messageListener = (message : string) => {
-//         setMessages([...messages, message])
-//     }
-//     useEffect(() => {
-//         socket?.on('game', messageListener)
-//         return () => {
-//             socket?.off('game', messageListener)
-//         }
-//     }, [messageListener])
-//
-//
-// }
-
-
 interface Paddle {
     x: number;
     y: number;
@@ -50,18 +23,57 @@ interface Ball {
 }
 
 interface Players {
-    firstId : number
+    firstPlayer : string
     firstScore : number
-    secondId : number
+    secondPlayer : string
     secondScore : number
+}
+
+interface GameData {
+    ballX : number;
+    ballY : number;
+    paddleLeft : number;
+    paddleRight : number;
+    ballSpeed : number;
+    paddleSpeed : number;
+    firstPlayerScore : number;
+    secondPlayerScore : number;
+    firstPlayer : string;
+    secondPlayer :string;
+    timer : number;
 }
 
 
 function PingPong(): JSX.Element {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+
+    // const [socket, setSocket] = useState<Socket>();
+    // const [gameData, setGameData] = useState<GameData>();
+    //
+    // const send = (data : GameData) => {
+    //     socket?.emit("GameData", data);
+    //     console.log(socket);
+    // }
+    // useEffect(() => {
+    //     const newSocket = io("http://localhost:5002/game");
+    //     setSocket(newSocket);
+    // }, [setSocket]);
+    //
+    // const gameListener = (gameData : GameData) => {
+    //     setGameData(gameData);
+    // }
+    // useEffect(() => {
+    //     socket?.on('game', gameListener)
+    //     return () => {
+    //         socket?.off('game', gameListener)
+    //     }
+    // }, [gameListener])
+    //
+
     useEffect(() => {
         const canvas = canvasRef.current!;
-
+        let timer = 0;
         const context = canvas.getContext('2d')!;
         const grid = 15;
         const paddleHeight = grid * 5; // 80
@@ -70,9 +82,9 @@ function PingPong(): JSX.Element {
         let paddleSpeed = 6;
         let ballSpeed = 5;
         let players : Players = {
-            firstId : 0,
+            firstPlayer : "",
             firstScore : 0,
-            secondId : 0,
+            secondPlayer : "",
             secondScore : 0
         };
 
@@ -99,6 +111,13 @@ function PingPong(): JSX.Element {
             dx: ballSpeed,
             dy: -ballSpeed,
         };
+
+
+
+        setInterval(() => {
+            timer++;
+            }, 1000);
+
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
@@ -116,6 +135,14 @@ function PingPong(): JSX.Element {
         const drawBall = (ball: Ball) => {
             context.fillStyle = 'black';
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
+        };
+
+        const drawTimer = () => {
+            context.font = "bold 24px Arial";
+            context.fillStyle = "black";
+            const x = 200;
+            const y= 30;
+            context.fillText("Time: " + timer, x, y);
         };
 
         const drawScore = (players: Players) => {
@@ -182,19 +209,19 @@ function PingPong(): JSX.Element {
                     ball.x = paddle.x + paddle.width;
                 else
                     ball.x = paddle.x - paddle.width;
-                // const ballCenter = ball.y + ball.height / 2;
-                // const paddleCenter = paddle.y + paddle.height / 2;
-                // const centerDiff = ballCenter - paddleCenter;
-                // const maxBounceAngle = Math.PI / 3;
-                // let bounceAngle = centerDiff / (paddle.height / 2) * maxBounceAngle;
-                //
-                // if (ball.dx > 0) {
-                //     bounceAngle = Math.PI - bounceAngle; // flip angle
-                // }
-                //
-                // ball.dx = ballSpeed * Math.cos(bounceAngle);
-                // ball.dy = ballSpeed * -Math.sin(bounceAngle);
-                // ball.dx *= -1; // switch direction
+                const ballCenter = ball.y + ball.height / 2;
+                const paddleCenter = paddle.y + paddle.height / 2;
+                const centerDiff = ballCenter - paddleCenter;
+                const maxBounceAngle = Math.PI / 3;
+                let bounceAngle = centerDiff / (paddle.height / 2) * maxBounceAngle;
+
+                if (ball.dx > 0) {
+                    bounceAngle = Math.PI - bounceAngle; // flip angle
+                }
+
+                ball.dx = ballSpeed * Math.cos(bounceAngle);
+                ball.dy = ballSpeed * -Math.sin(bounceAngle);
+                ball.dx *= -1; // switch direction
             }
         };
 
@@ -204,6 +231,7 @@ function PingPong(): JSX.Element {
             drawPaddle(leftPaddle);
             drawPaddle(rightPaddle);
             drawBall(ball);
+            drawTimer();
             drawScore(players);
         };
 
@@ -215,7 +243,6 @@ function PingPong(): JSX.Element {
             movePaddle(leftPaddle);
             movePaddle(rightPaddle);
             draw();
-
         };
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
