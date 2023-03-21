@@ -140,6 +140,5 @@ backend/.nyc_output
 !.vscode/extensions.json
 
 *.env
-docker/db_files/*
 
 *DS_Store
