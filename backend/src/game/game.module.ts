@@ -1,7 +1,7 @@
 // import { Module } from "@nestjs/common";
 //
 // @Module({
-//     controllers: [GameController],
+//     controllers: [GameController, GameGateway],
 //     providers: [],
 //     imports: [
 //         UserModule,

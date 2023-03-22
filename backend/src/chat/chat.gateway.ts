@@ -1,16 +1,14 @@
 import {ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
 import {ChatService} from "./chat.service";
-import { CreateMessageDto } from './dto/create-message.dto';
+import { CreateMessageDto } from './message/dto/create-message.dto';
 import { Server, Socket } from 'socket.io';
 import {Message} from "./message/message.entity";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 
-
-@WebSocketGateway({
+const CHAT_PORT = Number(process.env.CHAT_PORT) || 5001;
+@WebSocketGateway(CHAT_PORT, {
 	namespace: 'chat',
-	cors: {
-		origin: '*',
-	},
+	cors: {	origin: '*' },
 })
 
 export class ChatGateway {
@@ -19,19 +17,20 @@ export class ChatGateway {
 
     constructor(private readonly chatService : ChatService) {}
 
-    @SubscribeMessage('createMessage')
+    @SubscribeMessage('message')
     async create(
-  	    @MessageBody() dto : CreateMessageDto,
+        // @MessageBody() dto : string,
+        @MessageBody() dto : CreateMessageDto,
   	    @ConnectedSocket() client : Socket
         ) {
   	    const message = await this.chatService.createMessage(dto, client.id);
-  	    this.server.emit('message', message);
-  	    return message;
+  	    this.server.emit('message', dto);
+  	    return dto;
     }
 
     @SubscribeMessage('findChatMessages')
     async findChatMessages(@MessageBody('chatId') chatId : number) : Promise<Message[]>{
-  	    const chat = await this.chatService.getChatById(chatId);
+  	    const chat = await this.chatService.findChatById(chatId);
   	    return chat.messages;
     }
 

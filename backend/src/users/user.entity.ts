@@ -1,5 +1,4 @@
-import {Column, PrimaryGeneratedColumn, Entity, OneToMany} from "typeorm";
-import {MatchHistory} from "./match-history.entity";
+import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
 
 export enum UserStatus {
     ONLINE = "online",
@@ -25,10 +24,10 @@ export class User {
     status: UserStatus;
 
     @Column('integer', {array: true, default: null, nullable: true})
-    pendingFriends: number[];
+    bannedUsers: number[];
 
     @Column('integer', {array: true, default: null, nullable: true})
-    bannedUsers: number[];
+    pendingFriends: number[];
 
     @Column('integer', {array: true, default: null, nullable: true})
     friends: number[];
@@ -39,13 +38,18 @@ export class User {
     @Column('integer', {array: true, default: null, nullable: true})
     chats: number[];
 
-    @Column()
+    @Column('integer', {array: true, default: null, nullable: true})
+    matchHistory : number[];
+
+    @Column({default: 0})
     wins : number;
 
-    @Column()
+    @Column({default: 0})
     losses : number;
 
-    // @Column({array: true, default: null, nullable: true})
-    // @OneToMany(() => MatchHistory, (history) => history)
-    // history : MatchHistory[];
+    @Column({default: 0})
+    draws : number;
+
+    @Column({default: 0})
+    score : number;
 }
