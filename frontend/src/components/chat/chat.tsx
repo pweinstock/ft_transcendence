@@ -10,7 +10,6 @@ export default function Chat() {
 
     const send = (value: string) => {
         socket?.emit("message", value);
-        console.log(socket);
     }
     useEffect(() => {
         const newSocket = io("http://localhost:5001/chat");

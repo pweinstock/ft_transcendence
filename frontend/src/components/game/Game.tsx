@@ -48,18 +48,18 @@ function PingPong(): JSX.Element {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
 
-    // const [socket, setSocket] = useState<Socket>();
-    // const [gameData, setGameData] = useState<GameData>();
-    //
-    // const send = (data : GameData) => {
-    //     socket?.emit("GameData", data);
-    //     console.log(socket);
-    // }
-    // useEffect(() => {
-    //     const newSocket = io("http://localhost:5002/game");
-    //     setSocket(newSocket);
-    // }, [setSocket]);
-    //
+    const [socket, setSocket] = useState<Socket>();
+    const [gameData, setGameData] = useState<GameData>();
+
+    const join = (data : GameData) => {
+        socket?.emit("join", data);
+        console.log(socket);
+    }
+    useEffect(() => {
+        const newSocket = io("http://localhost:5002/game");
+        setSocket(newSocket);
+    }, [setSocket]);
+
     // const gameListener = (gameData : GameData) => {
     //     setGameData(gameData);
     // }
@@ -287,7 +287,9 @@ function PingPong(): JSX.Element {
         };
     }, []);
 
-    return <canvas ref={canvasRef} width={1200} height={800} />;
+    return (
+        <canvas ref={canvasRef} width={1200} height={800} />
+    )
 }
 
 export default PingPong;

@@ -11,7 +11,7 @@ import {GameService} from "./game.service";
 import {GameDataDTO} from "./dto/game-data.dto";
 
 
-const GAME_PORT = Number(process.env.GAME_PORT) || 5001;
+const GAME_PORT = Number(process.env.GAME_PORT) || 5002;
 @WebSocketGateway(GAME_PORT, {
     namespace: 'game',
     cors: {	origin: '*' },
@@ -49,6 +49,7 @@ export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGat
             console.log(dto);
         }
     }
+
     // afterInit(server: Server) {
     //     console.log('Pong game initialized');
     // }
