@@ -47,7 +47,7 @@ function PingPong(): JSX.Element {
 
 
     const [socket, setSocket] = useState<Socket>();
-    const [gameData, setGameData] = useState<GameData>();
+    // const [gameData, setGameData] = useState<GameData>();
     var newSocket : Socket;
 
     const join = (data : number) => {
