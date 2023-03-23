@@ -11,6 +11,7 @@ import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {Message} from "./message/message.entity";
+import {User, UserStatus} from "../users/user.entity";
 
 @Injectable()
 export class ChatService {
@@ -90,11 +91,12 @@ export class ChatService {
         }
     }
 
-    async joinChat(dto : JoinChatDto) : Promise<Chat> {
+    async joinChat(dto : JoinChatDto) : Promise<User> {
         const user = await this.userServices.findById(dto.userId);
         const chat = await this.findChatById(dto.chatId);
+        this.userServices.changeStatus(user, UserStatus.ONLINE);
         if (chat.users.includes(user))
-            return chat;
+            return user;
         if (chat.admins.includes(user.id))
             chat.users.push(user);
         else {
@@ -115,7 +117,7 @@ export class ChatService {
         }
         this.userServices.addChat(user, chat.id);
         this.chatRepository.save(chat);
-        return chat;
+        return user;
     }
 
     async addAdmin(dto: ChangeStatusDTO) : Promise<void> {
@@ -184,17 +186,16 @@ export class ChatService {
 
     //Message Interraction
     clienttoUser = {}
-    async identify (userId : number, clientId : string) {
-        const user = await this.userServices.findById(userId);
-        this.clienttoUser[clientId] = user.displayName;
-        return Object.values(this.clienttoUser);
+    async identify (user : User, clientId : string) : Promise<number> {
+        this.clienttoUser[clientId] = user;
+        return user.id;
     }
 
     getClientName(clientId : string) {
         return this.clienttoUser[clientId];
     }
 
-    async createMessage(dto : CreateMessageDto, socketId : string) : Promise<Message> {
+    async createMessage(dto : CreateMessageDto) : Promise<Message> {
         const user = await this.userServices.findById(dto.userId);
         const chat = await this.findChatById(dto.chatId);
         if (chat.bannedUsers.includes(user.id))

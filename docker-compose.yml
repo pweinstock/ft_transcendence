@@ -42,9 +42,12 @@ services:
         POSTGRES_HOST: postgres_db
         PORT: $PORT
         CHAT_PORT: $CHAT_PORT
+        GAME_PORT: $GAME_PORT
         FORTYTWO_APP_ID: $FORTYTWO_APP_ID
         FORTYTWO_APP_SECRET: $FORTYTWO_APP_SECRET
         FORTYTWO_CALLBACK_URL: $FORTYTWO_CALLBACK_URL
+        JWT_SECRET: $JWT_SECRET
+        JWT_EXPIRES_IN: $JWT_EXPIRES_IN
       volumes:
       - volnest:/nest/
       ports:

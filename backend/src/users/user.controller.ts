@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import {ChangeDataDTO} from "./dto/change-data.dto";
 import {FriendDto} from "./dto/friend.dto";
+import { AuthGuard } from '@nestjs/passport';
+import TwoFactorAuthenticationGuard from 'src/auth/twoFactorAuthentication.guard';
+
 
 @Controller('users')
 export class UserController {
@@ -10,6 +13,7 @@ export class UserController {
     constructor(private usersService: UserService) {}
 
     @Get()
+	@UseGuards(AuthGuard('2FA'))
     getAll() {
         return this.usersService.findAll();
     }
@@ -21,22 +25,22 @@ export class UserController {
 
     @Post('changeName')
     changeName(@Body() changeDataDTO : ChangeDataDTO) {
-        return this.usersService.changeName(changeDataDTO);
+        this.usersService.changeName(changeDataDTO);
     }
 
     @Post('changePhoto')
     changePhoto(@Body() changeDataDTO : ChangeDataDTO) {
-        return this.usersService.changePhoto(changeDataDTO);
+        this.usersService.changePhoto(changeDataDTO);
     }
 
     @Post('changeStatus')
     changeStatus(@Body() changeDataDTO : ChangeDataDTO) {
-        return this.usersService.changePhoto(changeDataDTO);
+        this.usersService.changePhoto(changeDataDTO);
     }
 
     @Post('acceptFriendRequest')
     acceptFriendRequest(@Body() dto : FriendDto) {
-        return this.usersService.acceptFriendRequest(dto);
+        this.usersService.acceptFriendRequest(dto);
     }
 
     @Post('declineFriendRequest')

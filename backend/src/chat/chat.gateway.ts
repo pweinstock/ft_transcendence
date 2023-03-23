@@ -4,13 +4,17 @@ import { CreateMessageDto } from './message/dto/create-message.dto';
 import { Server, Socket } from 'socket.io';
 import {Message} from "./message/message.entity";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
+import {JoinChatDto} from "./dto/join-chat.dto";
+import {User} from "../users/user.entity";
+
+
 
 const CHAT_PORT = Number(process.env.CHAT_PORT) || 5001;
+
 @WebSocketGateway(CHAT_PORT, {
 	namespace: 'chat',
 	cors: {	origin: '*' },
 })
-
 export class ChatGateway {
 	@WebSocketServer()
     server : Server;
@@ -18,17 +22,17 @@ export class ChatGateway {
     constructor(private readonly chatService : ChatService) {}
 
     @SubscribeMessage('message')
-    async create(
-        // @MessageBody() dto : string,
+    async createMessage(
         @MessageBody() dto : CreateMessageDto,
   	    @ConnectedSocket() client : Socket
         ) {
-  	    const message = await this.chatService.createMessage(dto, client.id);
-  	    this.server.emit('message', dto);
-  	    return dto;
+  	    const message = await this.chatService.createMessage(dto);
+  	    this.chatService.getClientName(client.id);
+  	    this.server.emit('message', message.content);
+  	    return message;
     }
 
-    @SubscribeMessage('findChatMessages')
+    @SubscribeMessage('getChatMessages')
     async findChatMessages(@MessageBody('chatId') chatId : number) : Promise<Message[]>{
   	    const chat = await this.chatService.findChatById(chatId);
   	    return chat.messages;
@@ -40,10 +44,12 @@ export class ChatGateway {
     }
 
     @SubscribeMessage('join')
-    joinRoom(
-  	    @MessageBody('user') userId : number,
+    async joinRoom(
+  	    @MessageBody('user') dto : JoinChatDto,
     	@ConnectedSocket() client : Socket
-        ) {
-  	    return this.chatService.identify(userId, client.id);
+        ) : Promise<User> {
+        const user = await this.chatService.joinChat(dto);
+  	    this.chatService.identify(user, client.id);
+  	    return user;
     }
 }

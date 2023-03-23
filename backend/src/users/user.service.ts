@@ -9,7 +9,7 @@ import {FriendDto} from "./dto/friend.dto";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private userRepository: Repository<User>,) {
+    constructor(@InjectRepository(User) private userRepository : Repository<User>) {
     }
 
     async createUser(dto: UserDTO): Promise<User> {
@@ -65,9 +65,8 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    async changeStatus(changeDataDTO : ChangeDataDTO) : Promise<User> {
-        const user = await this.findById(changeDataDTO.userId);
-        user.status = changeDataDTO.status;
+    async changeStatus(user : User, status : UserStatus) : Promise<User> {
+        user.status = status;
         return this.userRepository.save(user);
     }
 
@@ -177,4 +176,21 @@ export class UserService {
         user.chats = user.chats.filter(chatId => chatId !== chat);
         this.userRepository.save(user);
     }
+
+	//TwoFactorAuthentication
+	async setTwoFactorAuthenticationSecret(secret: string, Id: number) {
+		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: secret});
+	}
+
+	async unsetTwoFactorAuthenticationSecret(Id: number) {
+		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: null});
+	}
+
+	async enableTwoFactorAuthentication(Id: number) {
+		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: true});
+	}
+
+	async disableTwoFactorAuthentication(Id: number) {
+		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: false});
+	}
 }

@@ -52,4 +52,10 @@ export class User {
 
     @Column({default: 0})
     score : number;
+
+	@Column({default: false})
+	isTwoFactorAuthenticationEnabled: boolean;
+
+	@Column({nullable: true})
+	TwoFactorAuthenticationSecret: string;
 }
