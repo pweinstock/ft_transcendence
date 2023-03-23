@@ -12,6 +12,7 @@ import {GameDataDTO} from "./dto/game-data.dto";
 
 
 const GAME_PORT = Number(process.env.GAME_PORT) || 5002;
+
 @WebSocketGateway(GAME_PORT, {
     namespace: 'game',
     cors: {	origin: '*' },
@@ -23,12 +24,16 @@ export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGat
 
     constructor(private readonly gameService : GameService) {}
 
-    @SubscribeMessage('join')
+    @SubscribeMessage("join")
     joinGame(
-        @MessageBody('user') userId : number,
+        @MessageBody("join") data : number,
         @ConnectedSocket() client : Socket
     ) {
-        return this.gameService.identify(client.id);
+        console.log('game connected')
+        console.log(data);
+        this.gameService.identify(client.id);
+        this.server.emit('join', client.id);
+        return client.id;
     }
 
     @SubscribeMessage('movePaddle')

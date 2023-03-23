@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
-import Messages from "../chat/messages";
-import MesageInput from "../chat/messageInput"
 
 
 interface Paddle {
@@ -50,15 +48,22 @@ function PingPong(): JSX.Element {
 
     const [socket, setSocket] = useState<Socket>();
     const [gameData, setGameData] = useState<GameData>();
+    var newSocket : Socket;
 
-    const join = (data : GameData) => {
+    const join = (data : number) => {
         socket?.emit("join", data);
-        console.log(socket);
+
     }
+
     useEffect(() => {
-        const newSocket = io("http://localhost:5002/game");
+        newSocket = io("http://localhost:5002/game");
+        newSocket?.on('connect', function() {
+            console.log('check 2', newSocket?.connected);
+        });
         setSocket(newSocket);
-    }, [setSocket]);
+    }, []);
+
+
 
     // const gameListener = (gameData : GameData) => {
     //     setGameData(gameData);
@@ -248,6 +253,7 @@ function PingPong(): JSX.Element {
             switch (event.key) {
                 case 'w':
                     leftPaddle.dy = -paddleSpeed;
+                    join(timer);
                     break;
                 case 's':
                     leftPaddle.dy = paddleSpeed;

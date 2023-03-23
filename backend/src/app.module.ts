@@ -8,6 +8,7 @@ import { AuthModule } from "./auth/auth.module";
 import { Message } from "./chat/message/message.entity";
 import { MessageModule } from "./chat/message/message.module";
 import {Game} from "./game/game.entity";
+import {GameModule} from "./game/game.module";
 
 @Module({
     controllers: [],
@@ -26,7 +27,8 @@ import {Game} from "./game/game.entity";
         UserModule,
         ChatModule,
         // AuthModule,
-        MessageModule
+        MessageModule,
+        GameModule
     ],
 })
 

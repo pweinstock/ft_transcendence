@@ -3,14 +3,14 @@ import {GameGateway} from "./game.gateway";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Game} from "./game.entity";
 import {GameService} from "./game.service";
-import {UserService} from "../users/user.service";
+import {UserModule} from "../users/user.module";
 
 @Module({
-    controllers: [GameGateway],
-    providers: [GameService],
+    controllers: [],
+    providers: [GameService, GameGateway],
     imports: [
         TypeOrmModule.forFeature([Game]),
-        UserService,
+        UserModule,
     ],
 })
 export class GameModule {}
