@@ -74,7 +74,7 @@ function PingPong(): JSX.Element {
         const grid = 15;
         const paddleHeight = grid * 5; // 80
         const maxPaddleY = canvas.height - grid - paddleHeight;
-
+        
         let paddleSpeed = 6;
         let ballSpeed = 5;
         let players : Players = {
@@ -83,7 +83,7 @@ function PingPong(): JSX.Element {
             secondPlayer : "",
             secondScore : 0
         };
-
+        
         gameData = {
             leftPaddle : {
                 x: grid * 2,
@@ -118,13 +118,14 @@ function PingPong(): JSX.Element {
             timer : 0,
             paddleSpeed : 6
         }
-
-
-
+        gameDataUpdate(gameData);
+        
+        
+        
         setInterval(() => {
             timer++;
-            }, 1000);
-
+        }, 1000);
+        
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
