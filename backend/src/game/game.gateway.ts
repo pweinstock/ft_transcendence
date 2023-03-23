@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import {GameService} from "./game.service";
-import {GameDataDTO} from "./dto/game-data.dto";
+import {GameDataDto} from "./dto/game-data.dto";
 
 
 const GAME_PORT = Number(process.env.GAME_PORT) || 5002;
@@ -24,35 +24,39 @@ export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGat
 
     constructor(private readonly gameService : GameService) {}
 
-    @SubscribeMessage("join")
-    joinGame(
-        @MessageBody("join") data : number,
-        @ConnectedSocket() client : Socket
-    ) {
-        console.log('game connected')
-        console.log(data);
-        this.gameService.identify(client.id);
-        this.server.emit('join', client.id);
-        return client.id;
-    }
+    // @SubscribeMessage("join")
+    // joinGame(
+    //     @MessageBody("join") data : number,
+    //     @ConnectedSocket() client : Socket
+    // ) {
+    //     console.log('game connected')
+    //     console.log(data);
+    //     this.gameService.identify(client.id);
+    //     this.server.emit('join', client.id);
+    //     return client.id;
+    // }
+    //
+    // @SubscribeMessage('movePaddle')
+    // handleMovePaddle(@MessageBody('game') dto : GameDataDto,
+    //                  @ConnectedSocket() client : Socket) {
+    //     client.broadcast.emit('gameDataUpdate', dto);
+    // }
+    //
+    // @SubscribeMessage('changePosition')
+    // changePosition(@MessageBody('game') dto : GameDataDto,
+    //                  @ConnectedSocket() client : Socket) {
+    //     if (this.gameService.isFirstPlayer(client.id) || this.gameService.isSecondPlayer(client.id)) {
+    //         this.gameService.validate(dto);
+    //         client.broadcast.emit('changePosition', dto);
+    //         console.log(dto);
+    //     }
+    // }
 
-    @SubscribeMessage('movePaddle')
-    handleMovePaddle(@MessageBody('game') dto : GameDataDTO,
-                     @ConnectedSocket() client : Socket) {
-        if (this.gameService.isFirstPlayer(client.id))
-            client.broadcast.emit('movePaddleLeft', dto);
-        else if (this.gameService.isSecondPlayer(client.id))
-            client.broadcast.emit('movePaddleRight', dto);
-    }
-
-    @SubscribeMessage('changePosition')
-    changePosition(@MessageBody('game') dto : GameDataDTO,
-                     @ConnectedSocket() client : Socket) {
-        if (this.gameService.isFirstPlayer(client.id) || this.gameService.isSecondPlayer(client.id)) {
-            this.gameService.validate(dto);
-            client.broadcast.emit('changePosition', dto);
-            console.log(dto);
-        }
+    @SubscribeMessage('gameDataUpdate')
+    gameUpdate(@MessageBody('gameDataUpdate') dto : GameDataDto,
+               @ConnectedSocket() client : Socket) {
+        client.broadcast.emit('gameDataUpdate', dto);
+        console.log(dto.ball);
     }
 
     // afterInit(server: Server) {

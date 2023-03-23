@@ -176,4 +176,21 @@ export class UserService {
         user.chats = user.chats.filter(chatId => chatId !== chat);
         this.userRepository.save(user);
     }
+
+	//TwoFactorAuthentication
+	async setTwoFactorAuthenticationSecret(secret: string, Id: number) {
+		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: secret});
+	}
+
+	async unsetTwoFactorAuthenticationSecret(Id: number) {
+		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: null});
+	}
+
+	async enableTwoFactorAuthentication(Id: number) {
+		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: true});
+	}
+
+	async disableTwoFactorAuthentication(Id: number) {
+		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: false});
+	}
 }

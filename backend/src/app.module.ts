@@ -26,9 +26,8 @@ import {GameModule} from "./game/game.module";
         }),
         UserModule,
         ChatModule,
-        // AuthModule,
-        MessageModule,
-        GameModule
+        AuthModule,
+        MessageModule
     ],
 })
 
