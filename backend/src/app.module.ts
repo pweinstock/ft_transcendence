@@ -25,7 +25,7 @@ import {Game} from "./game/game.entity";
         }),
         UserModule,
         ChatModule,
-        // AuthModule,
+        AuthModule,
         MessageModule
     ],
 })
