@@ -34,7 +34,7 @@ services:
 
     nestjs:
       container_name: nestjs
-      build: ./docker/backend
+      build: ./docker
       environment:
         POSTGRES_DB: $POSTGRES_DB
         POSTGRES_USER: $POSTGRES_USER
