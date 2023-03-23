@@ -54,6 +54,10 @@ function PingPong(): JSX.Element {
 
     useEffect(() => {
         newSocket = io("http://localhost:5002/game");
+        if (newSocket.connected)
+            console.log('connected');
+        else
+            console.log('not connected');
         setSocket(newSocket);
     }, []);
 
@@ -69,20 +73,14 @@ function PingPong(): JSX.Element {
 
     useEffect(() => {
         const canvas = canvasRef.current!;
-        let timer = 0;
         const context = canvas.getContext('2d')!;
         const grid = 15;
         const paddleHeight = grid * 5; // 80
         const maxPaddleY = canvas.height - grid - paddleHeight;
+        const startTime = new Date().getTime();
 
         let paddleSpeed = 6;
         let ballSpeed = 5;
-        let players : Players = {
-            firstPlayer : "",
-            firstScore : 0,
-            secondPlayer : "",
-            secondScore : 0
-        };
 
         gameData = {
             leftPaddle : {
@@ -119,12 +117,6 @@ function PingPong(): JSX.Element {
             paddleSpeed : 6
         }
 
-
-
-        setInterval(() => {
-            timer++;
-            }, 1000);
-
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
@@ -149,7 +141,7 @@ function PingPong(): JSX.Element {
             context.fillStyle = "black";
             const x = 200;
             const y= 30;
-            context.fillText("Time: " + timer, x, y);
+            context.fillText("Time: " + gameData.timer, x, y);
         };
 
         const drawScore = (players: Players) => {
@@ -179,11 +171,11 @@ function PingPong(): JSX.Element {
             }
             if (gameData.ball.x <= 0) {
                 resetBall(gameData.rightPaddle);
-                players.secondScore += 1;
+                gameData.players.secondScore += 1;
             }
             if (gameData.ball.x + gameData.ball.width >= canvas.width) {
                 resetBall(gameData.leftPaddle);
-                players.firstScore += 1;
+                gameData.players.firstScore += 1;
             }
         };
 
@@ -239,10 +231,12 @@ function PingPong(): JSX.Element {
             drawPaddle(gameData.rightPaddle);
             drawBall(gameData.ball);
             drawTimer();
-            drawScore(players);
+            drawScore(gameData.players);
         };
 
         const update = () => {
+            const currentTime = new Date().getTime();
+            gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
             moveBall();
             checkWallCollision();
             checkPaddleCollision(gameData.leftPaddle, true);
@@ -250,6 +244,7 @@ function PingPong(): JSX.Element {
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
+            window.requestAnimationFrame(update);
         };
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
@@ -287,12 +282,11 @@ function PingPong(): JSX.Element {
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
 
-        const intervalId = setInterval(update, 1000 / 60);
+        update();
 
         return () => {
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('keyup', onKeyUp);
-            clearInterval(intervalId);
         };
     }, [gameData]);
 
