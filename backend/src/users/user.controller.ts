@@ -25,22 +25,22 @@ export class UserController {
 
     @Post('changeName')
     changeName(@Body() changeDataDTO : ChangeDataDTO) {
-        return this.usersService.changeName(changeDataDTO);
+        this.usersService.changeName(changeDataDTO);
     }
 
     @Post('changePhoto')
     changePhoto(@Body() changeDataDTO : ChangeDataDTO) {
-        return this.usersService.changePhoto(changeDataDTO);
+        this.usersService.changePhoto(changeDataDTO);
     }
 
     @Post('changeStatus')
     changeStatus(@Body() changeDataDTO : ChangeDataDTO) {
-        return this.usersService.changePhoto(changeDataDTO);
+        this.usersService.changePhoto(changeDataDTO);
     }
 
     @Post('acceptFriendRequest')
     acceptFriendRequest(@Body() dto : FriendDto) {
-        return this.usersService.acceptFriendRequest(dto);
+        this.usersService.acceptFriendRequest(dto);
     }
 
     @Post('declineFriendRequest')

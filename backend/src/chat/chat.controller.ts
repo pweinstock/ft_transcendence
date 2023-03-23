@@ -3,6 +3,8 @@ import { ChatService } from './chat.service';
 import { CreateChatDTO } from './dto/create-chat.dto';
 import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {ChangeStatusDTO} from "./dto/change-status.dto";
+import {User} from "../users/user.entity";
+import {Message} from "./message/message.entity";
 
 @Controller('chat')
 export class ChatController {
@@ -18,9 +20,16 @@ export class ChatController {
         return this.chatService.deleteChat(dto);
     }
 
+    @Get('/:id/users')
+    async getUserChats(@Param('id') chatId: number) :Promise<User[]> {
+        const chat = await this.chatService.findChatById(chatId);
+        return chat.users;
+    }
+
     @Get('/:id')
-    getUserChats(@Param('id') id: number) {
-        return this.chatService.findUserChats(id);
+    async getMessages(@Param('id') chatId : number) : Promise<Message[]>{
+        const chat = await this.chatService.findChatById(chatId);
+        return chat.messages;
     }
 
     @Get()
