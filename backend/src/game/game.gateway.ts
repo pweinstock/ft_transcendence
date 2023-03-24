@@ -16,7 +16,7 @@ import {GameDataDto} from "./dto/game-data.dto";
     cors: {	origin: '*' },
 })
 
-export class GameGateway { //implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
@@ -50,40 +50,41 @@ export class GameGateway { //implements OnGatewayInit, OnGatewayConnection, OnGa
     //     }
     // }
 
-    @SubscribeMessage("connect")
-    joinGame(
-        @ConnectedSocket() client : Socket
-    ) {
-        console.log('game connected')
-        return client.id;
-    }
+    // @SubscribeMessage("connect")
+    // joinGame(
+    //     @ConnectedSocket() client : Socket
+    // ) {
+    //     console.log('game connected')
+    //     return client.id;
+    // }
 
-    @SubscribeMessage('gameDataUpdate')
-    gameUpdate(@MessageBody('gameDataUpdate') dto : GameDataDto,
+    @SubscribeMessage('gameUpdate')
+    gameUpdate(@MessageBody() dto : GameDataDto,
                @ConnectedSocket() client : Socket) {
-        console.log('triied to connect!');
-        client.broadcast.emit('gameDataUpdate', dto);
-        console.log(dto.ball);
-        return dto;
+        console.log(dto.players.firstScore);
+        client.broadcast.emit('gameUpdate', dto);
+        // console.log(dto.ball);
+        // return dto;
     }
 
-    // afterInit(server: Server) {
-    //     console.log('Pong game initialized');
-    // }
-    //
-    // handleConnection(client: any, ...args: any[]) {
-    //     console.log(`Player ${client.id} connected`);
-    //     this.players.push(client);
-    //     client.emit('connectSuccess', `Connected to Pong game as Player ${this.players.length}`);
-    // }
-    //
-    // handleDisconnect(client: any) {
-    //     console.log(`Player ${client.id} disconnected`);
-    //     this.players.splice(this.players.indexOf(client), 1);
-    //     this.players.forEach((player, index) => {
-    //         player.emit('playerLeft', `Player ${client.id} left the game`);
-    //     });
-    // }
+    afterInit(server: Server) {
+        console.log('Port initialized');
+    }
+
+    handleConnection(client: any, ...args: any[]) {
+        console.log(`Player connected`);
+        // this.players.push(client);
+        // client.emit('connectSuccess', `Connected to Pong game as Player ${this.players.length}`);
+    }
+
+    handleDisconnect(client: any) {
+        console.log(`Player disconnected`);
+        // console.log(`Player ${client.id} disconnected`);
+        // this.players.splice(this.players.indexOf(client), 1);
+        // this.players.forEach((player, index) => {
+        //     player.emit('playerLeft', `Player ${client.id} left the game`);
+        // });
+    }
 
 
 

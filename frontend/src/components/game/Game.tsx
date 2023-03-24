@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
+import {socket} from "../../socket";
 
 
 interface Paddle {
@@ -39,7 +40,7 @@ interface GameData {
 
 
 
-function PingPong(): JSX.Element {
+export default function PingPong() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const paddleHeight = 75;
@@ -47,47 +48,17 @@ function PingPong(): JSX.Element {
     let paddleSpeed = 6;
     let ballSpeed = 5;
 
+    const socket = io("localhost:5002/game");
 
-    // const [socket, setSocket] = useState<Socket>();
-    // // const [gameData, setGameData] = useState<GameData>();
-    //
-    // const gameDataUpdate = (data : GameData) => {
-    //     if (socket) {
-    //         socket.emit("gameDataUpdate", data);
-    //         console.log(data.players.firstScore);
-    //     }
-    // }
-    //
-    // useEffect(() => {
-    //     const newSocket = io("http://localhost:5002/game");
-    //     if (newSocket.active)
-    //         console.log('socket active');
-    //     else
-    //         console.log('socket not active');
-    //     setSocket(newSocket);
-    // }, [setSocket]);
 
-    const socket = io("http://localhost:5002/game", {
-        transports: ["websocket"],
-    });
-
-    socket.on("connect", () => {
-        console.log("Connected to server");
-    });
-
-    socket.on("gameDataUpdate", (data) => {
-        console.log("Received game data update:", data);
-    });
-
-// To send a message to the server
-    const gameDataUpdate = (data : GameData) => {
-        socket.emit("gameDataUpdate", data);
+    const gameUpdate = (data : GameData) => {
+        socket.emit('gameUpdate', data);
     }
 
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!;
-        const gameData = {
+        let gameData = {
             leftPaddle : {
                 x: grid * 2,
                 y: canvas.height / 2 - paddleHeight / 2,
@@ -255,17 +226,19 @@ function PingPong(): JSX.Element {
             switch (event.key) {
                 case 'w':
                     gameData.leftPaddle.dy = -paddleSpeed;
-                    console.log(gameData.players.firstScore);
-                    gameDataUpdate(gameData);
+                    gameUpdate(gameData);
                     break;
                 case 's':
                     gameData.leftPaddle.dy = paddleSpeed;
+                    gameUpdate(gameData);
                     break;
                 case 'ArrowUp':
                     gameData.rightPaddle.dy = -paddleSpeed;
+                    gameUpdate(gameData);
                     break;
                 case 'ArrowDown':
                     gameData.rightPaddle.dy = paddleSpeed;
+                    gameUpdate(gameData);
                     break;
             }
         };
@@ -275,10 +248,12 @@ function PingPong(): JSX.Element {
                 case 'w':
                 case 's':
                     gameData.leftPaddle.dy = 0;
+                    gameUpdate(gameData);
                     break;
                 case 'ArrowUp':
                 case 'ArrowDown':
                     gameData.rightPaddle.dy = 0;
+                    gameUpdate(gameData);
                     break;
             }
         };
@@ -286,17 +261,18 @@ function PingPong(): JSX.Element {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
+        socket.on("gameUpdate", (data : GameData) =>
+            gameData = data
+        );
 
         update();
         return () => {
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('keyup', onKeyUp);
         };
-    }, []);
+    }, [socket]);
 
     return (
         <canvas ref={canvasRef} width={1200} height={800} />
     )
 }
-
-export default PingPong;
