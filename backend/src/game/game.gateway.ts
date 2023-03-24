@@ -13,6 +13,7 @@ import {GameDataDto} from "./dto/game-data.dto";
 
 @WebSocketGateway(Number(process.env.GAME_PORT) | 5002, {
     namespace: "game",
+    transports: ["websocket"],
     cors: {	origin: '*' },
 })
 
@@ -61,17 +62,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('gameUpdate')
     gameUpdate(@MessageBody() dto : GameDataDto,
                @ConnectedSocket() client : Socket) {
-        console.log(dto.players.firstScore);
         client.broadcast.emit('gameUpdate', dto);
-        // console.log(dto.ball);
-        // return dto;
     }
 
     afterInit(server: Server) {
         console.log('Port initialized');
     }
 
-    handleConnection(client: any, ...args: any[]) {
+    handleConnection(@MessageBody() dto : GameDataDto,
+                     @ConnectedSocket() client : Socket) {
         console.log(`Player connected`);
         // this.players.push(client);
         // client.emit('connectSuccess', `Connected to Pong game as Player ${this.players.length}`);

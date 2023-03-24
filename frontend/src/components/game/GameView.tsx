@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
+import {socket} from "../../socket";
 
 
 interface Paddle {
@@ -38,61 +39,32 @@ interface GameData {
 }
 
 
-function GameView(): JSX.Element {
-    const [socket, setSocket] = useState<Socket>();
-    let canvasRef = useRef<HTMLCanvasElement>(null);
-    let gameData : GameData = {
-        leftPaddle : {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            dy: 0,
-        },
-        rightPaddle : {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            dy: 0,
-        },
-        maxPaddleY : 0,
-        ball : {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            resetting: false,
-            dx: 0,
-            dy: 0,
-        },
-        players : {
-            firstPlayer : "",
-            firstScore : 0,
-            secondPlayer : "",
-            secondScore : 0
-        },
-        timer : 0,
-        paddleSpeed : 6
-    }
 
-    useEffect(() => {
-        const newSocket = io("http://localhost:5002/game");
-        setSocket(newSocket);
-    }, []);
+export default function PingPong() {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const grid = 15;
+    const paddleHeight = 75;
+    const startTime = new Date().getTime();
+    let ballSpeed = 5;
 
-    socket?.on('gameDataUpdate', (data: GameData) => {
-        gameData = data;
+    const socket = io("localhost:5002/game", {
+        transports: ["websocket"],
     });
 
+    // const rightPaddleUpdate = (data : number) => {
+    //     socket.emit('rightPaddleUpdate', data);
+    // }
+    //
+    // const leftPaddleUpdate = (data : number) => {
+    //     socket.emit('leftPaddleUpdate', data);
+    // }
+
+
+
     useEffect(() => {
-        let canvas = canvasRef.current!;
-        let context = canvas.getContext('2d')!;
-        const startTime = new Date().getTime();
-        const grid = 15;
-        const paddleHeight = grid * 5;
-        let ballSpeed = 5;
-        gameData = {
+        const canvas = canvasRef.current!;
+        const context = canvas.getContext('2d')!;
+        let gameData = {
             leftPaddle : {
                 x: grid * 2,
                 y: canvas.height / 2 - paddleHeight / 2,
@@ -126,7 +98,6 @@ function GameView(): JSX.Element {
             timer : 0,
             paddleSpeed : 6
         }
-        let timer : number = 0;
 
         const drawNet = () => {
             context.beginPath();
@@ -152,7 +123,7 @@ function GameView(): JSX.Element {
             context.fillStyle = "black";
             const x = 200;
             const y= 30;
-            context.fillText("Time: " + timer, x, y);
+            context.fillText("Time: " + gameData.timer, x, y);
         };
 
         const drawScore = (players: Players) => {
@@ -255,15 +226,20 @@ function GameView(): JSX.Element {
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
-            window.requestAnimationFrame(update);
+            requestAnimationFrame(update);
         };
+
+
         draw();
+        socket.on("gameUpdate", (data : GameData) => {
+                gameData = data
+            }
+        );
+
         update();
-        }, [gameData]);
+    }, [socket]);
 
     return (
         <canvas ref={canvasRef} width={1200} height={800} />
-)
+    )
 }
-
-export default GameView;

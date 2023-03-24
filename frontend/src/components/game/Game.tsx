@@ -48,12 +48,24 @@ export default function PingPong() {
     let paddleSpeed = 6;
     let ballSpeed = 5;
 
-    const socket = io("localhost:5002/game");
+    const socket = io("localhost:5002/game", {
+        transports: ["websocket"],
+    });
 
 
     const gameUpdate = (data : GameData) => {
         socket.emit('gameUpdate', data);
     }
+
+    // const rightPaddleUpdate = (data : number) => {
+    //     socket.emit('rightPaddleUpdate', data);
+    // }
+    //
+    // const leftPaddleUpdate = (data : number) => {
+    //     socket.emit('leftPaddleUpdate', data);
+    // }
+
+
 
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -219,8 +231,9 @@ export default function PingPong() {
             checkPaddleCollision(gameData.rightPaddle, false);
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
+            // gameUpdate(gameData);
             draw();
-            window.requestAnimationFrame(update);
+            requestAnimationFrame(update);
         };
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
@@ -261,9 +274,20 @@ export default function PingPong() {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        socket.on("gameUpdate", (data : GameData) =>
-            gameData = data
+        socket.on("gameUpdate", (data : GameData) => {
+                gameData = data
+            }
         );
+
+        // socket.on("rightPaddleUpdate", (data : number) => {
+        //         gameData.rightPaddle.dy = data
+        //     }
+        // );
+        //
+        // socket.on("leftPaddleUpdate", (data : number) => {
+        //         gameData.leftPaddle.dy = data
+        //     }
+        // );
 
         update();
         return () => {
