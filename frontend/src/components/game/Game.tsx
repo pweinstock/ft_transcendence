@@ -41,48 +41,53 @@ interface GameData {
 
 function PingPong(): JSX.Element {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const grid = 15;
+    const paddleHeight = 75;
+    const startTime = new Date().getTime();
+    let paddleSpeed = 6;
+    let ballSpeed = 5;
 
 
-    const [socket, setSocket] = useState<Socket>();
-    // const [gameData, setGameData] = useState<GameData>();
-    var newSocket : Socket;
+    // const [socket, setSocket] = useState<Socket>();
+    // // const [gameData, setGameData] = useState<GameData>();
+    //
+    // const gameDataUpdate = (data : GameData) => {
+    //     if (socket) {
+    //         socket.emit("gameDataUpdate", data);
+    //         console.log(data.players.firstScore);
+    //     }
+    // }
+    //
+    // useEffect(() => {
+    //     const newSocket = io("http://localhost:5002/game");
+    //     if (newSocket.active)
+    //         console.log('socket active');
+    //     else
+    //         console.log('socket not active');
+    //     setSocket(newSocket);
+    // }, [setSocket]);
 
+    const socket = io("http://localhost:5002/game", {
+        transports: ["websocket"],
+    });
+
+    socket.on("connect", () => {
+        console.log("Connected to server");
+    });
+
+    socket.on("gameDataUpdate", (data) => {
+        console.log("Received game data update:", data);
+    });
+
+// To send a message to the server
     const gameDataUpdate = (data : GameData) => {
-        socket?.emit("gameDataUpdate", data);
-        console.log(data.players.firstScore);
-    }
-
-    useEffect(() => {
-        newSocket = io("http://localhost:5002/game");
-        if (newSocket.connected)
-            console.log('connected');
-        else
-            console.log('not connected');
-        setSocket(newSocket);
-    }, []);
-
-    let gameData : GameData = {
-        leftPaddle  : { x: 0, y: 0, width: 0, height: 0, dy: 0 },
-        rightPaddle : { x: 0, y: 0, width: 0, height: 0, dy: 0 },
-        maxPaddleY  : 0,
-        ball : { x: 0, y: 0, width: 0, height: 0, resetting: false, dx: 0, dy: 0 },
-        players : { firstPlayer : "", firstScore : 0, secondPlayer : "", secondScore : 0 },
-        timer : 0,
-        paddleSpeed : 6
+        socket.emit("gameDataUpdate", data);
     }
 
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!;
-        const grid = 15;
-        const paddleHeight = grid * 5; // 80
-        const maxPaddleY = canvas.height - grid - paddleHeight;
-        const startTime = new Date().getTime();
-
-        let paddleSpeed = 6;
-        let ballSpeed = 5;
-
-        gameData = {
+        const gameData = {
             leftPaddle : {
                 x: grid * 2,
                 y: canvas.height / 2 - paddleHeight / 2,
@@ -191,8 +196,8 @@ function PingPong(): JSX.Element {
             paddle.y += paddle.dy;
             if (paddle.y < grid) {
                 paddle.y = grid;
-            } else if (paddle.y > maxPaddleY) {
-                paddle.y = maxPaddleY;
+            } else if (paddle.y > gameData.maxPaddleY) {
+                paddle.y = gameData.maxPaddleY;
             }
         };
 
@@ -283,12 +288,11 @@ function PingPong(): JSX.Element {
         document.addEventListener('keyup', onKeyUp);
 
         update();
-
         return () => {
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('keyup', onKeyUp);
         };
-    }, [gameData]);
+    }, []);
 
     return (
         <canvas ref={canvasRef} width={1200} height={800} />

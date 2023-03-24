@@ -11,14 +11,12 @@ import {GameService} from "./game.service";
 import {GameDataDto} from "./dto/game-data.dto";
 
 
-const GAME_PORT = Number(process.env.GAME_PORT) || 5002;
-
-@WebSocketGateway(GAME_PORT, {
-    namespace: 'game',
+@WebSocketGateway(Number(process.env.GAME_PORT) | 5002, {
+    namespace: "game",
     cors: {	origin: '*' },
 })
 
-export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway { //implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
@@ -26,16 +24,16 @@ export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGat
 
     // @SubscribeMessage("join")
     // joinGame(
-    //     @MessageBody("join") data : number,
+        // @MessageBody("join") data : number,
     //     @ConnectedSocket() client : Socket
     // ) {
     //     console.log('game connected')
-    //     console.log(data);
-    //     this.gameService.identify(client.id);
-    //     this.server.emit('join', client.id);
-    //     return client.id;
+        // console.log(data);
+        // this.gameService.identify(client.id);
+        // this.server.emit('join', client.id);
+        // return client.id;
     // }
-    //
+
     // @SubscribeMessage('movePaddle')
     // handleMovePaddle(@MessageBody('game') dto : GameDataDto,
     //                  @ConnectedSocket() client : Socket) {
@@ -52,11 +50,21 @@ export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGat
     //     }
     // }
 
+    @SubscribeMessage("connect")
+    joinGame(
+        @ConnectedSocket() client : Socket
+    ) {
+        console.log('game connected')
+        return client.id;
+    }
+
     @SubscribeMessage('gameDataUpdate')
     gameUpdate(@MessageBody('gameDataUpdate') dto : GameDataDto,
                @ConnectedSocket() client : Socket) {
+        console.log('triied to connect!');
         client.broadcast.emit('gameDataUpdate', dto);
         console.log(dto.ball);
+        return dto;
     }
 
     // afterInit(server: Server) {

@@ -88,6 +88,7 @@ function GameView(): JSX.Element {
     useEffect(() => {
         let canvas = canvasRef.current!;
         let context = canvas.getContext('2d')!;
+        const startTime = new Date().getTime();
         const grid = 15;
         const paddleHeight = grid * 5;
         let ballSpeed = 5;
@@ -126,10 +127,6 @@ function GameView(): JSX.Element {
             paddleSpeed : 6
         }
         let timer : number = 0;
-
-        setInterval(() => {
-            timer++;
-        }, 1000);
 
         const drawNet = () => {
             context.beginPath();
@@ -249,6 +246,8 @@ function GameView(): JSX.Element {
         };
 
         const update = () => {
+            const currentTime = new Date().getTime();
+            gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
             moveBall();
             checkWallCollision();
             checkPaddleCollision(gameData.leftPaddle, true);
@@ -256,15 +255,11 @@ function GameView(): JSX.Element {
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
+            window.requestAnimationFrame(update);
         };
-
         draw();
-        const intervalId = setInterval(update, 1000 / 60);
-
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, [gameData]);
+        update();
+        }, [gameData]);
 
     return (
         <canvas ref={canvasRef} width={1200} height={800} />
