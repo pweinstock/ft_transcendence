@@ -1,4 +1,209 @@
-.App {
+body {
+  background-color:  #02041b;
+}
+#root {
+  display: flex;    
+  background-color: #030625;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5vw;
+  margin: 0;
+  font-family: 'Lato', sans-serif;
+}
+
+canvas {
+  background-color: #d8cccc;
+}
+
+header {
+  display: flex;
+
+  width: 100%;
+  background-image: url("./img/ee7dbc369fd1cf1cce4714002480a8ad.jpg") ;
+  background-color: #585252;
   text-align: center;
-  margin-top: 100px;
-  }
+  color: wheat;
+  margin-bottom: 2%;
+  
+}
+header div {
+  width: 7%;
+  align-self: flex-end;
+  padding: 1%;
+}
+header div img {
+  width: 100%;
+}
+
+header p {
+  margin-top: 3%;
+  margin-bottom: 4%;
+  margin-left: 10%;
+  letter-spacing: 3vw;
+  font-size: 3vw;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  width: 80%;
+  justify-content: center;
+  /* align-items: center; */
+}
+
+
+section {
+  display: flex;
+  flex: 70%;
+  flex-direction: column;
+  margin: 0.5%;
+}
+article {
+  display: flex;
+  margin: 0.5%;
+  padding: 0.5%;
+  background-color: #dfdfdf;
+}
+.postcontain {
+  width: 100%;
+  margin: 0.5%;
+}
+
+.arrowbox {
+  margin-left: 2%;
+  margin-right: 2%;
+}
+.arrowbox p {
+  text-align: center;
+}
+
+.post_social {
+  margin-top: 0.5vw;
+  margin-bottom: 0.5vw;
+  font-size: 1vw;
+}
+.post_social span {
+  padding-right: 1%;
+}
+.post_userinfo {
+  font-size: 1vw;
+}
+.post_userinfo span {
+  padding-right: 1%;
+}
+.post_userinfo img {
+  width: 1.5vw;
+  padding-right: 1%;
+}
+
+
+.post_text, .post_title {
+  word-break: break-word;
+  overflow: hidden;
+}
+.post_text p, .post_title p {
+  margin-top: 0.5vw;
+  margin-bottom: 0;
+}
+
+/* Aside part */
+
+aside {
+  display: flex;
+  flex-direction: column;
+  flex: 25%;
+  margin: 0.5%;
+}
+.newpostlink, .loginbox {
+  /* width: 100%; */
+  text-decoration: none;
+  margin: 0.5%;
+}
+
+.buttonside {
+  width: 99%;
+  background-color: #837ca3;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  padding: 5% 2% 5% 2%;
+  margin: 0.5%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.5vw;
+  cursor: pointer;
+}
+
+.goupdescribtion {
+  margin: 1%;
+  font-size: 1.2vw;
+} 
+.groupnameabout {
+  background-color: #f1eaea;
+  padding: 3%;
+} 
+.groupnameabout p {
+  margin: 0;
+} 
+.gouplisttopic {
+  padding: 3%;
+  background-color: #d8cccc;
+  padding-bottom: 5%;
+}
+.gouplisttopic p {
+  padding-left: 5%;
+  margin: 0;
+}
+
+.gouplisttopic ul {
+  list-style-type: square;
+}
+
+.gouplisttopic li {
+  padding: 2%;
+}
+
+/* foooooooooooooooooooorm */
+
+.formholder {
+  display: flex;
+  background-color: #dfdfdf;
+  padding: 2%;
+  width: 60%;
+}
+
+ form {
+  width: 100%;
+} 
+
+input[type="text"] {
+  width: 96%;
+  padding: 1%;
+}
+textarea {
+  width: 96%;
+  padding: 1%;
+}
+
+.postlabel {
+  font-weight: bolder;
+  margin-top: 2%;
+  margin-bottom: 0.5%;
+}
+
+.submitbut {
+  width: 48%;
+  background-color: #837ca3;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  padding: 2% 2% 2% 2%;
+  margin: 1.5%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.5vw;
+  cursor: pointer;
+}
