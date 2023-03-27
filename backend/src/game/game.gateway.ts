@@ -62,6 +62,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('gameUpdate')
     gameUpdate(@MessageBody() dto : GameDataDto,
                @ConnectedSocket() client : Socket) {
+        console.log(client);
         client.broadcast.emit('gameUpdate', dto);
     }
 
@@ -78,6 +79,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     handleDisconnect(client: any) {
         console.log(`Player disconnected`);
+
         // console.log(`Player ${client.id} disconnected`);
         // this.players.splice(this.players.indexOf(client), 1);
         // this.players.forEach((player, index) => {

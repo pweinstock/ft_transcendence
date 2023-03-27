@@ -57,16 +57,6 @@ export default function PingPong() {
         socket.emit('gameUpdate', data);
     }
 
-    // const rightPaddleUpdate = (data : number) => {
-    //     socket.emit('rightPaddleUpdate', data);
-    // }
-    //
-    // const leftPaddleUpdate = (data : number) => {
-    //     socket.emit('leftPaddleUpdate', data);
-    // }
-
-
-
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!;
@@ -231,7 +221,6 @@ export default function PingPong() {
             checkPaddleCollision(gameData.rightPaddle, false);
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
-            // gameUpdate(gameData);
             draw();
             requestAnimationFrame(update);
         };

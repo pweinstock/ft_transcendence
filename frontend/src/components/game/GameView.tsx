@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {io, Socket} from "socket.io-client";
-import {socket} from "../../socket";
+import React, { useEffect, useRef } from 'react';
+import {io} from "socket.io-client";
 
 
 interface Paddle {
@@ -50,16 +49,6 @@ export default function PingPong() {
     const socket = io("localhost:5002/game", {
         transports: ["websocket"],
     });
-
-    // const rightPaddleUpdate = (data : number) => {
-    //     socket.emit('rightPaddleUpdate', data);
-    // }
-    //
-    // const leftPaddleUpdate = (data : number) => {
-    //     socket.emit('leftPaddleUpdate', data);
-    // }
-
-
 
     useEffect(() => {
         const canvas = canvasRef.current!;
