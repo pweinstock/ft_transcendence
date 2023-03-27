@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import astroman from './img/littleman.png';
 // const user = ;
 
-export default function NewPost() {
+export default function NewChat() {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');

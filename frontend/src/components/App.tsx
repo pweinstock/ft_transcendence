@@ -9,7 +9,7 @@ import {
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import GameView from "./game/GameView"
 import Test from "./Test"
-// import NewPost from './newpost';
+// import NewChat from './NewChat';
 import './App.css';
 import Basic from './basic';
 
