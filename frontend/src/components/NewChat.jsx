@@ -24,36 +24,30 @@ export default function NewChat() {
         // if (user) {
         //     temp = user.displayName;
         //     anopic = user.photoURL;
-        }
+        // }
     }
 
     return (
-        <div className='formholder'>
-            <form>
-                <div className="postlabel">
-                    <label htmlFor="lname" >Title</label>
-                </div>
-                <div className="inputtext">
-                    <input type="text" id="lname" name="lastname" key="110" placeholder="write your title..." value={title} onChange={handOnChangeTitle} required />
-                </div>
-                <div className="postlabel">
-                    <label htmlFor="url">URL</label>
-                </div>
-                <div className="inputtext">
-                    <input type="text" id="url" name="url" key="111" placeholder="http://..." value={urlpost} onChange={handOnChangeURL} required />
-                </div>
-                <div className="postlabel">
-                    <label htmlFor="subject">Subject</label>
-                </div>
-                <div className="bigtext">
-                    <textarea id="subject" name="subject" key="112" placeholder="Write something.." value={bigtext} onChange={handOnChangeText} required></textarea>
-                </div>
-                <Link to="/">
-                    <div className="newpostlink">
-                        <button type='button' className='submitbut' onClick={handOnClickSend}>submit</button>
+            <div className='formholder'>
+                <form>
+                    <div className="postlabel">
+                        <label htmlFor="lname" >Title</label>
                     </div>
-                </Link>
-            </form>
-        </div>
+                    <div className="inputtext">
+                        <input type="text" id="lname" name="lastname" key="110" placeholder="write your title..." value={title} onChange={handOnChangeTitle} required />
+                    </div>
+                    <div className="postlabel">
+                        <label htmlFor="subject">Massage</label>
+                    </div>
+                    <div className="bigtext">
+                        <textarea id="subject" name="subject" key="112" placeholder="Write something.." value={bigtext} onChange={handOnChangeText} required></textarea>
+                    </div>
+                    <Link to="/">
+                        <div className="newpostlink">
+                            <button type='button' className='submitbut' onClick={handOnClickSend}>send</button>
+                        </div>
+                    </Link>
+                </form>
+            </div>
     );
 }

@@ -9,9 +9,9 @@ import {
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import GameView from "./game/GameView"
 import Test from "./Test"
-// import NewChat from './NewChat';
 import './App.css';
 import Basic from './basic';
+import NewChat from './NewChat';
 
 export default function App() {
     return (
@@ -28,6 +28,7 @@ export default function App() {
                 <Route path="/"  element={<Basic />}/>
                 <Route path="/gameview" element={<GameView/>}/>
                 <Route path="/chat" element={<Chat/>}/>
+                <Route path="/newchat" element={<NewChat/>}/>
                 <Route path="/test" element={<Test/>}/>
             </Routes>
           </main>

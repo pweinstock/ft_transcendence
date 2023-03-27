@@ -16,6 +16,10 @@ canvas {
   background-color: #d8cccc;
 }
 
+.changingtext {
+  color: white;
+}
+
 header {
   display: flex;
 
