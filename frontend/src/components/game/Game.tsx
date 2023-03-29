@@ -94,11 +94,10 @@ export default function PingPong() {
             timer : 0,
             paddleSpeed : 6
         }
-
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
-            context.moveTo(canvas.width / 2, 0);
+            context.moveTo(canvas.width / 2, 20);
             context.lineTo(canvas.width / 2, canvas.height);
             context.strokeStyle = 'black';
             context.lineWidth = 2;
@@ -115,19 +114,19 @@ export default function PingPong() {
         };
 
         const drawTimer = () => {
-            context.font = "bold 24px Arial";
+            context.font = "bold 18px Arial";
             context.fillStyle = "black";
-            const x = 200;
-            const y= 30;
+            const x = 360;
+            const y= 15;
             context.fillText("Time: " + gameData.timer, x, y);
         };
 
         const drawScore = (players: Players) => {
-            context.font = "bold 24px Arial";
+            context.font = "bold 18px Arial";
             context.fillStyle = "black";
             const x1 = 10;
-            const x2 = 390;
-            const y= 30;
+            const x2 = 650;
+            const y= 20;
             context.fillText("Player 1: " + players.firstScore, x1, y);
             context.fillText("Player 2: " + players.secondScore, x2, y);
         };
@@ -286,6 +285,6 @@ export default function PingPong() {
     }, [socket]);
 
     return (
-        <canvas ref={canvasRef} width={1200} height={800} />
+        <canvas ref={canvasRef} width={800} height={530} />
     )
 }
