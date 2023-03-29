@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {io, Socket} from "socket.io-client";
-import {socket} from "../../socket";
+import React, { useEffect, useRef } from 'react';
+import {io} from "socket.io-client";
 
 
 interface Paddle {
@@ -45,17 +44,11 @@ export default function PingPong() {
     const grid = 15;
     const paddleHeight = 75;
     const startTime = new Date().getTime();
-    let paddleSpeed = 6;
     let ballSpeed = 5;
 
     const socket = io("localhost:5002/game", {
         transports: ["websocket"],
     });
-
-
-    const gameUpdate = (data : GameData) => {
-        socket.emit('gameUpdate', data);
-    }
 
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -224,65 +217,15 @@ export default function PingPong() {
             draw();
             requestAnimationFrame(update);
         };
-        const onKeyDown = (event: KeyboardEvent) => {
-            switch (event.key) {
-                case 'w':
-                    gameData.leftPaddle.dy = -paddleSpeed;
-                    gameUpdate(gameData);
-                    break;
-                case 's':
-                    gameData.leftPaddle.dy = paddleSpeed;
-                    gameUpdate(gameData);
-                    break;
-                case 'ArrowUp':
-                    gameData.rightPaddle.dy = -paddleSpeed;
-                    gameUpdate(gameData);
-                    break;
-                case 'ArrowDown':
-                    gameData.rightPaddle.dy = paddleSpeed;
-                    gameUpdate(gameData);
-                    break;
-            }
-        };
 
-        const onKeyUp = (event: KeyboardEvent) => {
-            switch (event.key) {
-                case 'w':
-                case 's':
-                    gameData.leftPaddle.dy = 0;
-                    gameUpdate(gameData);
-                    break;
-                case 'ArrowUp':
-                case 'ArrowDown':
-                    gameData.rightPaddle.dy = 0;
-                    gameUpdate(gameData);
-                    break;
-            }
-        };
 
         draw();
-        document.addEventListener('keydown', onKeyDown);
-        document.addEventListener('keyup', onKeyUp);
         socket.on("gameUpdate", (data : GameData) => {
                 gameData = data
             }
         );
 
-        // socket.on("rightPaddleUpdate", (data : number) => {
-        //         gameData.rightPaddle.dy = data
-        //     }
-        // );
-        //
-        // socket.on("leftPaddleUpdate", (data : number) => {
-        //         gameData.leftPaddle.dy = data
-        //     }
-        // );
-
         update();
-        return () => {
-            document.removeEventListener('keydown', onKeyDown);
-            document.removeEventListener('keyup', onKeyUp);
-        };
     }, [socket]);
 
     return (
