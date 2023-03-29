@@ -18,8 +18,8 @@ export default function Auth() {
         <Router>
             <Routes>
                 <Route path="/" element={<PingPong/>}/>
-                <Route path="/GameView" element={<GameView/>}/>
-                <Route path="/Chat" element={<Chat/>}/>
+                <Route path="/gameview" element={<GameView/>}/>
+                <Route path="/chat" element={<Chat/>}/>
             </Routes>
         </Router>);
 }

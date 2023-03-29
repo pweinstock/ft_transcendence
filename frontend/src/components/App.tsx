@@ -1,5 +1,5 @@
 // import PingPong from "./game/Game"
-import Chat from "./chat/chat"
+import Chat from "./chat/Chat"
 import astroman from './img/littleman.png';
 import {
     BrowserRouter as Router,
