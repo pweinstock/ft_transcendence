@@ -29,6 +29,12 @@ export default function Basic() {
                 <Link className="newpostlink" to="/gameview">
                     <button className='buttonside'>Watch Game</button>
                 </Link>
+                <Link className="newpostlink" to="/users">
+                    <button className='buttonside'>Users</button>
+                </Link>
+                <Link className="newpostlink" to="/settings">
+                    <button className='buttonside'>Settings</button>
+                </Link>
                 {/* <Login /> */}
                 {/* <Groupabout /> */}
             </aside>

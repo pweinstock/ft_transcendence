@@ -1,10 +1,28 @@
-import { Controller, Get, Post, Body, UseGuards} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import {ChangeDataDTO} from "./dto/change-data.dto";
 import {FriendDto} from "./dto/friend.dto";
 import { AuthGuard } from '@nestjs/passport';
 import TwoFactorAuthenticationGuard from 'src/auth/twoFactorAuthentication.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
+import path = require('path');
+import { Observable } from 'rxjs';
+
+export const storage = {
+    storage: diskStorage({
+        destination: './uploads/image',
+        filename: (req, file, cb) => {
+            const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+            const extension: string = path.parse(file.originalname).ext;
+
+            cb(null, `${filename}${extension}`)
+        }
+    })
+
+}
 
 
 @Controller('users')
@@ -18,25 +36,59 @@ export class UserController {
         return this.usersService.findAll();
     }
 
+    @Get('current')
+    @UseGuards(AuthGuard('2FA'))
+    getUser(@Req() request: any) {
+        //console.log('request: %s', request.user)
+        return request.user;
+    }
+
     @Post()
     create(@Body() userDto: UserDTO) {
         return this.usersService.createUser(userDto);
     } //todo delete later: Testing purpose only
 
+
     @Post('changeName')
-    changeName(@Body() changeDataDTO : ChangeDataDTO) {
-        this.usersService.changeName(changeDataDTO);
+    @UseGuards(AuthGuard('2FA'))
+    changeName(@Req() request: any, @Body('newName') newName: string) {
+        this.usersService.changeName(request.user.id, newName);
     }
 
-    @Post('changePhoto')
-    changePhoto(@Body() changeDataDTO : ChangeDataDTO) {
-        this.usersService.changePhoto(changeDataDTO);
+    @Post('upload')
+    @UseGuards(AuthGuard('2FA'))
+    @UseInterceptors(FileInterceptor('file', storage))
+    uploadFile(@UploadedFile() file, @Req() req): Promise<string> {
+        console.log('req.user.photo: %s', req.user.photo);
+        if (req.user.photo != 'null')
+            this.usersService.deleteImage(req.user.photo); 
+        return this.usersService.uploadAvatar(req.user.id, file.filename)
     }
 
-    @Post('changeStatus')
-    changeStatus(@Body() changeDataDTO : ChangeDataDTO) {
-        this.usersService.changePhoto(changeDataDTO);
+    @Post('delete')
+    @UseGuards(AuthGuard('2FA'))
+    deleteAvatar(@Req() req) {
+        this.usersService.deleteImage(req.user.photo);
+        this.usersService.uploadAvatar(req.user.id, null)
     }
+
+
+    @Get('image/:imagename')
+    @UseGuards(AuthGuard('2FA'))
+    getImage(@Param('imagename') imagename, @Res() res): Promise<Observable<Object>> {
+        return this.usersService.getImage(res, imagename);
+    }
+
+
+    // @Post('changePhoto')
+    // changePhoto(@Body() changeDataDTO : ChangeDataDTO) {
+    //     this.usersService.changePhoto(changeDataDTO);
+    // }
+
+    // @Post('changeStatus')
+    // changeStatus(@Body() changeDataDTO : ChangeDataDTO) {
+    //     this.usersService.changePhoto(changeDataDTO);
+    // }
 
     @Post('acceptFriendRequest')
     acceptFriendRequest(@Body() dto : FriendDto) {

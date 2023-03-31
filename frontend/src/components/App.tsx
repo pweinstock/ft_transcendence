@@ -12,6 +12,9 @@ import Test from "./Test"
 import './App.css';
 import Basic from './basic';
 import NewChat from './NewChat';
+import Login from "./auth/login/Login";
+import Users from "./users/users";
+import Settings from "./settings/settings";
 
 export default function App() {
     return (
@@ -30,6 +33,9 @@ export default function App() {
                 <Route path="/chat" element={<Chat/>}/>
                 <Route path="/newchat" element={<NewChat/>}/>
                 <Route path="/test" element={<Test/>}/>
+                <Route path="/auth" element={<Login/>}/>
+                <Route path="/users" element={<Users/>}/>
+                <Route path="/settings" element={<Settings/>}/>
             </Routes>
           </main>
         </Router>

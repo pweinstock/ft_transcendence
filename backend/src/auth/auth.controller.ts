@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AuthGuard } from "@nestjs/passport";
 import { Response } from "express";
@@ -25,7 +25,7 @@ export class AuthController {
 		};
 		const accessToken = this.jwtService.sign(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true});
-		res.redirect('http://localhost:5000/users');
+		res.redirect('http://localhost:3000/users');
 	}
 
 	@UseGuards(AuthGuard('jwt'))
@@ -56,8 +56,8 @@ export class AuthController {
 	}
 
 	@UseGuards(AuthGuard('jwt'))
-	@Get('validate')
-	async verify(@Req() req: any, @Res({passthrough: true}) res: Response, @Query('code') code: string | null) {
+	@Post('validate')
+	async verify(@Req() req: any, @Res({passthrough: true}) res: Response, @Body('code') code: string | null) {
 		const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(code, req.user);
 		if (!isCodeValid)
 			throw new HttpException('Wrong 2FA code', HttpStatus.NOT_ACCEPTABLE);

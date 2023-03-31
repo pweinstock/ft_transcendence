@@ -1,10 +1,13 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable, Res} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import {User, UserStatus} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {ChangeDataDTO} from "./dto/change-data.dto";
 import {FriendDto} from "./dto/friend.dto";
+//import { Observable } from 'rxjs-compat';
+import { join } from 'path';
+import { Observable, of } from 'rxjs';
 
 
 @Injectable()
@@ -53,16 +56,29 @@ export class UserService {
     }
 
     //USER INFO
-    async changeName(changeDataDTO : ChangeDataDTO) : Promise<User> {
-        const user = await this.findById(changeDataDTO.userId);
-        user.displayName = changeDataDTO.value;
-        return this.userRepository.save(user);
+    async changeName(id: number, newName: string) : Promise<any> {
+        return this.userRepository.update(id, { displayName: newName});
     }
 
-    async changePhoto(changeDataDTO : ChangeDataDTO) : Promise<User> {
-        const user = await this.findById(changeDataDTO.userId);
-        user.photo = changeDataDTO.value;
-        return this.userRepository.save(user);
+    async uploadAvatar(id: number, filename: string) : Promise<any> {
+        return this.userRepository.update(id, {photo: filename});
+    }
+
+    deleteImage(imagename: string) {
+		let fs = require('fs');
+		let filePath = "./uploads/image/" + imagename;
+		fs.stat(filePath, function (err, stats) {
+			if (err) {
+				return console.error(err);
+			}
+			fs.unlinkSync(filePath);
+		})
+	}
+
+    async getImage(@Res() res, imagename: string): Promise<Observable<Object>> {
+        if (imagename === 'null')
+            return of(res.sendFile(join(process.cwd(), './uploads/image/' + 'littleman.png')));
+        return of(res.sendFile(join(process.cwd(), './uploads/image/' + imagename)));
     }
 
     async changeStatus(user : User, status : UserStatus) : Promise<User> {
