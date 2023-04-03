@@ -37,7 +37,7 @@ function Users() {
   }, []);
 
   // Render the user's image and data
-  const user = usersData[1] || {};
+  const user = usersData[0] || {};
   console.log("user.photo: %s", user.photo);
   const userImageUrl = `http://localhost:5000/users/image/${user.photo}`;
 
