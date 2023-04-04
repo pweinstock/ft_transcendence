@@ -1,18 +1,23 @@
-import {Body, Controller, Get, Param, Post} from '@nestjs/common';
+import {Body, Controller, Get, HttpException, HttpStatus, Param, Post, Req, UseGuards} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDTO } from './dto/create-chat.dto';
 import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {ChangeStatusDTO} from "./dto/change-status.dto";
 import {User} from "../users/user.entity";
 import {Message} from "./message/message.entity";
+import {AuthGuard} from '@nestjs/passport';
+import {Chat} from "./chat.entity";
+
 
 @Controller('chat')
 export class ChatController {
     constructor (private chatService: ChatService) {}
 
     @Post('create')
-    create(@Body() dto: CreateChatDTO) {
-        return this.chatService.createChat(dto);
+    @UseGuards(AuthGuard('2FA'))
+    async create(@Req() request, @Body() dto: CreateChatDTO) {
+        const chat = await this.chatService.createChat(request.user, dto);
+        return chat;
     }
 
     @Post('delete')
@@ -21,18 +26,27 @@ export class ChatController {
     }
 
     @Get('/:id/users')
-    async getUserChats(@Param('id') chatId: number) :Promise<User[]> {
+    async getUsersInChat(@Param('id') chatId: number) :Promise<User[]> {
         const chat = await this.chatService.findChatById(chatId);
         return chat.users;
     }
 
-    @Get('/:id')
+    @Get()
+    @UseGuards(AuthGuard('2FA'))
+    async getUserChats(@Req() request) : Promise<Chat[]> {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        const chats = await this.chatService.getUserChats(request.user);
+        return chats;
+    }
+
+    @Get('/id/:id')
     async getMessages(@Param('id') chatId : number) : Promise<Message[]>{
         const chat = await this.chatService.findChatById(chatId);
         return chat.messages;
     }
 
-    @Get()
+    @Get('/all')
     getAllchats() {
         return this.chatService.findAllChats();
     }
