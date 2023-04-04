@@ -11,6 +11,10 @@ export default function Chat() {
     const send = (value: string) => {
         socket?.emit("message", value);
     }
+
+    const chatId = 1;
+    socket?.emit('joinRoom', chatId)
+
     useEffect(() => {
         const newSocket = io("http://localhost:5001/chat");
         setSocket(newSocket);

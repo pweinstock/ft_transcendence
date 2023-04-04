@@ -29,7 +29,7 @@ export class UserController {
     constructor(private usersService: UserService) {}
 
     @Get()
-	@UseGuards(AuthGuard('2FA'))
+	// @UseGuards(AuthGuard('2FA'))
     getAll() {
         return this.usersService.findAll();
     }

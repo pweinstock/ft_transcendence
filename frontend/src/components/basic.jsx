@@ -20,6 +20,9 @@ export default function Basic() {
                 <Link className="newpostlink" to="/chat">
                     <button className='buttonside'>Chat</button>
                 </Link>
+                <Link className="newpostlink" to="/chatrooms">
+                    <button className='buttonside'>ChatRooms</button>
+                </Link>
                 <Link className="newpostlink" to="/newchat">
                     <button className='buttonside'>Send Massage</button>
                 </Link>

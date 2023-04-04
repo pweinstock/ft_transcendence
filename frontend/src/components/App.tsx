@@ -12,6 +12,7 @@ import Test from "./Test"
 import './App.css';
 import Basic from './basic';
 import NewChat from './NewChat';
+import ChatRooms from './ChatRooms';
 import Login from "./auth/login/Login";
 import Users from "./users/users";
 import Settings from "./settings/settings1";
@@ -32,6 +33,7 @@ export default function App() {
             <Routes>
                 <Route path="/"  element={<Basic />}/>
                 <Route path="/gameview" element={<GameView/>}/>
+                <Route path="/chatrooms" element={<ChatRooms/>}/>
                 <Route path="/chat" element={<Chat/>}/>
                 <Route path="/newchat" element={<NewChat/>}/>
                 <Route path="/test" element={<Test/>}/>

@@ -21,20 +21,20 @@ export class ChatService {
     ) {}
 
     // CHAT INTERRACTION
-    async createChat(dto: CreateChatDTO) : Promise<Chat> {
+    async createChat(owner : User, dto: CreateChatDTO) : Promise<Chat> {
         if (dto.type == ChatType.PROTECTED && !dto.password)
             throw new HttpException('Wrong data provided!', HttpStatus.BAD_REQUEST);
-        const owner = await this.userServices.findById(dto.owner);
-        if (!owner)
-            throw new HttpException('User not found!', HttpStatus.BAD_REQUEST);
         const chat = this.chatRepository.create(dto);
+        chat.owner = owner.id;
         chat.admins = [];
         chat.bannedUsers = [];
         // chat.mutedUsers = new Array<MutedUser>(); //todo find solution for this
         chat.users = [];
         chat.messages = [];
         chat.users.push(owner);
-        this.chatRepository.save(chat);
+        await this.chatRepository.save(chat);
+        await this.userServices.addChat(owner, chat.id);
+        console.log(owner);
         return chat;
     }
 
@@ -71,6 +71,17 @@ export class ChatService {
 
 
     //USER INTERRACTION
+    async getUserChats(user : User) : Promise<Chat[]> {
+        if (user.chats.length === 0)
+            return null;
+        let chats : Chat[] = await Promise.all(
+            user.chats.map(async (chatId) => {
+                const chat = await this.findChatById(chatId);
+                return chat;
+            })
+        );
+        return chats;
+    }
 
     async addUser(dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);

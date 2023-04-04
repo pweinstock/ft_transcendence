@@ -6,6 +6,7 @@ import {Repository} from "typeorm";
 import {FriendDto} from "./dto/friend.dto";
 import { join } from 'path';
 import { Observable, of } from 'rxjs';
+import {Chat} from "../chat/chat.entity";
 
 
 @Injectable()
@@ -181,10 +182,10 @@ export class UserService {
     }
 
     //CHAT
-    addChat (user : User, chat : number) : void {
+    async addChat (user : User, chat : number) : Promise<void> {
         if (!user.chats.includes(chat)) {
             user.chats.push(chat);
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
