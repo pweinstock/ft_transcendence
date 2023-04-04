@@ -14,14 +14,14 @@ export enum ChatType {
 
 export default function ChatRooms()
 {
-    const [value, setValue] = useState(0); //set with basic value 0
+    // const [value, setValue] = useState(0); //set with basic value 0
 
     // useEffect(() => {
     //     // This effect uses the `value` variable,
     //     // so it "depends on" `value`.
     //     console.log(value);
     // }, [value]) //if value is dependency the change will trigger the useffect to run.
-    // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
+    // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat2'}, {withCredentials: true});
     // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat2'}, {withCredentials: true});
 
     useEffect(() => {
@@ -30,19 +30,49 @@ export default function ChatRooms()
             console.log(response);
         }
         fetchUser();
+    }, [handOnClickSend]);
+
+    useEffect(() => {
+        async function fetchUser() {
+            const chatId = '1';
+            const response = await axios.get("http://localhost:5000/id/" + chatId, {withCredentials: true});
+            const messages = response.data;
+            console.log(response);
+        }
+        fetchUser();
     }, []);
 
-
     function handOnClickSend() {
-        setValue(value + 1);
+        axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
+
+    }
+    function handOnClickSend1() {
+        const socket = io("http://localhost:5001/chat");
+        const chatId = 1;
+        socket?.emit('joinRoom', chatId);
     }
 
 
     return (
         <>
             <div className="changingtext">
-                <button onClick={handOnClickSend}>Add Friend</button>
+                <button onClick={handOnClickSend}>CreatTestChat</button>
+            </div>
+            <div className="changingtext">
+                <button onClick={handOnClickSend1}>join</button>
             </div>
         </>
     );
 }
+
+/*
+    MESSAGES JSON
+    {
+        id: number;
+        content: string;
+        displayName: string;
+        createdAt: Date;
+        user: number;
+        chat: number[];
+    }
+ */

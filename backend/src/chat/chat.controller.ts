@@ -41,9 +41,14 @@ export class ChatController {
     }
 
     @Get('/id/:id')
-    async getMessages(@Param('id') chatId : number) : Promise<Message[]>{
-        const chat = await this.chatService.findChatById(chatId);
-        return chat.messages;
+    @UseGuards(AuthGuard('2FA'))
+    async getMessages(@Req() request, @Param('id') chatId : number) : Promise<Chat>{
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        if (!request.user.includes(chatId))
+            throw new HttpException('You are not in the Chat!', HttpStatus.BAD_REQUEST);
+        const chat = await this.chatService.findChatById( chatId);
+        return chat;
     }
 
     @Get('/all')
