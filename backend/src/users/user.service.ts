@@ -3,9 +3,7 @@ import { UserDTO } from './dto/user.dto';
 import {User, UserStatus} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {ChangeDataDTO} from "./dto/change-data.dto";
 import {FriendDto} from "./dto/friend.dto";
-//import { Observable } from 'rxjs-compat';
 import { join } from 'path';
 import { Observable, of } from 'rxjs';
 

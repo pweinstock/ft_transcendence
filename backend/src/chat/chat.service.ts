@@ -7,7 +7,6 @@ import {ChangeStatusDTO} from './dto/change-status.dto';
 import {CreateChatDTO} from './dto/create-chat.dto';
 import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
-import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {Message} from "./message/message.entity";
@@ -91,12 +90,11 @@ export class ChatService {
         }
     }
 
-    async joinChat(dto : JoinChatDto) : Promise<User> {
-        const user = await this.userServices.findById(dto.userId);
+    async joinChat(user: User, dto : JoinChatDto) : Promise<Chat> {
         const chat = await this.findChatById(dto.chatId);
         this.userServices.changeStatus(user, UserStatus.ONLINE);
         if (chat.users.includes(user))
-            return user;
+            return chat;
         if (chat.admins.includes(user.id))
             chat.users.push(user);
         else {
@@ -117,7 +115,7 @@ export class ChatService {
         }
         this.userServices.addChat(user, chat.id);
         this.chatRepository.save(chat);
-        return user;
+        return chat;
     }
 
     async addAdmin(dto: ChangeStatusDTO) : Promise<void> {
@@ -185,24 +183,25 @@ export class ChatService {
     }
 
     //Message Interraction
-    clienttoUser = {}
-    async identify (user : User, clientId : string) : Promise<number> {
+    clienttoUser = {};
+
+    identify (user : User, clientId : string) : void {
         this.clienttoUser[clientId] = user;
-        return user.id;
     }
 
-    getClientName(clientId : string) {
-        return this.clienttoUser[clientId];
+    getClient(clientId : string) : User {
+        const user = this.clienttoUser[clientId];
+        if (!user)
+            throw new HttpException('You are not registered in this room!', HttpStatus.FORBIDDEN)
+        return user;
     }
 
-    async createMessage(dto : CreateMessageDto) : Promise<Message> {
-        const user = await this.userServices.findById(dto.userId);
-        const chat = await this.findChatById(dto.chatId);
+    async createMessage(user : User, chat : Chat, newMessage: string) : Promise<Message> {
         if (chat.bannedUsers.includes(user.id))
             throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
         if (this.isMuted(chat, user.id))
             throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
-        const message = await this.messageServices.createMessage(dto);
+        const message = await this.messageServices.createMessage ({ content : newMessage, userId : user.id, chatId : chat.id});
         message.displayName = user.displayName;
         chat.messages.push(message);
         this.chatRepository.save(message);
@@ -210,11 +209,10 @@ export class ChatService {
         return message;
     }
 
-    async removeMessage(dto : DeleteMessageDto) : Promise<void> {
+    async removeMessage(dto : DeleteMessageDto, user : User) : Promise<void> {
         const message = await this.messageServices.findMessageById(dto.messageId);
-        if (message.user != dto.userId)
-            throw new HttpException('Message not belongs to user!', HttpStatus.BAD_REQUEST);
-        const user = await this.userServices.findById(dto.userId);
+        if (message.user != user.id)
+            throw new HttpException('Message not belongs to user!', HttpStatus.FORBIDDEN);
         const chat = await this.findChatById(dto.chatId);
         chat.messages = chat.messages.filter((msg) => msg.id != dto.messageId);
         this.chatRepository.save(message);
