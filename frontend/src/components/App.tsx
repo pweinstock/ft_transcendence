@@ -14,7 +14,9 @@ import Basic from './basic';
 import NewChat from './NewChat';
 import Login from "./auth/login/Login";
 import Users from "./users/users";
-import Settings from "./settings/settings";
+import Settings from "./settings/settings1";
+import TwoFactorAuth from "./auth/login/TwoFactorAuth";
+import Settings2 from "./settings/settings2";
 
 export default function App() {
     return (
@@ -34,8 +36,10 @@ export default function App() {
                 <Route path="/newchat" element={<NewChat/>}/>
                 <Route path="/test" element={<Test/>}/>
                 <Route path="/auth" element={<Login/>}/>
+                <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/users" element={<Users/>}/>
-                <Route path="/settings" element={<Settings/>}/>
+                <Route path="/settings" element={<Settings2/>}/>
+
             </Routes>
           </main>
         </Router>

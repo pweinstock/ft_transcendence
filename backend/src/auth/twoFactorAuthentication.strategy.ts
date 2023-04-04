@@ -25,12 +25,12 @@ export class TwoFactorAuthenticationStrategy extends PassportStrategy(Strategy, 
 		const email = payload.email;
 		const user = await this.userService.findByEmail(email);
 		if (!user)
-			throw new HttpException("1Unauthorized", HttpStatus.UNAUTHORIZED);
+			throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
 		else if (!user.isTwoFactorAuthenticationEnabled)
 			return user;
 		else if (payload.isTwoFactorAuthenticated)
 			return user;
 		else
-			throw new HttpException("2Unauthorized", HttpStatus.UNAUTHORIZED);
+			throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
 	}
 }

@@ -17,8 +17,10 @@ export class UserService {
         if (!dto.email || !dto.displayName)
             throw new HttpException('Required information was not provided!', HttpStatus.BAD_REQUEST);
         const existingUser = await this.userRepository.findOneBy({email: dto.email});
-        if (existingUser)
+        if (existingUser) {
+            await this.userRepository.update(existingUser.id, {first: false})
             return existingUser;
+        }
         const user = this.userRepository.create(dto);
         user.pendingFriends = [];
         user.bannedUsers = [];
