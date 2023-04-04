@@ -70,7 +70,7 @@ export class AuthController {
 		};
 		const accessToken = this.jwtService.sign(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true});
-		return { isTwoFactorAuthenticated: true};
+		return { valid: true};
 	}
 
 }
