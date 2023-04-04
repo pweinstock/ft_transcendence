@@ -21,18 +21,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly gameService : GameService) {}
+    constructor(private readonly gameService: GameService) {
+    }
 
     // @SubscribeMessage("join")
     // joinGame(
-        // @MessageBody("join") data : number,
+    // @MessageBody("join") data : number,
     //     @ConnectedSocket() client : Socket
     // ) {
     //     console.log('game connected')
-        // console.log(data);
-        // this.gameService.identify(client.id);
-        // this.server.emit('join', client.id);
-        // return client.id;
+    // console.log(data);
+    // this.gameService.identify(client.id);
+    // this.server.emit('join', client.id);
+    // return client.id;
     // }
 
     // @SubscribeMessage('movePaddle')
@@ -60,18 +61,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // }
 
     @SubscribeMessage('gameUpdate')
-    gameUpdate(@MessageBody() dto : GameDataDto,
-               @ConnectedSocket() client : Socket) {
+    gameUpdate(@MessageBody() dto: GameDataDto,
+               @ConnectedSocket() client: Socket) {
         // console.log(client);
         client.broadcast.emit('gameUpdate', dto);
     }
 
     afterInit(server: Server) {
-        console.log('Port initialized');
     }
 
-    handleConnection(@MessageBody() dto : GameDataDto,
-                     @ConnectedSocket() client : Socket) {
+    handleConnection(@MessageBody() dto: GameDataDto,
+                     @ConnectedSocket() client: Socket) {
         console.log(`Player connected`);
         // this.players.push(client);
         // client.emit('connectSuccess', `Connected to Pong game as Player ${this.players.length}`);
@@ -88,7 +88,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
 
-
     // @SubscribeMessage('scorePoint')
     // handleScorePoint(client: any) {
     //     console.log(`Player ${client.id} scored a point`);
@@ -100,6 +99,5 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     //         }
     //     });
     // }
-
 
 }
