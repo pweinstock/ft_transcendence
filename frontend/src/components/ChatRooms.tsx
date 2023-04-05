@@ -3,6 +3,9 @@ import { color } from '@mui/system';
 import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
 import axios from "axios";
+import {
+    Link
+} from "react-router-dom";
 
 
 export enum ChatType {
@@ -57,6 +60,9 @@ export default function ChatRooms()
 
         <>
             <section>
+                <Link className="newpostlink" to="/chat">
+                    <button className='chatroombutton'>Home</button>
+                </Link>
                 <div>
                     {value.map((item, index) => (
                         <p style={{color: "white"}} key={index}>{item.name}</p>
