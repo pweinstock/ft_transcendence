@@ -14,7 +14,7 @@ export enum ChatType {
 
 export default function ChatRooms()
 {
-    // const [value, setValue] = useState(0); //set with basic value 0
+    const [value, setValue] = useState([]); //set with basic value 0
 
     // useEffect(() => {
     //     // This effect uses the `value` variable,
@@ -28,9 +28,10 @@ export default function ChatRooms()
         async function fetchUser() {
             const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
             console.log(response);
+            setValue(response.data);
         }
         fetchUser();
-    }, [handOnClickSend]);
+    },[]);
 
     // useEffect(() => {
     //     async function fetchUser() {
@@ -56,15 +57,20 @@ export default function ChatRooms()
     return (
 
         <>
-        <section>
-            <div className="changingtext">
-                <button onClick={handOnClickSend}>CreatTestChat</button>
-            </div>
-            <div className="changingtext">
-                <button onClick={handOnClickSend1}>join</button>
-            </div>
-        </section>
-    </>
+            <section>
+                <div>
+                    {value.map((item, index) => (
+                        <p style={{color: "white"}} key={index}>{item.name}</p>
+                    ))}
+                </div>
+                <div className="changingtext">
+                    <button onClick={handOnClickSend}>CreatTestChat</button>
+                </div>
+                <div className="changingtext">
+                    <button onClick={handOnClickSend1}>join</button>
+                </div>
+            </section>
+        </>
     );
 }
 
