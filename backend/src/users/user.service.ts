@@ -26,7 +26,6 @@ export class UserService {
         user.pendingFriends = [];
         user.bannedUsers = [];
         user.friends = [];
-        user.messages = [];
         user.chats = [];
         user.matchHistory = [];
         return this.userRepository.save(user);
@@ -51,6 +50,15 @@ export class UserService {
             throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
         return user;
     }
+
+    // async findUsersByIds(ids: number[]): Promise<User[]> {
+    //     const users: User[] = [];
+    //     for (const id of ids) {
+    //         const user = await this.findById(id);
+    //         users.push(user);
+    //     }
+    //     return users;
+    // }
 
     async remove(user: User) : Promise<void> {
         await this.userRepository.remove(user);
@@ -85,17 +93,6 @@ export class UserService {
     async changeStatus(user : User, status : UserStatus) : Promise<User> {
         user.status = status;
         return this.userRepository.save(user);
-    }
-
-    //MESSAGES
-    addMessage(messageId: number, user : User) : void {
-        user.messages.push(messageId);
-        this.userRepository.save(user);
-    }
-
-    deleteMessage(messageId: number, user : User) : void {
-        user.messages = user.messages.filter((message) => message != messageId);
-        this.userRepository.save(user);
     }
 
     //FRIEND LIST
@@ -189,7 +186,8 @@ export class UserService {
         }
     }
 
-    deleteChat (user : User, chat : number) : void {
+    async deleteChat (userId : number, chat : number) : Promise<void> {
+        const user = await this.findById(userId);
         user.chats = user.chats.filter(chatId => chatId !== chat);
         this.userRepository.save(user);
     }

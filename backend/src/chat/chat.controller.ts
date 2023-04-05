@@ -26,9 +26,9 @@ export class ChatController {
     }
 
     @Get('/:id/users')
-    async getUsersInChat(@Param('id') chatId: number) :Promise<User[]> {
-        const chat = await this.chatService.findChatById(chatId);
-        return chat.users;
+    async getUsersInChat(@Param('id') chatId: number) : Promise<User[]> {
+        const users = await this.chatService.findChatUsers(chatId);
+        return users;
     }
 
     @Get()
