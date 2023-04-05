@@ -29,32 +29,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     afterInit(server: Server) {}
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
-        console.log(`Disconnected: ${client.id}`);
+        this.chatService.disconnectClient(client);
     }
 
-    handleConnection(@ConnectedSocket() client: Socket) {
-        console.log(`Connected: ${client.id}`);
+    async handleConnection(@ConnectedSocket() client: Socket) {
     }
 
     @SubscribeMessage('joinRoom')
-    @UseGuards(AuthGuard('2FA'))
     async handleJoinRoom(
-        @Req() request: any,
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinChatDto
-    ) : Promise <Message[]> {
-        if (!request)
-            throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-        const chat = await this.chatService.joinChat(request.user, dto);
-        this.chatService.identify(request.user, client.id);
+    ) : Promise <void> {
+        const chat = await this.chatService.joinChat(dto, client);
         client.join(String(chat.id));
-        this.server.to(String(chat.id)).emit('system', `${request.user.displayName}: joined the ${chat.name}`);
-        return chat.messages;
+        const user = this.chatService.getClientRoom(client.id).user;
+        this.server.to(String(chat.id)).emit('system', `${user.displayName}: joined the ${chat.name}`);
     }
 
     @SubscribeMessage('leaveRoom')
     handleLeaveRoom(client: Socket, data: { room: string }) {
-        const user = this.chatService.getClient(client.id);
+        const user = this.chatService.getClientRoom(client.id).user;
         console.log(`${user.displayName} left ${data.room}`);
         client.leave(data.room);
     }
@@ -74,17 +68,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   	    return message;
     }
 
-    @SubscribeMessage('getChatMessages')
-    @UseGuards(AuthGuard('2FA'))
-    async findChatMessages(
-        @Req() request: any,
-        @MessageBody('chatId') chatId : number
-    ) : Promise<Message[]> {
-  	    const chat = await this.chatService.findChatById(chatId);
-  	    if (!chat.users.includes(request.user.id))
-  	        throw new HttpException('user is not in this chat', HttpStatus.FORBIDDEN);
-  	    return chat.messages;
-    }
+    // @SubscribeMessage('getChatMessages')
+    // @UseGuards(AuthGuard('2FA'))
+    // async findChatMessages(
+    //     @Req() request: any,
+    //     @MessageBody('chatId') chatId : number
+    // ) : Promise<Message[]> {
+  	//     const chat = await this.chatService.findChatById(chatId);
+  	//     if (!chat.users.includes(request.user.id))
+  	//         throw new HttpException('user is not in this chat', HttpStatus.FORBIDDEN);
+  	//     return chat.messages;
+    // }
 
     @SubscribeMessage('removeMessage')
     @UseGuards(AuthGuard('2FA'))
