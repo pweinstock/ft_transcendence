@@ -46,8 +46,10 @@ services:
         FORTYTWO_APP_ID: $FORTYTWO_APP_ID
         FORTYTWO_APP_SECRET: $FORTYTWO_APP_SECRET
         FORTYTWO_CALLBACK_URL: $FORTYTWO_CALLBACK_URL
+        HOST_IP: $HOST_IP
         JWT_SECRET: $JWT_SECRET
         JWT_EXPIRES_IN: $JWT_EXPIRES_IN
+        
       volumes:
       - volnest:/nest/
       ports:
