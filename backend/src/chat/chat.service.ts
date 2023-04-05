@@ -212,8 +212,6 @@ export class ChatService {
     }
 
     //Message Interraction
-
-
     private clienttoUser = new Map<string, Room>();
 
     identify (newUser : User, client : Socket, chatID : number) : void {
@@ -318,7 +316,7 @@ export class ChatService {
         const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
         if (mutedUser) {
             const currentDate = new Date();
-            if (mutedUser.unmuteDate >= currentDate)
+            if (mutedUser.unmuteDate > currentDate)
                 return true;
             chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
             this.chatRepository.save(chat);

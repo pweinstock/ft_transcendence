@@ -68,7 +68,7 @@ export class ChatController {
     @Get('/all')
     getAllchats() {
         return this.chatService.findAllChats();
-    }//todo remove later
+    } //todo remove later
 
     @Post('admin')
     @UseGuards(AuthGuard('2FA'))
