@@ -1,7 +1,6 @@
 import {Body, Controller, Get, HttpException, HttpStatus, Param, Post, Req, UseGuards} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDTO } from './dto/create-chat.dto';
-import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {ChangeStatusDTO} from "./dto/change-status.dto";
 import {User} from "../users/user.entity";
 import {Message} from "./message/message.entity";
@@ -20,12 +19,15 @@ export class ChatController {
         return chat;
     }
 
-    @Post('delete')
-    delete(@Body() dto: DeleteChatDTO) {
-        return this.chatService.deleteChat(dto);
+    @Get('delete/:id')
+    @UseGuards(AuthGuard('2FA'))
+    delete(@Req() request, @Param('id') chatId : number) {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        return this.chatService.deleteChat(request.user.id, chatId);
     }
 
-    @Get('/:id/users')
+    @Get('/users/:id')
     async getUsersInChat(@Param('id') chatId: number) : Promise<User[]> {
         const users = await this.chatService.findChatUsers(chatId);
         return users;

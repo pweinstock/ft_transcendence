@@ -43,9 +43,9 @@ export class ChatService {
         return chat;
     }
 
-    async deleteChat(dto: DeleteChatDTO): Promise<void> {
-        const chat = await this.findChatById(dto.chatId);
-        if (chat.owner !== dto.owner)
+    async deleteChat(userId : number, chatId: number): Promise<void> {
+        const chat = await this.findChatById(chatId);
+        if (chat.owner !== userId)
             throw new HttpException('Not Allowed!', HttpStatus.FORBIDDEN);
         chat.users.forEach(user => this.userServices.deleteChat(user, chat.id));
         chat.messages.forEach(message => {
