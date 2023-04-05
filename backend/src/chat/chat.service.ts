@@ -101,11 +101,14 @@ export class ChatService {
         }
     }
 
-    async joinChat(user: User, dto : JoinChatDto) : Promise<Chat> {
+    async joinChat(dto : JoinChatDto, clientId : string) : Promise<Chat> {
+        const user = await this.userServices.findById(dto.userId);
         const chat = await this.findChatById(dto.chatId);
         this.userServices.changeStatus(user, UserStatus.ONLINE);
-        if (chat.users.includes(user))
+        if (chat.users.includes(user)) {
+            this.identify(user, clientId);
             return chat;
+        }
         if (chat.admins.includes(user.id))
             chat.users.push(user);
         else {
@@ -125,6 +128,7 @@ export class ChatService {
             }
         }
         this.userServices.addChat(user, chat.id);
+        this.identify(user, clientId);
         this.chatRepository.save(chat);
         return chat;
     }

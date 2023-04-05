@@ -32,23 +32,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log(`Disconnected: ${client.id}`);
     }
 
-    handleConnection(@ConnectedSocket() client: Socket) {
-        console.log(`Connected: ${client.id}`);
+    async handleConnection(@ConnectedSocket() client: Socket) {
     }
 
     @SubscribeMessage('joinRoom')
-    @UseGuards(AuthGuard('2FA'))
     async handleJoinRoom(
-        @Req() request: any,
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinChatDto
     ) : Promise <Message[]> {
-        if (!request)
-            throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-        const chat = await this.chatService.joinChat(request.user, dto);
-        this.chatService.identify(request.user, client.id);
+        const chat = await this.chatService.joinChat(dto, client.id);
         client.join(String(chat.id));
-        this.server.to(String(chat.id)).emit('system', `${request.user.displayName}: joined the ${chat.name}`);
+        const user = this.chatService.getClient(client.id);
+        this.server.to(String(chat.id)).emit('system', `${user.displayName}: joined the ${chat.name}`);
         return chat.messages;
     }
 
