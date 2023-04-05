@@ -230,6 +230,18 @@ export class ChatService {
         }
     }
 
+    async getChatMessages(user : User, chatId : number) : Promise<Message[]> {
+        const chat = await this.findChatById(chatId);
+        if (!chat.users.includes(user.id))
+            throw new HttpException('You are not authorised in chat', HttpStatus.FORBIDDEN);
+        const messages: Message[] = [];
+        for (const messageId of chat.messages) {
+            const message = await this.messageServices.findMessageById(messageId);
+            messages.push(message);
+        }
+        return messages;
+    }
+
     getClientRoom(clientId : string) : Room {
         const room = this.clienttoUser.get(clientId);
         if (!room)
