@@ -28,6 +28,7 @@ export class ChatController {
     }
 
     @Get('/users/:id')
+    @UseGuards(AuthGuard('2FA'))
     async getUsersInChat(@Param('id') chatId: number) : Promise<User[]> {
         const users = await this.chatService.findChatUsers(chatId);
         return users;
@@ -67,20 +68,29 @@ export class ChatController {
     @Get('/all')
     getAllchats() {
         return this.chatService.findAllChats();
-    }
+    }//todo remove later
 
     @Post('admin')
-    addAdmin(@Body() dto: ChangeStatusDTO) {
-        return this.chatService.addAdmin(dto);
+    @UseGuards(AuthGuard('2FA'))
+    addAdmin(@Req() request, @Body() dto: ChangeStatusDTO) {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        return this.chatService.addAdmin(request.user.id, dto);
     }
 
     @Post('ban')
-    ban(@Body() dto: ChangeStatusDTO) {
-        return this.chatService.banUser(dto);
+    @UseGuards(AuthGuard('2FA'))
+    ban(@Req() request, @Body() dto: ChangeStatusDTO) {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        return this.chatService.banUser(request.user.id, dto);
     }
 
     @Post('mute')
-    mute(@Body() dto: ChangeStatusDTO) {
-        return this.chatService.muteUser(dto);
+    @UseGuards(AuthGuard('2FA'))
+    mute(@Req() request, @Body() dto: ChangeStatusDTO) {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        return this.chatService.muteUser(request.user.id, dto);
     }
 }

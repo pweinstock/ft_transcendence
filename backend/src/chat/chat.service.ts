@@ -5,7 +5,6 @@ import {Repository} from 'typeorm';
 import {Chat, ChatType, MutedUser} from './chat.entity';
 import {ChangeStatusDTO} from './dto/change-status.dto';
 import {CreateChatDTO} from './dto/create-chat.dto';
-import {DeleteChatDTO} from "./dto/delete-chat.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
@@ -98,15 +97,15 @@ export class ChatService {
         return chats;
     }
 
-    async addUser(dto: ChangeStatusDTO) : Promise<void> {
+    async addUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         this.checkBan(chat, dto.userId);
         const user = await this.userServices.findById(dto.userId);
         if(chat.type === ChatType.DIRECT) {
             if (chat.users.length > 1)
                 throw new HttpException('Max 2 users is allowed in DM!', HttpStatus.FORBIDDEN);
-            if (user.bannedUsers.includes(dto.adminId))
+            if (user.bannedUsers.includes(adminId))
                 throw new HttpException('You are banned by user!', HttpStatus.FORBIDDEN);
         }
         if (!chat.users.includes(user.id)) {
@@ -148,11 +147,11 @@ export class ChatService {
         return chat;
     }
 
-    async addAdmin(dto: ChangeStatusDTO) : Promise<void> {
+    async addAdmin(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if (chat.owner === dto.userId)
             return;
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         const user = await this.userServices.findById(dto.userId);
         if (chat.users.includes(user.id) && !chat.admins.includes(user.id)) {
             this.removeBan(chat, user.id);
@@ -162,53 +161,53 @@ export class ChatService {
         }
     }
 
-    async removeAdmin(dto: ChangeStatusDTO) : Promise<void> {
+    async removeAdmin(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         if (chat.admins.includes(dto.userId)) {
             chat.admins = chat.admins.filter((admin) => admin != dto.userId);
             this.chatRepository.save(chat);
         }
     }
 
-    async changeOwner(dto: ChangeStatusDTO) : Promise<void> {
+    async changeOwner(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        if (chat.owner !== dto.adminId)
+        if (chat.owner !== adminId)
             throw new HttpException('Only owner can do it!', HttpStatus.FORBIDDEN);
         const user = await this.userServices.findById(dto.userId);
         chat.owner = user.id;
         this.chatRepository.save(chat);
     }
 
-    async banUser(dto: ChangeStatusDTO) : Promise<void> {
+    async banUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         const user = await this.userServices.findById(dto.userId);
         this.addBan(chat, user.id);
     }
 
-    async unbanUser(dto: ChangeStatusDTO) : Promise<void> {
+    async unbanUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         this.removeBan(chat, dto.userId);
     }
 
-    async muteUser(dto: ChangeStatusDTO) : Promise<void> {
+    async muteUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         if (!dto.timeoutMinutes)
             return;
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         const user = await this.userServices.findById(dto.userId);
         this.addMute(chat, user.id, dto.timeoutMinutes);
     }
 
-    async unmuteUser(dto: ChangeStatusDTO) : Promise<void> {
+    async unmuteUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
-        this.checkAdmin(chat, dto.adminId);
+        this.checkAdmin(chat, adminId);
         this.removeMute(chat, dto.userId);
     }
 
