@@ -4,7 +4,8 @@ import astroman from './img/littleman.png';
 import {
     BrowserRouter as Router,
     Route,
-    Routes
+    Routes,
+    Link
   } from "react-router-dom";
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import GameView from "./game/GameView"
@@ -18,6 +19,7 @@ import Users from "./users/users";
 import Settings from "./settings/settings1";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
+import User from './users/users';
 
 export default function App() {
     return (
@@ -41,9 +43,36 @@ export default function App() {
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/users" element={<Users/>}/>
                 <Route path="/settings" element={<Settings2/>}/>
-
             </Routes>
+            <aside>
+                <Login />
+                <User />
+                <h3 style={{color:"white"}}>Here will put the loged in user and maybe even the active chats?</h3>
+                {/* <Groupabout /> */}
+            </aside>
           </main>
+          <footer>
+            <nav>
+              <Link className="newpostlink" to="/">
+                    <button className='navbutton'>Home</button>
+                </Link>
+              <Link className="newpostlink" to="/chatrooms">
+                    <button className='navbutton'>ChatRooms</button>
+              </Link>
+              <Link className="newpostlink" to="/gameview">
+                    <button className='navbutton'>WatchGame</button>
+              </Link>
+              <Link className="newpostlink" to="/users">
+                    <button className='navbutton'>Users</button>
+                </Link>
+                <Link className="newpostlink" to="/test">
+                    <button className='navbutton'>Friends</button>
+                </Link>
+                <Link className="newpostlink" to="/settings">
+                    <button className='navbutton'>Settings</button>
+                </Link>
+            </nav>
+          </footer>
         </Router>
       </>
     );

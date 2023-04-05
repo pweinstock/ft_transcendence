@@ -48,6 +48,48 @@ header p {
   font-size: 3vw;
 }
 
+footer  {
+  background-image: url("./img/ee7dbc369fd1cf1cce4714002480a8ad.jpg") ;
+  width: 100%;
+  display: flex;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  text-decoration: none;
+}
+
+nav {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  /* align-items: center; */
+  /* align-self: center; */
+}
+nav a {
+  display: flex;
+  width: 10%;
+}
+
+.navbutton {
+  width: 100%;
+  background-color: #837ca36b;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  padding: 5% 2% 5% 2%;
+  margin: 0.5%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1vw;
+  cursor: pointer;
+}
+
+.navbutton:hover {
+  background-color: #837ca39b;
+}
+
 main {
   display: flex;
   flex-wrap: wrap;
@@ -63,6 +105,8 @@ section {
   flex-direction: column;
   margin: 0.5%;
 }
+
+
 article {
   display: flex;
   margin: 0.5%;
@@ -139,6 +183,7 @@ aside {
   font-size: 1.5vw;
   cursor: pointer;
 }
+
 
 .goupdescribtion {
   margin: 1%;

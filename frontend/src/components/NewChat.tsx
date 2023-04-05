@@ -8,16 +8,26 @@ export default function NewChat() {
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
 
-    function handOnChangeTitle(event) {
-        setTitle(event.target.value)
+    // function handOnChangeTitle(event) {
+    //     setTitle(event.target.value)
+    // }
+    // function handOnChangeURL(event) {
+    //     setUrlpost(event.target.value)
+    // }
+    // function handOnChangeText(event) {
+    //     setBigtext(event.target.value)
+    // }
+    function handOnChangeTitle() {
+        // setTitle(.target.value)
     }
-    function handOnChangeURL(event) {
-        setUrlpost(event.target.value)
+    function handOnChangeURL() {
+        // setUrlpost(.target.value)
     }
-    function handOnChangeText(event) {
-        setBigtext(event.target.value)
+    function handOnChangeText() {
+        // setBigtext(.target.value)
     }
 
+// 
     function handOnClickSend() {
         let temp = "Anonymus";
         let anopic = astroman;

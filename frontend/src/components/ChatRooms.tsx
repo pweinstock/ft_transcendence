@@ -14,7 +14,7 @@ export enum ChatType {
 
 export default function ChatRooms()
 {
-    // const [value, setValue] = useState(0); //set with basic value 0
+    const [value, setValue] = useState([]); //set with basic value 0
 
     // useEffect(() => {
     //     // This effect uses the `value` variable,
@@ -28,39 +28,47 @@ export default function ChatRooms()
         async function fetchUser() {
             const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
             console.log(response);
+            setValue(response.data);
         }
         fetchUser();
-    }, [handOnClickSend]);
+    },[]);
 
-    useEffect(() => {
-        async function fetchUser() {
-            const chatId = '1';
-            const response = await axios.get("http://localhost:5000/id/" + chatId, {withCredentials: true});
-            const messages = response.data;
-            console.log(response);
-        }
-        fetchUser();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchUser() {
+    //         const chatId = '1';
+    //         const response = await axios.get("http://localhost:5000/id/" + chatId, {withCredentials: true});
+    //         const messages = response.data;
+    //         console.log(response);
+    //     }
+    //     fetchUser();
+    // }, []);
 
     function handOnClickSend() {
         axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
 
     }
     function handOnClickSend1() {
-        const socket = io("http://localhost:5001/chat");
+        const socket = io("http://localhost:5001/chat" );
         const chatId = 1;
         socket?.emit('joinRoom', chatId);
     }
 
-
     return (
+
         <>
-            <div className="changingtext">
-                <button onClick={handOnClickSend}>CreatTestChat</button>
-            </div>
-            <div className="changingtext">
-                <button onClick={handOnClickSend1}>join</button>
-            </div>
+            <section>
+                <div>
+                    {value.map((item, index) => (
+                        <p style={{color: "white"}} key={index}>{item.name}</p>
+                    ))}
+                </div>
+                <div className="changingtext">
+                    <button onClick={handOnClickSend}>CreatTestChat</button>
+                </div>
+                <div className="changingtext">
+                    <button onClick={handOnClickSend1}>join</button>
+                </div>
+            </section>
         </>
     );
 }
