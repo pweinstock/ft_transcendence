@@ -15,7 +15,7 @@ function Settings() {
 
   useEffect(() => {
     async function fetchUser() {
-      const response = await axios.get("http://localhost:5000/users/current", { withCredentials: true });
+      const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
       if (response.data.first) {
         setDisplayName(response.data.displayName);
         setOpen(true);
@@ -33,7 +33,7 @@ function Settings() {
 
   const handleConfirmName = async () => {
     if (newName !== "") {
-      await axios.post("http://localhost:5000/users/changeName", { newName }, { withCredentials: true });
+      await axios.post(`http://${window.location.hostname}:5000/users/changeName`, { newName }, { withCredentials: true });
       setDisplayName(newName);
       setNewName("");
       setOpen(false);
@@ -61,7 +61,7 @@ function Settings() {
     if (image) {
       const formData = new FormData();
       formData.append("file", image);
-      await axios.post("http://localhost:5000/users/upload", formData, { withCredentials: true });
+      await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true });
       setUploadOpen(false);
     }
     else
@@ -71,14 +71,14 @@ function Settings() {
   const handleToggleChange = async () => {
     //const newToggle = !toggle;
     //const url = newToggle ? "http://localhost:5000/auth/enable" : "http://localhost:5000/auth/disable";
-    await axios.get("http://localhost:5000/auth/disable", { withCredentials: true });
+    await axios.get(`http://${window.location.hostname}:5000/auth/disable`, { withCredentials: true });
     //setToggle(newToggle);
     console.log('toggle: %s', toggle);
     setToggle(!toggle)
     if (!toggle) {
       // Open the dialog and fetch the image from the server
       setDialogOpen(true);
-      const response = await fetch('http://localhost:5000/auth/generate', { credentials: "include" });
+      const response = await fetch(`http://${window.location.hostname}:5000/auth/generate`, { credentials: "include" });
           const imageBlob = await response.blob();
           setImageSrc(URL.createObjectURL(imageBlob));
     } else {
@@ -92,9 +92,9 @@ function Settings() {
   };
 
   const handleVerify = async () => {
-    const response = await axios.post("http://localhost:5000/auth/validate", { code }, { withCredentials: true });
+    const response = await axios.post(`http://${window.location.hostname}:5000/auth/validate`, { code }, { withCredentials: true });
     if (response.data.valid) {
-      const response = await axios.get("http://localhost:5000/auth/enable", { withCredentials: true });
+      const response = await axios.get(`http://${window.location.hostname}:5000/auth/enable`, { withCredentials: true });
       // Close the dialog and show a success message
       setDialogOpen(false);
       alert("Two-factor authentication has been enabled!");
@@ -111,7 +111,7 @@ function Settings() {
   };
 
   const handleDialogCancel = async () => {
-    const response = await axios.get("http://localhost:5000/auth/disable", { withCredentials: true });
+    const response = await axios.get(`http://${window.location.hostname}:5000/auth/disable`, { withCredentials: true });
     if (!response.data.isTwoFactorAuthenticated) {
       setToggle(!toggle);
       setDialogOpen(false);
