@@ -7,7 +7,7 @@ const Login = () => {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#000' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
       <Button variant="contained" color="primary" onClick={handleLogin}>
         Sign In with 42
       </Button>

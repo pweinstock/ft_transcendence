@@ -20,7 +20,8 @@ export default function TestCont()
 
 
 	return (
-		<>
+		<section>
+
 			<div className="changingtext">
 				<h1>I have so many friends!</h1>
 				<h4>
@@ -31,6 +32,7 @@ export default function TestCont()
 				</p>
 				<button onClick={handOnClickSend}>Add Friend</button>
 			</div>
-		</>
+		</section>
+
 	);
 }
