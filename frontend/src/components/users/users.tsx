@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -63,7 +64,7 @@ function Users() {
       <pre style={{ color: "white", fontSize: "14px", marginLeft: "50%" }}>
         {JSON.stringify(usersData, null, 2)}
       </pre>
-      <button onClick={handleLogout}>Logout</button>
+      <Button onClick={handleLogout} variant="contained">Logout</Button>
     </div>
   );
 }
