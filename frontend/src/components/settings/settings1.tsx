@@ -10,8 +10,8 @@ import {
   Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
+// import SaveIcon from "@mui/icons-material/Save";
+// import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
 const Settings = () => {
   const [username, setUsername] = useState("");
@@ -175,7 +175,7 @@ const Settings = () => {
       />
       <label htmlFor="avatar-upload-input">
         <IconButton component="span">
-          <PhotoCamera style={{ color: "white" }} />
+          {/* <PhotoCamera style={{ color: "white" }} /> */}
         </IconButton>
       </label>
       {editing ? (
@@ -192,7 +192,7 @@ const Settings = () => {
       )}
       {editing ? (
         <IconButton onClick={handleSave}>
-          <SaveIcon style={{ color: "white" }} />
+          {/* <SaveIcon style={{ color: "white" }} /> */}
         </IconButton>
       ) : (
         <IconButton onClick={handleEdit}>

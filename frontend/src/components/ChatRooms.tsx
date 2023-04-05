@@ -32,15 +32,15 @@ export default function ChatRooms()
         fetchUser();
     }, [handOnClickSend]);
 
-    useEffect(() => {
-        async function fetchUser() {
-            const chatId = '1';
-            const response = await axios.get("http://localhost:5000/id/" + chatId, {withCredentials: true});
-            const messages = response.data;
-            console.log(response);
-        }
-        fetchUser();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchUser() {
+    //         const chatId = '1';
+    //         const response = await axios.get("http://localhost:5000/id/" + chatId, {withCredentials: true});
+    //         const messages = response.data;
+    //         console.log(response);
+    //     }
+    //     fetchUser();
+    // }, []);
 
     function handOnClickSend() {
         axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
@@ -54,14 +54,17 @@ export default function ChatRooms()
 
 
     return (
+
         <>
+        <section>
             <div className="changingtext">
                 <button onClick={handOnClickSend}>CreatTestChat</button>
             </div>
             <div className="changingtext">
                 <button onClick={handOnClickSend1}>join</button>
             </div>
-        </>
+        </section>
+    </>
     );
 }
 
