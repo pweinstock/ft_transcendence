@@ -47,11 +47,7 @@ export default function ChatRooms()
 
     }
     function handOnClickSend1() {
-        const socket = io("http://localhost:5001/chat", {
-            extraHeaders: {
-                "Cookie": "cookieName=cookieValue"
-            }
-        });
+        const socket = io("http://localhost:5001/chat" );
         const chatId = 1;
         socket?.emit('joinRoom', chatId);
     }

@@ -33,9 +33,6 @@ export class User {
     friends: number[];
 
     @Column('integer', {array: true, default: null, nullable: true})
-    messages: number[];
-
-    @Column('integer', {array: true, default: null, nullable: true})
     chats: number[];
 
     @Column('integer', {array: true, default: null, nullable: true})
