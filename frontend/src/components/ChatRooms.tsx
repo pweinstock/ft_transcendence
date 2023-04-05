@@ -4,8 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
 import axios from "axios";
 import {
+    BrowserRouter as Router,
+    Route,
+    Routes,
     Link
-} from "react-router-dom";
+  } from "react-router-dom";
 
 
 export enum ChatType {
@@ -60,9 +63,15 @@ export default function ChatRooms()
 
         <>
             <section>
+                {/* <Routes>
+                     {value.map((item, index) => (
+                         <Route path="/chat" element={<Chat/>}/>
+                        <p style={{color: "white"}} key={index}>{item.name}</p>
+                    ))}
+                </Routes>
                 <Link className="newpostlink" to="/chat">
                     <button className='chatroombutton'>Home</button>
-                </Link>
+                </Link> */}
                 <div>
                     {value.map((item, index) => (
                         <p style={{color: "white"}} key={index}>{item.name}</p>
