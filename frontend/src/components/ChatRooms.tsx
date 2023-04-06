@@ -24,6 +24,7 @@ export default function ChatRooms()
     // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat2'}, {withCredentials: true});
     // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat2'}, {withCredentials: true});
 
+
     useEffect(() => {
         async function fetchUser() {
             const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
@@ -53,13 +54,15 @@ export default function ChatRooms()
         socket?.emit('joinRoom', chatId);
     }
 
+
+
     return (
 
         <>
             <section>
                 <div>
                     {value.map((item, index) => (
-                        <p style={{color: "white"}} key={index}>{item.name}</p>
+                        item ? <p style={{color: "white"}} key={index}>{item.name}</p> : <p></p>
                     ))}
                 </div>
                 <div className="changingtext">
