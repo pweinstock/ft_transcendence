@@ -37,7 +37,7 @@ export default function App() {
                 <Route path="/gameview" element={<GameView/>}/>
                 <Route path="/chatrooms" element={<ChatRooms/>}/>
                 <Route path="/chat" element={<Chat/>}/>
-                <Route path="/newchat" element={<NewChat/>}/>
+                {/* <Route path="/newchat" element={<NewChat/>}/> */}
                 <Route path="/test" element={<Test/>}/>
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>

@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import astroman from './img/littleman.png';
+import axios from "axios";
 // const user = ;
 
-export default function NewChat() {
+interface Props {
+    chatidp: number;
+  }
+
+//   export default function NewChat({chatidp}) {
+  const NewChat: React.FC<Props> = ({chatidp}) => {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
 
-    // function handOnChangeTitle(event) {
-    //     setTitle(event.target.value)
-    // }
-    // function handOnChangeURL(event) {
-    //     setUrlpost(event.target.value)
-    // }
-    // function handOnChangeText(event) {
-    //     setBigtext(event.target.value)
-    // }
-    function handOnChangeTitle() {
-        // setTitle(.target.value)
-    }
-    function handOnChangeURL() {
-        // setUrlpost(.target.value)
-    }
-    function handOnChangeText() {
-        // setBigtext(.target.value)
-    }
+    const [msg, setmsg] = useState([]); //set with basic value 0
+    const chatId = chatidp;
 
-// 
+    useEffect(() => {
+        async function printassages() {
+            // const chatId = '1';
+            const response = await axios.get("http://localhost:5000/chat/id/" + chatId, {withCredentials: true});
+            setmsg(response.data);
+            // const messages = response.data;
+            console.log(response.data);
+        }
+        printassages();
+    }, []);
+
     function handOnClickSend() {
         let temp = "Anonymus";
         let anopic = astroman;
@@ -39,25 +39,22 @@ export default function NewChat() {
 
     return (
             <div className='formholder'>
+                <h1>Room {chatId} Content goes here</h1>
                 <form>
-                    <div className="postlabel">
-                        <label htmlFor="lname" >Title</label>
-                    </div>
-                    <div className="inputtext">
-                        <input type="text" id="lname" name="lastname" key="110" placeholder="write your title..." value={title} onChange={handOnChangeTitle} required />
-                    </div>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
                     </div>
                     <div className="bigtext">
-                        <textarea id="subject" name="subject" key="112" placeholder="Write something.." value={bigtext} onChange={handOnChangeText} required></textarea>
+                        <textarea id="subject" name="subject" key="112" placeholder="Write something.." value={bigtext} required></textarea>
                     </div>
-                    <Link to="/">
+                    {/* <Link to="/">
                         <div className="newpostlink">
                             <button type='button' className='submitbut' onClick={handOnClickSend}>send</button>
                         </div>
-                    </Link>
+                    </Link> */}
                 </form>
             </div>
     );
 }
+
+export default NewChat;

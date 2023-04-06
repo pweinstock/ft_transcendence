@@ -73,7 +73,7 @@ export class ChatController {
     async getChat(@Req() request, @Param('id') chatId : number) : Promise<Chat>{
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
-        if (!request.user.includes(chatId))
+        if (!request.user.chats.includes(Number(chatId)))
             throw new HttpException('You are not in the Chat!', HttpStatus.BAD_REQUEST);
         const chat = await this.chatService.findChatById( chatId);
         return chat;

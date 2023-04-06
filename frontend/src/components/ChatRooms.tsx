@@ -9,7 +9,7 @@ import {
     Routes,
     Link
   } from "react-router-dom";
-
+  import NewChat from './NewChat';
 
 export enum ChatType {
     PUBLIC = "public",
@@ -18,9 +18,25 @@ export enum ChatType {
     DIRECT = "direct",
 };
 
+// interface Props {
+//     count: number;
+//   }
+
+  interface ChatData {
+    chatidp: number;
+  }
+
 export default function ChatRooms()
 {
-    const [value, setValue] = useState([]); //set with basic value 0
+    const [value, setValue] = useState<{id: number, name: string }[]>([]); //set with basic value 0
+
+    // const chatfuck: ChatData = {
+    //     chatidp = 1
+    // };
+    // const chat: ChatData = {
+    //     // name: "John",
+    //     chatidp: 30
+    //   };
     // const [value, setValue] = useState<Array<{ name: string }>>([]);
 
     // useEffect(() => {
@@ -41,18 +57,9 @@ export default function ChatRooms()
         fetchUser();
     },[]);
 
-    // useEffect(() => {
-    //     async function fetchUser() {
-    //         const chatId = '1';
-    //         const response = await axios.get("http://localhost:5000/id/" + chatId, {withCredentials: true});
-    //         const messages = response.data;
-    //         console.log(response);
-    //     }
-    //     fetchUser();
-    // }, []);
 
     function handOnClickSend() {
-        axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
+        axios.post("http://localhost:5000/chat/",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
 
     }
     function handOnClickSend1() {
@@ -64,20 +71,39 @@ export default function ChatRooms()
     return (
 
         <>
-            <section>
                 {/* <Routes>
                      {value.map((item, index) => (
-                         <Route path="/chat" element={<Chat/>}/>
-                        <p style={{color: "white"}} key={index}>{item.name}</p>
+                        <Route path={"/chat" + item.id} element={<NewChat chatidp={item.id}/>}/>
                     ))}
-                </Routes>
-                <Link className="newpostlink" to="/chat">
-                    <button className='chatroombutton'>Home</button>
-                </Link> */}
+                </Routes> */}
+            <section>
                 <div>
-                    {value.map((item, index) => (
-                        <p style={{color: "white"}} key={index}>{item.name}</p>
+                     {value.map((item, index) => (
+                        <div  style={{color: "white"}}>
+                            {/* <Route path={"/chat" + item ? item.id : "empty"} element={<NewChat chatidp={chatidp}/>}/> */}
+                            {/* <p style={{color: "white"}} key={index}>{item.name}</p> */}
+                            <Link className="newpostlink" to={"/chat" + item.id}>
+                                <button className='chatroombutton'>{item.name}</button>
+                            </Link>
+                        </div>
                     ))}
+                    {/* {value.map((item, index) => (
+                        <div>
+
+                           <p  key={index}>name of chatroom: {item.name}</p>
+                            <div>
+                                <p>conent of chatroom:</p>
+
+                            </div>
+                        </div>
+                    ))} */}
+                            {/* <div>
+                                <p>Manual conent of chatroom:</p>
+                                <p>
+                                {msg.content}
+                                </p>
+
+                            </div> */}
                 </div>
                 <div className="changingtext">
                     <button onClick={handOnClickSend}>CreatTestChat</button>
