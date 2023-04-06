@@ -51,22 +51,18 @@ export class UserService {
         return user;
     }
 
-    // async findUsersByIds(ids: number[]): Promise<User[]> {
-    //     const users: User[] = [];
-    //     for (const id of ids) {
-    //         const user = await this.findById(id);
-    //         users.push(user);
-    //     }
-    //     return users;
-    // }
-
     async remove(user: User) : Promise<void> {
         await this.userRepository.remove(user);
     }
 
     //USER INFO
-    async changeName(id: number, newName: string) : Promise<any> {
-        return this.userRepository.update(id, { displayName: newName});
+    async changeName(id: number, newName: string) : Promise<void> {
+        try {
+            await this.userRepository.update(id, { displayName: newName});
+        }
+        catch (e) {
+            throw new HttpException("Name is not unique!", HttpStatus.BAD_REQUEST);
+        }
     }
 
     async uploadAvatar(id: number, filename: string) : Promise<any> {

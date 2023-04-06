@@ -1,16 +1,18 @@
 import {
-    WebSocketGateway,
-    WebSocketServer,
-    OnGatewayInit,
+    ConnectedSocket,
+    MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
-    SubscribeMessage, MessageBody, ConnectedSocket
+    OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import {Server, Socket} from 'socket.io';
 import {GameService} from "./game.service";
-import {HttpException, HttpStatus, Req, UseGuards} from "@nestjs/common";
-import {AuthGuard} from '@nestjs/passport';
-
+import {GameDataDto} from "./dto/game-data.dto";
+import {JoinGameDto} from "./dto/join-game.dto";
+import {GameScoreDto} from "./dto/game-score.dto";
 
 
 @WebSocketGateway(Number(process.env.GAME_PORT) | 5002, {
@@ -25,103 +27,51 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly gameService: GameService) {}
 
-    // @SubscribeMessage('gameUpdate')
-    // gameUpdate(@MessageBody() dto: GameDataDto,
-    //            @ConnectedSocket() client: Socket) {
-    //     // client.broadcast.emit('gameUpdate', dto);
-    //     const gameId = this.gameService.getGame(client.id);
-    //     if (gameId)
-    //         this.server.to(String(gameId)).emit('gameUpdate', dto);
-    //     else
-    //         console.log('game not registered under this player!');
-    // }
+    @SubscribeMessage('gameUpdate')
+    gameUpdate(@MessageBody() dto: GameDataDto,
+               @ConnectedSocket() client: Socket) {
+        // client.broadcast.emit('gameUpdate', dto);
+        //const gameId = this.gameService.getGame(client.id);
+        // if (gameId)
+        //     this.server.to(String(gameId)).emit('gameUpdate', dto);
+        // else
+        //     console.log('game not registered under this player!');
+    }
 
     afterInit(server: Server) {}
 
-    @UseGuards(AuthGuard('2FA'))
     handleConnection() {}
 
-    handleDisconnect(@ConnectedSocket() client: Socket) {}
-
-    @SubscribeMessage('newGame')
-    @UseGuards(AuthGuard('2FA'))
-    handleNewGame(
-        @Req() request: any,
-        @ConnectedSocket() client: Socket,
-        @MessageBody() gameId : number
-    ) : void {
-        if (!request)
-            throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-        this.gameService.newGame(request.user, gameId);
-        client.join(String(gameId));
-        this.server.to(String(gameId)).emit('gameCreated', gameId);
+    handleDisconnect(@ConnectedSocket() client: Socket) {
+        if (this.gameService.isPlayer(client.id)) {
+            const gameId = this.gameService.getGameId(client.id);
+            if (this.gameService.isStarted(gameId))
+                this.server.to(String(gameId)).emit("playerDisconnected", gameId);
+            else {
+                this.gameService.deletePlayer(client.id);
+                this.gameService.deleteGame(gameId);
+            }
+        }
     }
 
-    @SubscribeMessage('joinGame')
-    @UseGuards(AuthGuard('2FA'))
-    handleJoinGame(
-        @Req() request: any,
+    @SubscribeMessage('join')
+    async handleJoin(
         @ConnectedSocket() client: Socket,
-        @MessageBody() gameId : number
-    ) : void {
-        if (!request)
-            throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-        this.gameService.addSecondPlayer(request.user, gameId);
-        client.join(String(gameId));
-        this.server.to(String(gameId)).emit('startGame', gameId);
+        @MessageBody() dto : JoinGameDto
+    ) : Promise<void> {
+        const status = await this.gameService.joinGame(client.id, dto);
+        client.join(String(dto.gameId));
+        this.server.to(String(dto.gameId)).emit(status, dto.gameId);
     }
 
-    @SubscribeMessage('watchGame')
-    @UseGuards(AuthGuard('2FA'))
-    handleWatchGame (
-        @Req() request: any,
+    @SubscribeMessage('end')
+    gameEnd(
         @ConnectedSocket() client: Socket,
-        @MessageBody() gameId : number
+        @MessageBody() dto : GameScoreDto
     ) : void {
-        if (!request)
-            throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-        // this.gameService.userJoined(request.user, client.id);
-        client.join(String(gameId));
-        this.server.to(String(gameId)).emit('userJoined', request.user.displayName);
+        const isEnded = this.gameService.endOfGame(client.id, dto);
+        // client.join(String(gameId));
+        if (isEnded)
+            this.server.to(String(dto.gameId)).emit('finished', dto.gameId);
     }
-
-
-    // @SubscribeMessage('finishGame')
-    // @UseGuards(AuthGuard('2FA'))
-    // handlefinishGame(
-    //     @Req() request: any,
-    //     @ConnectedSocket() client: Socket,
-    //     @MessageBody() dto : createGameDto
-    // ) : void {
-    //     if (!request)
-    //         throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-    //     this.server.to(String(gameId)).emit('', request.user.displayName);
-    // }
-
-
-    // @SubscribeMessage('leaveGame')
-    // @UseGuards(AuthGuard('2FA'))
-    // handleLeaveGame(@Req() request: any,
-    //                 @ConnectedSocket() client: Socket,
-    //                 @MessageBody() gameId : string
-    // ) : void {
-    //     if (!request)
-    //         throw new HttpException('Request is not recieved!', HttpStatus.BAD_REQUEST);
-    //     client.leave(String(gameId));
-    //     this.server.to(String(gameId)).emit('userLeft', request.user.displayName);
-    //     // this.gameService.gamefinished(); // todo implement function!
-    // }
-
-    // @SubscribeMessage('scorePoint')
-    // handleScorePoint(client: any) {
-    //     console.log(`Player ${client.id} scored a point`);
-    //     this.players.forEach((player, index) => {
-    //         if (player.id !== client.id) {
-    //             player.emit('opponentScored', 'Your opponent scored a point!');
-    //         } else {
-    //             player.emit('youScored', 'You scored a point!');
-    //         }
-    //     });
-    // }
-
 }

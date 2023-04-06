@@ -48,8 +48,8 @@ export class UserController {
 
     @Post('changeName')
     @UseGuards(AuthGuard('2FA'))
-    changeName(@Req() request: any, @Body('newName') newName: string) {
-        this.usersService.changeName(request.user.id, newName);
+    async changeName(@Req() request: any, @Body('newName') newName: string) {
+        await this.usersService.changeName(request.user.id, newName);
     }
 
     @Post('upload')
@@ -74,12 +74,6 @@ export class UserController {
     getImage(@Param('imagename') imagename, @Res() res): Promise<Observable<Object>> {
         return this.usersService.getImage(res, imagename);
     }
-
-
-    // @Post('changeStatus')
-    // changeStatus(@Body() changeDataDTO : ChangeDataDTO) {
-    //     this.usersService.changePhoto(changeDataDTO);
-    // }
 
     @Post('acceptFriendRequest')
     acceptFriendRequest(@Body() dto : FriendDto) {

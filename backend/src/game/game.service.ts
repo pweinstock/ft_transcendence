@@ -2,51 +2,112 @@ import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Game} from "./game.entity";
-import {UserService} from "../users/user.service";
-import {User} from "../users/user.entity";
 import {createGameDto} from "./dto/create-game.dto";
+import {JoinGameDto} from "./dto/join-game.dto";
+import {GameScoreDto} from "./dto/game-score.dto";
 
-export interface MatchData {
-    firstPlayer : User,
-    secondPlayer : User,
+interface MatchData {
+    firstPlayer : string,
+    secondPlayer : string,
+    isStarted : boolean
 }
 
 @Injectable()
 export class GameService {
-    constructor(@InjectRepository(Game) private gameRepository : Repository<Game>,
-                private readonly userService : UserService) {}
+    constructor(@InjectRepository(Game) private gameRepository : Repository<Game>) {}
 
     private matchData = new Map<number, MatchData>();
-    private clientToPlayers = new Map<string, User>();
-    //
-    // joinUser(user : User, clientId : string) : void {
-    //     if (!this.clientToUser.has(clientId))
-    //         this.clientToUser.set(clientId, user);
-    // }
-    //
-    // disconnectUser(clientId : string) : void {
-    //     if (this.clientToUser.has(clientId))
-    //         this.clientToUser.delete(clientId);
-    // }
-    //
-    // getClient(clientId : string) : User {
-    //     return this.clientToUser.get(clientId);
-    // }
+    private clientToGame = new Map<string, number>();
 
-    newGame (user : User, gameID : number) : void {
-        if (this.matchData.has(gameID))
-            throw new HttpException('Cant create game with this ID', HttpStatus.BAD_REQUEST);
-        this.matchData.set(gameID, { firstPlayer : user, secondPlayer : null });
+    async joinGame (clientId : string, dto : JoinGameDto) : Promise<string> {
+        const game = await this.findGamebyId(dto.gameId);
+        if (game.finished)
+            throw new HttpException('Game is finished!', HttpStatus.BAD_REQUEST);
+        if (this.matchData.has(game.id)) {
+            return this.checkPlayerStatus(clientId, dto);
+        }
+        this.deletePlayer(clientId);
+        this.clientToGame.set(clientId, game.id);
+        this.matchData.set(game.id, { firstPlayer : dto.displayName, secondPlayer : null, isStarted: false }); //todo check if null works or should be empty string
+        return "firstPlayer";
     }
 
-    addSecondPlayer (user : User, gameId : number) : void {
-        if (!this.matchData.has(gameId))
-            throw new HttpException('Game is not found!', HttpStatus.BAD_REQUEST);
-        const data = this.getMatchData(gameId);
-        if (data.firstPlayer === user || data.secondPlayer)
-            throw new HttpException('Can not join this game!', HttpStatus.BAD_REQUEST);
-        data.secondPlayer = user;
-        this.matchData.set(gameId, data);
+    isStarted(gameId : number) : boolean {
+        return this.matchData.get(gameId).isStarted
+    }
+
+    endOfGame(clientId : string, dto : GameScoreDto) : boolean {
+        if (!this.clientToGame.has(clientId) || !this.matchData.has(dto.gameId))
+            return false;
+        if (this.clientToGame.get(clientId) !== dto.gameId)
+            return false;
+        this.deletePlayer(clientId);
+        this.deleteGame(dto.gameId);
+        this.finalScore(dto);
+        return true;
+    }
+
+    //WORKING WITH DATABASE
+    async findAllGame() : Promise<Game[]> {
+        const games = this.gameRepository.find();
+        return games;
+    }
+
+    async findGamebyId(gameId : number) : Promise<Game> {
+        const game = this.gameRepository.findOneBy({id : gameId});
+        if (!game)
+            throw new HttpException('game is not exists', HttpStatus.BAD_REQUEST);
+        return game;
+    }
+
+    async createGame(dto : createGameDto) : Promise<Game> {
+        if (!dto || !dto.firstPlayer || !dto.secondPlayer || dto.firstPlayer === '' || dto.secondPlayer === '')
+            throw new HttpException('Player names are Empty', HttpStatus.BAD_REQUEST)
+        const game = await this.gameRepository.save(dto);
+        return game;
+    }
+
+    async finalScore(dto : GameScoreDto) {
+        const game = await this.findGamebyId(dto.gameId);
+        game.firstPlayerScore = dto.firstPlayerScore;
+        game.secondPlayerScore = dto.secondPlayerScore;
+        game.finished = true;
+        this.gameRepository.save(game);
+    }
+
+    deleteGame(gameId : number) : void {
+        this.matchData.delete(gameId);
+        this.gameRepository.delete(gameId);
+    }
+
+    //Helpers
+    checkPlayerStatus (clientId : string, dto : JoinGameDto) : string {
+        let match = this.matchData.get(dto.gameId);
+        if (match.secondPlayer === dto.displayName || match.firstPlayer === dto.displayName)
+            return "reconnected";
+        if (match.secondPlayer)
+            return "viewer";
+        match.secondPlayer = dto.displayName;
+        match.isStarted = true;
+        this.matchData.set(dto.gameId, match);
+        this.deletePlayer(clientId);
+        this.clientToGame.set(clientId, dto.gameId);
+        return "secondPlayer";
+    }
+
+    deletePlayer(clientId : string) : void {
+        if (this.clientToGame.has(clientId))
+            this.clientToGame.delete(clientId);
+    }
+
+    isPlayer(clientId : string) : boolean {
+        if (this.clientToGame.has(clientId))
+            return true;
+        return false;
+    }
+
+    getGameId(clientId : string) : number {
+        return this.clientToGame.get(clientId);
     }
 
     getMatchData(gameId : number) : MatchData {
@@ -56,56 +117,4 @@ export class GameService {
     deletePlayerData(gameId : number) : void {
         this.matchData.delete(gameId);
     }
-
-
-    //WORKING WITH DATABASE
-    async createGame(dto : createGameDto) : Promise<Game> {
-        if (!dto || !dto.firstPlayer || !dto.secondPlayer || dto.firstPlayer === '' || dto.secondPlayer === '')
-            throw new HttpException('Player names are Empty', HttpStatus.BAD_REQUEST)
-        const game = await this.gameRepository.save(dto);
-        return game;
-    }
-
-    endOfGame(game : Game, firstPlayerScore : number, secondPlayerScore : number) {
-        game.firstPlayerScore = firstPlayerScore;
-        game.secondPlayerScore = secondPlayerScore;
-        this.gameRepository.save(game);
-        // if ()
-        // this.userService.wonGame( game.id)
-    }
-
-    // async gameEnd(dto : GameDataDto) : Promise<void> {
-    //     const game = await this.gameRepository.create(dto);
-    //     this.gameRepository.save(game);
-    // }
-    //
-    // async identify(clientId : string) : Promise<void> {
-    //     if (firstPlayer)
-    //         firstPlayer = clientId;
-    //     else
-    //         secondPlayer = clientId;
-    // }
-    //
-    // isFirstPlayer(player : string) : boolean{
-    //     if (player === firstPlayer)
-    //         return true;
-    //     return false;
-    // }
-    //
-    // isSecondPlayer(player : string) : boolean{
-    //     if (player === secondPlayer)
-    //         return true;
-    //     return false;
-    // }
-    //
-    //
-    // // validate(dto : GameDataDto) {
-    // //     if (recievedDto) {
-    // //         dto.ballX = recievedDto.ballX * (dto.timer - recievedDto.timer) * recievedDto.ballSpeed;
-    // //         dto.ballY = recievedDto.ballY * (dto.timer - recievedDto.timer) * recievedDto.ballSpeed;
-    // //     }
-    // //     else
-    // //         recievedDto = dto;
-    // //     return dto;
-    // // }
 }
