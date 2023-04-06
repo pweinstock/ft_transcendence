@@ -52,7 +52,6 @@ export default function PingPong() {
         transports: ["websocket"],
     });
 
-
     const gameUpdate = (data : GameData) => {
         socket.emit('gameUpdate', data);
     }
