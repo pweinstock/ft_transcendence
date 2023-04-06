@@ -33,7 +33,7 @@ export class AuthController {
 		res.cookie('jwt', accessToken, {httpOnly: true});
 		if (req.user['isTwoFactorAuthenticationEnabled'])
 			res.redirect(`http://${process.env.HOST_IP}:3000/auth/2FA`);
-		res.redirect(`http://${process.env.HOST_IP}:3000/users`);
+		res.redirect(`http://${process.env.HOST_IP}:3000`);
 	}
 
 	@UseGuards(AuthGuard('jwt'))

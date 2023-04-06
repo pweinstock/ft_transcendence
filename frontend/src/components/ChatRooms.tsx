@@ -14,7 +14,8 @@ export enum ChatType {
 
 export default function ChatRooms()
 {
-    const [value, setValue] = useState([]); //set with basic value 0
+    // const [value, setValue] = useState([]); //set with basic value 0
+    const [value, setValue] = useState<Array<{ name: string }>>([]);
 
     // useEffect(() => {
     //     // This effect uses the `value` variable,

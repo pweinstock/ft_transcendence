@@ -45,8 +45,8 @@ export default function App() {
                 <Route path="/settings" element={<Settings2/>}/>
             </Routes>
             <aside>
-                <Login />
-                <User />
+                {/* <Login /> */}
+                {/* <User /> */}
                 <h3 style={{color:"white"}}>Here will put the loged in user and maybe even the active chats?</h3>
                 {/* <Groupabout /> */}
             </aside>
