@@ -1,9 +1,6 @@
+import { Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import { useNavigate } from "react-router-dom";
 
 interface User {
   id: number;
@@ -28,12 +25,14 @@ interface User {
 function Users() {
   const [usersData, setUsersData] = useState<User[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5000/users", { credentials: "include" })
+    fetch(`http://${window.location.hostname}:5000/users`, { credentials: "include" })
       .then((response) => {
         if (response.status === 401) {
-          window.location.href = "http://localhost:3000/auth";
+          console.log('is called!');
+          navigate('/auth');
         } else {
           return response.json();
         }
@@ -42,17 +41,20 @@ function Users() {
       .catch((error) => console.error(error));
   }, []);
 
+  function handleLogout() {
+    fetch(`http://${window.location.hostname}:5000/auth/logout`, { credentials: "include" })
+      .then(() => {
+        navigate('/auth');
+      })
+      .catch((error) => console.error(error));
+  }
+
   // Render the user's image and data
+  console.log('usersData: %s', usersData);
   const user = usersData[0] || {};
-  const userImageUrl = `http://localhost:5000/users/image/${user.photo}`;
+  const userImageUrl = `http://${window.location.hostname}:5000/users/image/${user.photo}`;
 
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
-  };
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-  };
 
   return (
     <div>
@@ -64,27 +66,7 @@ function Users() {
       <pre style={{ color: "white", fontSize: "14px", marginLeft: "50%" }}>
         {JSON.stringify(user, null, 2)}
       </pre>
-      <Button
-        variant="contained"
-        onClick={handleOpenDialog}
-        style={{ marginTop: "16px" }}
-      >
-        Open Dialog
-      </Button>
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Dialog Title</DialogTitle>
-        <DialogContent>
-          <p>Dialog content goes here</p>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleCloseDialog} color="primary">
-            Ok
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Button onClick={handleLogout} variant="contained">Logout</Button>
     </div>
   );
 }

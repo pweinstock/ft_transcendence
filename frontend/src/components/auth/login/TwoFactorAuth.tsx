@@ -15,7 +15,7 @@ const TwoFactorAuth = () => {
   };
 
   const handleValidation = () => {
-    fetch('http://localhost:5000/auth/validate', {
+    fetch(`http://${window.location.hostname}:5000/auth/validate`, {
       method: 'POST',
       credentials: "include",
       headers: {
@@ -25,7 +25,7 @@ const TwoFactorAuth = () => {
     })
       .then(response => response.json())
       .then(data => {
-        if (data.success) {
+        if (data.valid) {
           setValidationResult('Validation successful');
         } else {
           setValidationResult('Validation failed');
@@ -37,7 +37,7 @@ const TwoFactorAuth = () => {
   };
 
   const handleContinue = () => {
-    window.location.href = 'http://localhost:3000/users';
+    window.location.href = `http://${window.location.hostname}:3000`;
   };
 
   return (
