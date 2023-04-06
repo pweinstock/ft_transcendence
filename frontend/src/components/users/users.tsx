@@ -31,6 +31,7 @@ function Users() {
     fetch(`http://${window.location.hostname}:5000/users`, { credentials: "include" })
       .then((response) => {
         if (response.status === 401) {
+          console.log('is called!');
           navigate('/auth');
         } else {
           return response.json();
@@ -49,6 +50,7 @@ function Users() {
   }
 
   // Render the user's image and data
+  console.log('usersData: %s', usersData);
   const user = usersData[0] || {};
   const userImageUrl = `http://${window.location.hostname}:5000/users/image/${user.photo}`;
 
@@ -62,7 +64,7 @@ function Users() {
         style={{ float: "left", width: "50%" }}
       />
       <pre style={{ color: "white", fontSize: "14px", marginLeft: "50%" }}>
-        {JSON.stringify(usersData, null, 2)}
+        {JSON.stringify(user, null, 2)}
       </pre>
       <Button onClick={handleLogout} variant="contained">Logout</Button>
     </div>
