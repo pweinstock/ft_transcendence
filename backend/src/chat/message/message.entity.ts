@@ -12,7 +12,7 @@ export class Message {
   displayName: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  date: Date;
 
   @Column({type: "integer", nullable:true})
   user: number;

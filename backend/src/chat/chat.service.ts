@@ -14,7 +14,7 @@ import { Socket } from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 
 interface Room {
-    user : User,
+    userId : number,
     chatId : number
 }
 
@@ -139,38 +139,6 @@ export class ChatService {
         return chat;
     }
 
-    // async joinChat(dto : JoinChatDto, client : Socket) : Promise<Chat> {
-    //     const user = await this.userServices.findById(dto.userId);
-    //     const chat = await this.findChatById(dto.chatId);
-    //     this.userServices.changeStatus(user, UserStatus.ONLINE);
-    //     if (chat.users.length != 0 && chat.users.includes(user.id)) {
-    //         this.identify(user, client, chat.id);
-    //         return chat;
-    //     }
-    //     if (chat.admins.includes(user.id))
-    //         chat.users.push(user.id);
-    //     else {
-    //         this.checkBan(chat, user.id);
-    //         switch (chat.type) {
-    //             case ChatType.PUBLIC:
-    //                 chat.users.push(user.id);
-    //                 break;
-    //             case ChatType.PROTECTED:
-    //                 if (chat.password === dto.password)
-    //                     chat.users.push(user.id);
-    //                 else
-    //                     throw new HttpException('Wrong Password!', HttpStatus.FORBIDDEN);
-    //                 break;
-    //             default:
-    //                 throw new HttpException('No access rights!', HttpStatus.FORBIDDEN);
-    //         }
-    //     }
-    //     this.userServices.addChat(user, chat.id);
-    //     this.identify(user, client, chat.id);
-    //     this.chatRepository.save(chat);
-    //     return chat;
-    // }
-
     async addAdmin(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if (chat.owner === dto.userId)
@@ -229,9 +197,9 @@ export class ChatService {
     //Message Interraction
     private clienttoUser = new Map<string, Room>();
 
-    identify (newUser : User, client : Socket, chatID : number) : void {
+    identify (client : Socket, dto: JoinChatDto) : void {
         this.disconnectClient(client);
-        this.clienttoUser.set(client.id, {user : newUser, chatId : chatID});
+        this.clienttoUser.set(client.id, {userId : dto.userId, chatId : dto.chatId});
     }
 
     disconnectClient(client : Socket) : void {
