@@ -1,47 +1,28 @@
 import { Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface User {
-  id: number;
-  email: string;
-  displayName: string;
-  photo?: string;
-  status: string;
-  bannedUsers: any[];
-  pendingFriends: any[];
-  friends: any[];
-  messages: any[];
-  chats: any[];
-  matchHistory: any[];
-  wins: number;
-  losses: number;
-  draws: number;
-  score: number;
-  isTwoFactorAuthenticationEnabled: boolean;
-  TwoFactorAuthenticationSecret: string | null;
-}
+import axios from "axios";
 
 function Users() {
-  const [usersData, setUsersData] = useState<User[]>([]);
+  const [usersData, setUsersData] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:5000/users`, { credentials: "include" })
+    axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
       .then((response) => {
-        if (response.status === 401) {
-          navigate('/auth');
-        } else {
-          return response.json();
-        }
+        setUsersData(response.data);
       })
-      .then((data) => setUsersData(data))
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        if (error.response && error.response.status === 401) {
+          navigate('/auth');
+        }
+      });
   }, []);
 
   function handleLogout() {
-    fetch(`http://${window.location.hostname}:5000/auth/logout`, { credentials: "include" })
+    axios.get(`http://${window.location.hostname}:5000/auth/logout`, { withCredentials: true })
       .then(() => {
         navigate('/auth');
       })
@@ -51,8 +32,6 @@ function Users() {
   // Render the user's image and data
   const user = usersData[0] || {};
   const userImageUrl = `http://${window.location.hostname}:5000/users/image/${user.photo}`;
-
-
 
   return (
     <div>

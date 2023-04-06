@@ -37,7 +37,7 @@ const TwoFactorAuth = () => {
   };
 
   const handleContinue = () => {
-    window.location.href = `http://${window.location.hostname}:3000/users`;
+    window.location.href = `http://${window.location.hostname}:3000`;
   };
 
   return (

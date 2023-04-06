@@ -21,6 +21,7 @@ export enum ChatType {
 export default function ChatRooms()
 {
     const [value, setValue] = useState([]); //set with basic value 0
+    // const [value, setValue] = useState<Array<{ name: string }>>([]);
 
     // useEffect(() => {
     //     // This effect uses the `value` variable,
@@ -29,6 +30,7 @@ export default function ChatRooms()
     // }, [value]) //if value is dependency the change will trigger the useffect to run.
     // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat2'}, {withCredentials: true});
     // axios.post("http://localhost:5000/chat/create",  { type : ChatType.PUBLIC,  name : 'testchat2'}, {withCredentials: true});
+
 
     useEffect(() => {
         async function fetchUser() {

@@ -4,7 +4,6 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, S
 
 function Settings() {
   const [open, setOpen] = useState(false);
-  const [displayName, setDisplayName] = useState("");
   const [newName, setNewName] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -17,7 +16,7 @@ function Settings() {
     async function fetchUser() {
       const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
       if (response.data.first) {
-        setDisplayName(response.data.displayName);
+        setNewName(response.data.displayName);
         setOpen(true);
       }
       setToggle(response.data.isTwoFactorAuthenticationEnabled);
@@ -33,11 +32,16 @@ function Settings() {
 
   const handleConfirmName = async () => {
     if (newName !== "") {
-      await axios.post(`http://${window.location.hostname}:5000/users/changeName`, { newName }, { withCredentials: true });
-      setDisplayName(newName);
-      setNewName("");
-      setOpen(false);
-      setUploadOpen(true);
+      try {
+        await axios.post(`http://${window.location.hostname}:5000/users/changeName`, { newName }, { withCredentials: true });
+        setNewName("");
+        setOpen(false);
+        setUploadOpen(true);
+      } catch(e) {
+          alert("Username already exists!");
+      }
+    } else {
+      alert("Username cannot be empty!");
     }
   };
 
@@ -130,7 +134,7 @@ function Settings() {
             autoFocus
             margin="dense"
             label="Username"
-            value={newName || displayName}
+            value={newName}
             onChange={handleNewNameChange}
             fullWidth
           />

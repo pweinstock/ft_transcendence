@@ -18,10 +18,8 @@ export class UserService {
         if (!dto.email || !dto.displayName)
             throw new HttpException('Required information was not provided!', HttpStatus.BAD_REQUEST);
         const existingUser = await this.userRepository.findOneBy({email: dto.email});
-        if (existingUser) {
-            await this.userRepository.update(existingUser.id, {first: false})
+        if (existingUser)
             return existingUser;
-        }
         const user = this.userRepository.create(dto);
         user.pendingFriends = [];
         user.bannedUsers = [];
@@ -66,7 +64,12 @@ export class UserService {
 
     //USER INFO
     async changeName(id: number, newName: string) : Promise<any> {
-        return this.userRepository.update(id, { displayName: newName});
+        try {
+            await this.userRepository.update(id, { displayName: newName});
+            await this.userRepository.update(id, {first: false});
+        } catch (e) {
+            throw new HttpException("Username already exists!", HttpStatus.CONFLICT);
+        }
     }
 
     async uploadAvatar(id: number, filename: string) : Promise<any> {
