@@ -8,6 +8,7 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
 import { Observable } from 'rxjs';
+import { Request } from 'express';
 
 export const storage = {
     storage: diskStorage({
@@ -36,8 +37,14 @@ export class UserController {
 
     @Get('current')
     @UseGuards(AuthGuard('2FA'))
-    getUser(@Req() request: any) {
+    getUser(@Req() request: Request) {
         return request.user;
+    }
+
+    @Get(':id')
+    @UseGuards(AuthGuard('2FA'))
+    getPublicUser(@Param('id') id) {
+        return this.usersService.findById(id);;
     }
 
     @Post()
@@ -49,7 +56,7 @@ export class UserController {
     @Post('changeName')
     @UseGuards(AuthGuard('2FA'))
     async changeName(@Req() request: any, @Body('newName') newName: string) {
-        await this.usersService.changeName(request.user.id, newName);
+       await this.usersService.changeName(request.user.id, newName);
     }
 
     @Post('upload')
