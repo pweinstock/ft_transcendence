@@ -1,48 +1,28 @@
 import { Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface User {
-  id: number;
-  email: string;
-  displayName: string;
-  photo?: string;
-  status: string;
-  bannedUsers: any[];
-  pendingFriends: any[];
-  friends: any[];
-  messages: any[];
-  chats: any[];
-  matchHistory: any[];
-  wins: number;
-  losses: number;
-  draws: number;
-  score: number;
-  isTwoFactorAuthenticationEnabled: boolean;
-  TwoFactorAuthenticationSecret: string | null;
-}
+import axios from "axios";
 
 function Users() {
-  const [usersData, setUsersData] = useState<User[]>([]);
+  const [usersData, setUsersData] = useState<any[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:5000/users`, { credentials: "include" })
+    axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
       .then((response) => {
-        if (response.status === 401) {
-          console.log('is called!');
-          navigate('/auth');
-        } else {
-          return response.json();
-        }
+        setUsersData(response.data);
       })
-      .then((data) => setUsersData(data))
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        if (error.response && error.response.status === 401) {
+          navigate('/auth');
+        }
+      });
   }, []);
 
   function handleLogout() {
-    fetch(`http://${window.location.hostname}:5000/auth/logout`, { credentials: "include" })
+    axios.get(`http://${window.location.hostname}:5000/auth/logout`, { withCredentials: true })
       .then(() => {
         navigate('/auth');
       })
@@ -50,11 +30,8 @@ function Users() {
   }
 
   // Render the user's image and data
-  console.log('usersData: %s', usersData);
   const user = usersData[0] || {};
   const userImageUrl = `http://${window.location.hostname}:5000/users/image/${user.photo}`;
-
-
 
   return (
     <div>
@@ -64,7 +41,7 @@ function Users() {
         style={{ float: "left", width: "50%" }}
       />
       <pre style={{ color: "white", fontSize: "14px", marginLeft: "50%" }}>
-        {JSON.stringify(user, null, 2)}
+        {JSON.stringify(usersData, null, 2)}
       </pre>
       <Button onClick={handleLogout} variant="contained">Logout</Button>
     </div>
