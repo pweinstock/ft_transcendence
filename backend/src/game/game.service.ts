@@ -16,33 +16,34 @@ interface MatchData {
 export class GameService {
     constructor(@InjectRepository(Game) private gameRepository : Repository<Game>) {}
 
-    private matchData = new Map<number, MatchData>();
-    private clientToGame = new Map<string, number>();
+    private gameIdToMatchData = new Map<number, MatchData>();
+    private playerToGameId = new Map<string, number>();
+    private viewerToGameId = new Map<string, number>();
 
     async joinGame (clientId : string, dto : JoinGameDto) : Promise<string> {
         const game = await this.findGamebyId(dto.gameId);
         if (game.finished)
             throw new HttpException('Game is finished!', HttpStatus.BAD_REQUEST);
-        if (this.matchData.has(game.id)) {
+        if (this.gameIdToMatchData.has(game.id)) {
             return this.checkPlayerStatus(clientId, dto);
         }
         this.deletePlayer(clientId);
-        this.clientToGame.set(clientId, game.id);
-        this.matchData.set(game.id, { firstPlayer : dto.displayName, secondPlayer : null, isStarted: false }); //todo check if null works or should be empty string
+        this.playerToGameId.set(clientId, game.id);
+        this.gameIdToMatchData.set(game.id, { firstPlayer : dto.displayName, secondPlayer : null, isStarted: false }); //todo check if null works or should be empty string
         return "firstPlayer";
     }
 
     isStarted(gameId : number) : boolean {
-        if (this.matchData.has(gameId))
-            return this.matchData.get(gameId).isStarted;
+        if (this.gameIdToMatchData.has(gameId))
+            return this.gameIdToMatchData.get(gameId).isStarted;
         return false;
     }
 
     endOfGame(clientId : string, dto : GameScoreDto) : boolean {
-        if (!this.clientToGame.has(clientId) || this.clientToGame.get(clientId) !== dto.gameId)
+        if (!this.playerToGameId.has(clientId) || this.playerToGameId.get(clientId) !== dto.gameId)
             return false;
         this.deletePlayer(clientId);
-        if (!this.matchData.has(dto.gameId))
+        if (!this.gameIdToMatchData.has(dto.gameId))
             return false;
         this.deleteGame(dto.gameId);
         this.finalScore(dto);
@@ -56,10 +57,10 @@ export class GameService {
     }
 
     async findGamebyId(gameId : number) : Promise<Game> {
-        const game = this.gameRepository.findOneBy({id : gameId});
-        if (!game)
+        const gameData = this.gameRepository.findOneBy({id : gameId});
+        if (!gameData)
             throw new HttpException('game is not exists', HttpStatus.BAD_REQUEST);
-        return game;
+        return gameData;
     }
 
     async createGame(dto : createGameDto) : Promise<Game> {
@@ -78,39 +79,46 @@ export class GameService {
     }
 
     deleteGame(gameId : number) : void {
-        if (this.matchData.has(gameId)) {
-            this.matchData.delete(gameId);
+        if (this.gameIdToMatchData.has(gameId)) {
+            this.gameIdToMatchData.delete(gameId);
             this.gameRepository.delete(gameId);
         }
     }
 
     //Helpers
     checkPlayerStatus (clientId : string, dto : JoinGameDto) : string {
-        let match = this.matchData.get(dto.gameId);
+        let match = this.gameIdToMatchData.get(dto.gameId);
         if (match.secondPlayer === dto.displayName || match.firstPlayer === dto.displayName)
             return "reconnected";
-        if (match.secondPlayer)
+        if (match.secondPlayer) {
+            this.viewerToGameId.set(clientId, dto.gameId);
             return "viewer";
+        }
         match.secondPlayer = dto.displayName;
         match.isStarted = true;
-        this.matchData.set(dto.gameId, match);
+        this.gameIdToMatchData.set(dto.gameId, match);
         this.deletePlayer(clientId);
-        this.clientToGame.set(clientId, dto.gameId);
+        this.playerToGameId.set(clientId, dto.gameId);
         return "secondPlayer";
     }
 
     deletePlayer(clientId : string) : void {
-        if (this.clientToGame.has(clientId))
-            this.clientToGame.delete(clientId);
+        if (this.playerToGameId.has(clientId))
+            this.playerToGameId.delete(clientId);
+    }
+
+    deleteViewer(clientId : string) : void {
+        if (this.viewerToGameId.has(clientId))
+            this.viewerToGameId.delete(clientId);
     }
 
     isPlayer(clientId : string) : boolean {
-        if (this.clientToGame.has(clientId))
+        if (this.playerToGameId.has(clientId))
             return true;
         return false;
     }
 
     getGameId(clientId : string) : number {
-        return this.clientToGame.get(clientId);
+        return this.playerToGameId.get(clientId);
     }
 }

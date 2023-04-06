@@ -52,6 +52,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             }
             client.leave(String(gameId));
         }
+        else
+            this.gameService.deleteViewer(client.id);
     }
 
     @SubscribeMessage('join')
@@ -83,6 +85,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const isEnded = this.gameService.endOfGame(client.id, dto);
         if (isEnded)
             this.server.to(String(dto.gameId)).emit('finished', dto.gameId);
+        this.gameService.deleteViewer(client.id);
         client.leave(String(dto.gameId));
     }
 }
