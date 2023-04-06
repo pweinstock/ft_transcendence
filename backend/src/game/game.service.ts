@@ -33,15 +33,17 @@ export class GameService {
     }
 
     isStarted(gameId : number) : boolean {
-        return this.matchData.get(gameId).isStarted
+        if (this.matchData.has(gameId))
+            return this.matchData.get(gameId).isStarted;
+        return false;
     }
 
     endOfGame(clientId : string, dto : GameScoreDto) : boolean {
-        if (!this.clientToGame.has(clientId) || !this.matchData.has(dto.gameId))
-            return false;
-        if (this.clientToGame.get(clientId) !== dto.gameId)
+        if (!this.clientToGame.has(clientId) || this.clientToGame.get(clientId) !== dto.gameId)
             return false;
         this.deletePlayer(clientId);
+        if (!this.matchData.has(dto.gameId))
+            return false;
         this.deleteGame(dto.gameId);
         this.finalScore(dto);
         return true;
@@ -76,8 +78,10 @@ export class GameService {
     }
 
     deleteGame(gameId : number) : void {
-        this.matchData.delete(gameId);
-        this.gameRepository.delete(gameId);
+        if (this.matchData.has(gameId)) {
+            this.matchData.delete(gameId);
+            this.gameRepository.delete(gameId);
+        }
     }
 
     //Helpers
@@ -108,13 +112,5 @@ export class GameService {
 
     getGameId(clientId : string) : number {
         return this.clientToGame.get(clientId);
-    }
-
-    getMatchData(gameId : number) : MatchData {
-        return this.matchData.get(gameId);
-    }
-
-    deletePlayerData(gameId : number) : void {
-        this.matchData.delete(gameId);
     }
 }

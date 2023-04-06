@@ -30,12 +30,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('gameUpdate')
     gameUpdate(@MessageBody() dto: GameDataDto,
                @ConnectedSocket() client: Socket) {
-        // client.broadcast.emit('gameUpdate', dto);
-        //const gameId = this.gameService.getGame(client.id);
-        // if (gameId)
-        //     this.server.to(String(gameId)).emit('gameUpdate', dto);
-        // else
-        //     console.log('game not registered under this player!');
+        if (this.gameService.isPlayer(client.id)) {
+            const gameId = this.gameService.getGameId(client.id);
+            if (gameId)
+                this.server.to(String(gameId)).emit('gameUpdate', dto);
+        }
     }
 
     afterInit(server: Server) {}
@@ -51,6 +50,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGame(gameId);
             }
+            client.leave(String(gameId));
         }
     }
 
@@ -70,8 +70,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() dto : GameScoreDto
     ) : void {
         const isEnded = this.gameService.endOfGame(client.id, dto);
-        // client.join(String(gameId));
         if (isEnded)
             this.server.to(String(dto.gameId)).emit('finished', dto.gameId);
+        client.leave(String(dto.gameId));
+    }
+
+    @SubscribeMessage('leave')
+    leaveGame(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameScoreDto
+    ) : void {
+        const isEnded = this.gameService.endOfGame(client.id, dto);
+        if (isEnded)
+            this.server.to(String(dto.gameId)).emit('finished', dto.gameId);
+        client.leave(String(dto.gameId));
     }
 }
