@@ -14,8 +14,8 @@ export enum ChatType {
 
 export default function ChatRooms()
 {
-    // const [value, setValue] = useState([]); //set with basic value 0
-    const [value, setValue] = useState<Array<{ name: string }>>([]);
+    const [value, setValue] = useState([]); //set with basic value 0
+    // const [value, setValue] = useState<Array<{ name: string }>>([]);
 
     // useEffect(() => {
     //     // This effect uses the `value` variable,
@@ -55,15 +55,13 @@ export default function ChatRooms()
         socket?.emit('joinRoom', chatId);
     }
 
-
-
     return (
 
         <>
             <section>
                 <div>
                     {value.map((item, index) => (
-                        item ? <p style={{color: "white"}} key={index}>{item.name}</p> : <p></p>
+                        <p style={{color: "white"}} key={index}>{item.name}</p>
                     ))}
                 </div>
                 <div className="changingtext">
