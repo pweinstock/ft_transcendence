@@ -82,29 +82,38 @@ export class UserController {
         return this.usersService.getImage(res, imagename);
     }
 
+    //FriendList Interraction
     @Post('acceptFriendRequest')
-    acceptFriendRequest(@Body() dto : FriendDto) {
+    @UseGuards(AuthGuard('2FA'))
+    acceptFriendRequest(@Req() request: any, @Body() dto : FriendDto) {
         this.usersService.acceptFriendRequest(dto);
     }
 
-    @Post('declineFriendRequest')
-    async declineFriendRequest(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.declineFriendRequest(user, friend);
+    @Get('declineFriendRequest/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async declineFriendRequest(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.declineFriendRequest(request.user, friend);
     }
 
-    @Post('sendFriendRequest')
-    async sendFriendRequest(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.sendFriendRequest(user, friend);
+    @Get('/sendFriendRequest/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async sendFriendRequest(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.sendFriendRequest(request.user, friend);
     }
 
-    @Post('unbanUser')
-    async unbanUser(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.unbanUser(user, friend);
+    @Get('ban/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async banUser(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.banUser(request.user, friend);
+    }
+
+    @Get('unbanUser/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async unbanUser(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.unbanUser(request.user, friend);
     }
 }
