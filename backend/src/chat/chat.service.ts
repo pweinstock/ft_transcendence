@@ -68,8 +68,6 @@ export class ChatService {
     }
 
     async findChatUsers(chatId : string) : Promise<User[]> {
-        // const users = await this.userServices.findUsersByIds(chat.users);
-        // return users;
         const chat = await this.findChatById(chatId);
         const users: User[] = [];
         for (const id of chat.users) {
@@ -217,7 +215,7 @@ export class ChatService {
         const chat = await this.findChatById(chatId);
         if (!chat.users.includes(user.id))
             throw new HttpException('You are not authorised in chat', HttpStatus.FORBIDDEN);
-        const messages: Message[] = [];
+        const messages : Message[] = [];
         for (const messageId of chat.messages) {
             const message = await this.messageServices.findMessageById(messageId);
             messages.push(message);

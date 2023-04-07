@@ -33,7 +33,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (this.gameService.isPlayer(client.id)) {
             const gameId = this.gameService.getGameId(client.id);
             if (gameId)
-                this.server.to(String(gameId)).emit('update', dto);
+                this.server.to(gameId).emit('update', dto);
         }
     }
 
@@ -45,7 +45,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (this.gameService.isPlayer(client.id)) {
             const gameId = this.gameService.getGameId(client.id);
             if (this.gameService.isStarted(gameId))
-                this.server.to(String(gameId)).emit("disconnect", gameId);
+                this.server.to(gameId).emit("disconnect", gameId);
             else {
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGame(gameId);
