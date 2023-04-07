@@ -218,6 +218,7 @@ aside {
 
 .formholder {
   display: flex;
+  flex-direction: column;
   background-color: #dfdfdf;
   padding: 2%;
   width: 60%;
