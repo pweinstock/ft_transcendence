@@ -195,17 +195,17 @@ export class ChatService {
     //Message Interraction
     private clienttoUser = new Map<string, Room>();
 
-    async identify (client : Socket, dto: JoinChatDto) : Promise<void> {
+    async identify (clientId : string, dto: JoinChatDto) : Promise<void> {
         const chat = await this.chatRepository.findOneBy({id: dto.chatId});
         if (chat && chat.users.includes(dto.userId)) {
-            this.disconnectClient(client);
-            this.clienttoUser.set(client.id, {userId: dto.userId, chatId: dto.chatId});
+            this.clienttoUser.set(clientId, {userId: dto.userId, chatId: dto.chatId});
+        
         }
     }
 
-    clientInChat(clientId : string, userId : string, chatId : string) : boolean {
+    clientInChat(clientId : string, dto: CreateMessageDto) : boolean {
         const room = this.clienttoUser.get(clientId);
-        if (room && room.userId === userId && room.chatId === clientId)
+        if (room && room.userId === dto.userId && room.chatId === dto.chatId)
             return true;
         return false;
     }

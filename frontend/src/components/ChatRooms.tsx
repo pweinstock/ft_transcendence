@@ -67,15 +67,15 @@ export default function ChatRooms()
 
 
     function handOnClickSend() {
-        axios.post("http://localhost:5000/chat/",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
+        axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
 
     }
 
     function joinbuttonHandler() {
             // console.log('joinButton pressed');
-            axios.post("http://localhost:5000/chat/join",  { userId : 2,  chatId : 1}, {withCredentials: true}).then( () => {
+            axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : "561bdb88-9164-4a34-91a6-0ceb00d1bf6f",  chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"}, {withCredentials: true}).then( () => {
                 const socket = io("http://localhost:5001/chat" );
-                const chatId = 1;
+                const chatId = "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4";
                 socket?.emit('joinRoom', chatId);
 
     }).catch((reason) => {
@@ -130,7 +130,7 @@ export default function ChatRooms()
                     <button onClick={handOnClickSend}>CreatTestChat</button>
                 </div>
                 <div className="changingtext">
-                    {/* <button onClick={joinbuttonHandler}>join</button> */}
+                    <button onClick={joinbuttonHandler}>join</button>
                 </div>
             </section>
         </>

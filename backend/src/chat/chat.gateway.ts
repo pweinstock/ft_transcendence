@@ -33,9 +33,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto: JoinChatDto
     ): Promise<void> {
-        this.chatService.identify(client, dto);
+        this.chatService.identify(client.id, dto);
         client.join(dto.chatId);
-    }
+        }
 
     @SubscribeMessage('leaveRoom')
     handleLeaveRoom(client: Socket): void {
@@ -47,7 +47,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() dto: CreateMessageDto,
         @ConnectedSocket() client: Socket
     ): void {
-        if (this.chatService.clientInChat(client.id, dto.userId, dto.chatId))
+        if (this.chatService.clientInChat(client.id, dto))
             this.server.to(dto.chatId).emit('message', dto);
     }
 
