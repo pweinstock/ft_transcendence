@@ -10,6 +10,7 @@ import {
     Link
   } from "react-router-dom";
   import NewChat from './NewChat';
+  import { BrowserRouter } from "react-router-dom";
 
 export enum ChatType {
     PUBLIC = "public",
@@ -49,12 +50,19 @@ export default function ChatRooms()
 
 
     useEffect(() => {
-        async function fetchUser() {
-            const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
-            console.log(response);
-            setValue(response.data);
+        async function fetchChatrooms() {
+            try{
+                const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
+                if (response)
+                  console.log(response.data);
+                  setValue(response.data);
+                }
+                catch(e) {
+                  //error handling
+                  console.log("error");
+                }
         }
-        fetchUser();
+        fetchChatrooms();
     },[]);
 
 
@@ -62,7 +70,24 @@ export default function ChatRooms()
         axios.post("http://localhost:5000/chat/",  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
 
     }
-    function handOnClickSend1() {
+
+    function joinbuttonHandler() {
+            // console.log('joinButton pressed');
+            axios.post("http://localhost:5000/chat/join",  { userId : 2,  chatId : 1}, {withCredentials: true}).then( () => {
+                const socket = io("http://localhost:5001/chat" );
+                const chatId = 1;
+                socket?.emit('joinRoom', chatId);
+
+    }).catch((reason) => {
+                if (reason.response!.status === 400) {
+                  // Handle 400
+                } else {
+                  // Handle else
+                }
+                console.log(reason.message)
+              });
+   
+     
         const socket = io("http://localhost:5001/chat" );
         const chatId = 1;
         socket?.emit('joinRoom', chatId);
@@ -71,19 +96,15 @@ export default function ChatRooms()
     return (
 
         <>
-                {/* <Routes>
-                     {value.map((item, index) => (
-                        <Route path={"/chat" + item.id} element={<NewChat chatidp={item.id}/>}/>
-                    ))}
-                </Routes> */}
+            
             <section>
                 <div>
-                     {value.map((item, index) => (
+                     {value && value.map((item, index) => (
                         <div  style={{color: "white"}}>
                             {/* <Route path={"/chat" + item ? item.id : "empty"} element={<NewChat chatidp={chatidp}/>}/> */}
                             {/* <p style={{color: "white"}} key={index}>{item.name}</p> */}
-                            <Link className="newpostlink" to={"/chat" + item.id}>
-                                <button className='chatroombutton'>{item.name}</button>
+                            <Link key = {item.id} className="newpostlink" to={"/chat/id/" + item.id}>
+                                <button className='chatroombutton'>{item.name} {item.id}</button>
                             </Link>
                         </div>
                     ))}
@@ -109,7 +130,7 @@ export default function ChatRooms()
                     <button onClick={handOnClickSend}>CreatTestChat</button>
                 </div>
                 <div className="changingtext">
-                    <button onClick={handOnClickSend1}>join</button>
+                    <button onClick={joinbuttonHandler}>join</button>
                 </div>
             </section>
         </>
