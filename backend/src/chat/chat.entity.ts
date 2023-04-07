@@ -26,21 +26,21 @@ export class Chat {
     @Column({type: 'enum', enum: ChatType, default: [ChatType.PUBLIC]})
     type: ChatType;
 
-    @Column('string', {array: true, default: null, nullable: true})
+    @Column("text", {array: true, default: null, nullable: true})
     admins: string[];
 
-    @Column('string', {array: true, default: null, nullable: true})
+    @Column("text", {array: true, default: null, nullable: true})
     bannedUsers: string[];
 
     @Column('simple-json', {array: true, default: null, nullable: true})
     mutedUsers: MutedUser[];
 
-    @Column('string', {nullable: true})
+    @Column("text", {nullable: true})
     owner: string;
 
-    @Column('string', {array: true, default: null, nullable: true})
+    @Column("text", {array: true, default: null, nullable: true})
     users: string[];
 
-    @Column('string', {array: true, default: null, nullable: true})
+    @Column("text", {array: true, default: null, nullable: true})
     messages: string[];
 }

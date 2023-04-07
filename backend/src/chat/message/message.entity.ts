@@ -14,9 +14,9 @@ export class Message {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   date: Date;
 
-  @Column({type: "string", nullable:true})
+  @Column({nullable:true})
   user: string;
 
-  @Column({type: "string", nullable:true})
+  @Column({nullable:true})
   chat: string;
 }
