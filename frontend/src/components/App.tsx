@@ -20,8 +20,31 @@ import Settings from "./settings/settings1";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
 import User from './users/users';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from "axios";
 
 export default function App() {
+
+  const [value, setValue] = useState<{id: number, name: string }[]>([]); 
+  useEffect(() => {
+    async function fetchChatrooms() {
+
+        try{
+        const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
+        if (response)
+          console.log(response.data);
+          setValue(response.data);
+        }
+        catch(e) {
+          //error handling
+          console.log("error");
+        }
+
+        
+        
+    }
+    fetchChatrooms();
+},[]);
     return (
         <>
         <Router>
@@ -43,6 +66,11 @@ export default function App() {
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/users" element={<Users/>}/>
                 <Route path="/settings" element={<Settings2/>}/>
+                     {value && value.map((item, index) => (
+                        // <Route key = {item.id} path={"/chat/id/:id"} element={<NewChat chatidp={42}/>}/>
+                        // <Route key = {item.id} path={"/chat/id/:id"} element={<NewChat chatidp={item.id}/>}/>
+                        <Route key = {item.id} path={"/chat/id/" + item.id} element={<NewChat chatidp={item.id}/>}/>
+                    ))}
             </Routes>
             <aside>
                 {/* <Login /> */}
