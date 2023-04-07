@@ -5,6 +5,7 @@ import {Game} from "./game.entity";
 import {createGameDto} from "./dto/create-game.dto";
 import {JoinGameDto} from "./dto/join-game.dto";
 import {GameScoreDto} from "./dto/game-score.dto";
+import {UserService} from "../users/user.service";
 
 interface MatchData {
     firstPlayer : string,
@@ -14,7 +15,8 @@ interface MatchData {
 
 @Injectable()
 export class GameService {
-    constructor(@InjectRepository(Game) private gameRepository : Repository<Game>) {}
+    constructor(@InjectRepository(Game) private gameRepository : Repository<Game>,
+                private userService : UserService) {}
 
     private gameIdToMatchData = new Map<number, MatchData>();
     private playerToGameId = new Map<string, number>();
@@ -120,5 +122,18 @@ export class GameService {
 
     getGameId(clientId : string) : number {
         return this.playerToGameId.get(clientId);
+    }
+
+    sendScoreToUser(dto : GameScoreDto) : void {
+        this.gameIdToMatchData
+        if (dto.firstPlayerScore > dto.secondPlayerScore){
+
+        }
+        else if (dto.firstPlayerScore < dto.secondPlayerScore) {
+
+        }
+        else {
+
+        }
     }
 }

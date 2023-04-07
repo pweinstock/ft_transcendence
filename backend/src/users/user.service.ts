@@ -46,6 +46,14 @@ export class UserService {
         return user;
     }
 
+    async findByName(name: string): Promise<User> {
+        const user = await this.userRepository.findOneBy({displayName: name});
+        if (!user)
+            throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+        return user;
+    }
+
+
     async remove(user: User) : Promise<void> {
         await this.userRepository.remove(user);
     }//todo need to implement?
