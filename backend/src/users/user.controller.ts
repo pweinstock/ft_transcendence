@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
-import {FriendDto} from "./dto/friend.dto";
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -9,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
 import { Observable } from 'rxjs';
 import { Request } from 'express';
+import {User} from "./user.entity";
 
 export const storage = {
     storage: diskStorage({
@@ -31,7 +31,7 @@ export class UserController {
 
     @Get()
 	@UseGuards(AuthGuard('2FA'))
-    getAll() {
+    async getAll() : Promise<User[]>{
         return this.usersService.findAll();
     }
 
@@ -41,21 +41,21 @@ export class UserController {
         return request.user;
     }
 
-    @Get(':id')
+    @Get('/:name')
     @UseGuards(AuthGuard('2FA'))
-    getPublicUser(@Param('id') id) {
-        return this.usersService.findById(id);;
+    async getPublicUser(@Param('name') displayName : string) : Promise<User> {
+        return this.usersService.findByName(displayName);
     }
 
     @Post()
-    create(@Body() userDto: UserDTO) {
+    async create(@Body() userDto: UserDTO) : Promise<User> {
         return this.usersService.createUser(userDto);
     } //todo delete later: Testing purpose only
 
 
     @Post('changeName')
     @UseGuards(AuthGuard('2FA'))
-    async changeName(@Req() request: any, @Body('newName') newName: string) {
+    async changeName(@Req() request: any, @Body('newName') newName: string) : Promise<void>{
        await this.usersService.changeName(request.user.id, newName);
     }
 
@@ -71,46 +71,49 @@ export class UserController {
 
     @Post('delete')
     @UseGuards(AuthGuard('2FA'))
-    deleteAvatar(@Req() req) {
+    deleteAvatar(@Req() req) : void {
         this.usersService.deleteImage(req.user.photo);
         this.usersService.uploadAvatar(req.user.id, null)
     }
 
-    @Get('image/:imagename')
+    @Get('/image/:imagename')
     @UseGuards(AuthGuard('2FA'))
     getImage(@Param('imagename') imagename, @Res() res): Promise<Observable<Object>> {
         return this.usersService.getImage(res, imagename);
     }
 
-
-    // @Post('changeStatus')
-    // changeStatus(@Body() changeDataDTO : ChangeDataDTO) {
-    //     this.usersService.changePhoto(changeDataDTO);
-    // }
-
-    @Post('acceptFriendRequest')
-    acceptFriendRequest(@Body() dto : FriendDto) {
-        this.usersService.acceptFriendRequest(dto);
+    //FriendList Interraction
+    @Get('/acceptFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    acceptFriendRequest(@Req() request: any, @Param('id') friendId : number) : void {
+        this.usersService.acceptFriendRequest(request.user, friendId);
     }
 
-    @Post('declineFriendRequest')
-    async declineFriendRequest(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.declineFriendRequest(user, friend);
+    @Get('/declineFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async declineFriendRequest(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+        const friend = await this.usersService.findById(friendId);
+        this.usersService.declineFriendRequest(request.user, friend);
     }
 
-    @Post('sendFriendRequest')
-    async sendFriendRequest(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.sendFriendRequest(user, friend);
+    @Get('/addFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async sendFriendRequest(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+        const friend = await this.usersService.findById(friendId);
+        this.usersService.sendFriendRequest(request.user, friend);
     }
 
-    @Post('unbanUser')
-    async unbanUser(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.unbanUser(user, friend);
+    @Get('/ban/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async banUser(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+        const friend = await this.usersService.findById(friendId);
+        this.usersService.banUser(request.user, friend);
+    }
+
+    @Get('/unban/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async unbanUser(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+        const friend = await this.usersService.findById(friendId);
+        this.usersService.unbanUser(request.user, friend);
     }
 }
