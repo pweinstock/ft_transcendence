@@ -25,7 +25,7 @@ export class GameService {
     async joinGame (clientId : string, dto : JoinGameDto) : Promise<string> {
         const game = await this.findGamebyId(dto.gameId);
         if (game.finished)
-            throw new HttpException('Game is finished!', HttpStatus.BAD_REQUEST);
+            return "finished"
         if (this.gameIdToMatchData.has(game.id)) {
             return this.checkPlayerStatus(clientId, dto);
         }
