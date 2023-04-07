@@ -9,20 +9,21 @@ export default function Chat() {
     const [messages, setMessages] = useState<string[]>([]);
 
     const send = (value: string) => {
-        socket?.emit("message", {content : value, userId: "561bdb88-9164-4a34-91a6-0ceb00d1bf6f", chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"});
+        socket?.emit("message", {content : value, userId: "0acaf517-5050-467d-b4f9-5380547105c2", chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"});
     }
 
     const chatId = "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4";
-    socket?.emit('joinRoom', chatId);
+    socket?.emit('joinRoom',  {userId: "0acaf517-5050-467d-b4f9-5380547105c2", chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"});
 
     useEffect(() => {
         const newSocket = io("http://localhost:5001/chat");
         setSocket(newSocket);
     }, [setSocket]);
 
-    const messageListener = (message: string) => {
-        console.log(message);
-        setMessages([...messages, message])
+    const messageListener = (message: any) => {
+        console.log("message listener");
+        console.log(message.content);
+        setMessages([...messages, message.content])
     }
     useEffect(() => {
         console.log("hello listen");
