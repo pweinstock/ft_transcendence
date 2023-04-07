@@ -196,11 +196,11 @@ export class ChatService {
     private clienttoUser = new Map<string, Room>();
 
     async identify (client : Socket, dto: JoinChatDto) : Promise<void> {
-        const chat = await this.findChatById(dto.chatId);
-        if (!chat.users.includes(dto.userId))
-            throw new HttpException('You are not in chat!', HttpStatus.FORBIDDEN);
-        this.disconnectClient(client);
-        this.clienttoUser.set(client.id, {userId : dto.userId, chatId : dto.chatId});
+        const chat = await this.chatRepository.findOneBy({id: dto.chatId});
+        if (chat && chat.users.includes(dto.userId)) {
+            this.disconnectClient(client);
+            this.clienttoUser.set(client.id, {userId: dto.userId, chatId: dto.chatId});
+        }
     }
 
     disconnectClient(client : Socket) : void {
