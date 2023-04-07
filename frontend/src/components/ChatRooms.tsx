@@ -71,11 +71,11 @@ export default function ChatRooms()
     return (
 
         <>
-                {/* <Routes>
+                <Routes>
                      {value.map((item, index) => (
-                        <Route path={"/chat" + item.id} element={<NewChat chatidp={item.id}/>}/>
+                        <Route path={"/chat" + item.id} element={<NewChat chatidp={1}/>}/>
                     ))}
-                </Routes> */}
+                </Routes>
             <section>
                 <div>
                      {value.map((item, index) => (
