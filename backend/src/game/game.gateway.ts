@@ -1,95 +1,90 @@
 import {
-    WebSocketGateway,
-    WebSocketServer,
-    OnGatewayInit,
+    ConnectedSocket,
+    MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
-    SubscribeMessage, MessageBody, ConnectedSocket
+    OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import {Server, Socket} from 'socket.io';
 import {GameService} from "./game.service";
 import {GameDataDto} from "./dto/game-data.dto";
+import {JoinGameDto} from "./dto/join-game.dto";
+import {GameScoreDto} from "./dto/game-score.dto";
 
 
-const GAME_PORT = Number(process.env.GAME_PORT) || 5002;
-
-@WebSocketGateway(GAME_PORT, {
-    namespace: 'game',
+@WebSocketGateway(Number(process.env.GAME_PORT) | 5002, {
+    namespace: "game",
+    transports: ["websocket"],
     cors: {	origin: '*' },
 })
 
-export class GameGateway{// implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
-    server: Server;
+    server : Server;
 
-    constructor(private readonly gameService : GameService) {}
+    constructor(private readonly gameService: GameService) {}
 
-    // @SubscribeMessage("join")
-    // joinGame(
-    //     @MessageBody("join") data : number,
-    //     @ConnectedSocket() client : Socket
-    // ) {
-    //     console.log('game connected')
-    //     console.log(data);
-    //     this.gameService.identify(client.id);
-    //     this.server.emit('join', client.id);
-    //     return client.id;
-    // }
-    //
-    // @SubscribeMessage('movePaddle')
-    // handleMovePaddle(@MessageBody('game') dto : GameDataDto,
-    //                  @ConnectedSocket() client : Socket) {
-    //     client.broadcast.emit('gameDataUpdate', dto);
-    // }
-    //
-    // @SubscribeMessage('changePosition')
-    // changePosition(@MessageBody('game') dto : GameDataDto,
-    //                  @ConnectedSocket() client : Socket) {
-    //     if (this.gameService.isFirstPlayer(client.id) || this.gameService.isSecondPlayer(client.id)) {
-    //         this.gameService.validate(dto);
-    //         client.broadcast.emit('changePosition', dto);
-    //         console.log(dto);
-    //     }
-    // }
-
-    @SubscribeMessage('gameDataUpdate')
-    gameUpdate(@MessageBody('gameDataUpdate') dto : GameDataDto,
-               @ConnectedSocket() client : Socket) {
-        client.broadcast.emit('gameDataUpdate', dto);
-        console.log(dto.ball);
+    @SubscribeMessage('update')
+    gameUpdate(@MessageBody() dto: GameDataDto,
+               @ConnectedSocket() client: Socket) {
+        if (this.gameService.isPlayer(client.id)) {
+            const gameId = this.gameService.getGameId(client.id);
+            if (gameId)
+                this.server.to(gameId).emit('update', dto);
+        }
     }
 
-    // afterInit(server: Server) {
-    //     console.log('Pong game initialized');
-    // }
-    //
-    // handleConnection(client: any, ...args: any[]) {
-    //     console.log(`Player ${client.id} connected`);
-    //     this.players.push(client);
-    //     client.emit('connectSuccess', `Connected to Pong game as Player ${this.players.length}`);
-    // }
-    //
-    // handleDisconnect(client: any) {
-    //     console.log(`Player ${client.id} disconnected`);
-    //     this.players.splice(this.players.indexOf(client), 1);
-    //     this.players.forEach((player, index) => {
-    //         player.emit('playerLeft', `Player ${client.id} left the game`);
-    //     });
-    // }
+    afterInit(server: Server) {}
 
+    handleConnection() {}
 
+    handleDisconnect(@ConnectedSocket() client: Socket) {
+        if (this.gameService.isPlayer(client.id)) {
+            const gameId = this.gameService.getGameId(client.id);
+            if (this.gameService.isStarted(gameId))
+                this.server.to(gameId).emit("disconnect", gameId);
+            else {
+                this.gameService.deletePlayer(client.id);
+                this.gameService.deleteGame(gameId);
+            }
+        }
+        else
+            this.gameService.deleteViewer(client.id);
+    }
 
-    // @SubscribeMessage('scorePoint')
-    // handleScorePoint(client: any) {
-    //     console.log(`Player ${client.id} scored a point`);
-    //     this.players.forEach((player, index) => {
-    //         if (player.id !== client.id) {
-    //             player.emit('opponentScored', 'Your opponent scored a point!');
-    //         } else {
-    //             player.emit('youScored', 'You scored a point!');
-    //         }
-    //     });
-    // }
+    @SubscribeMessage('join')
+    async handleJoin(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : JoinGameDto
+    ) : Promise<void> {
+        const status = await this.gameService.joinGame(client.id, dto);
+        client.join(dto.gameId);
+        this.server.to(dto.gameId).emit(status, dto.gameId);
+    }
 
+    @SubscribeMessage('end')
+    gameEnd(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameScoreDto
+    ) : void {
+        const isEnded = this.gameService.endOfGame(client.id, dto);
+        if (isEnded)
+            this.server.to(dto.gameId).emit('finished', dto.gameId);
+        client.leave(dto.gameId);
+    }
 
+    @SubscribeMessage('leave')
+    leaveGame(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameScoreDto
+    ) : void {
+        const isEnded = this.gameService.endOfGame(client.id, dto);
+        if (isEnded)
+            this.server.to(dto.gameId).emit('finished', dto.gameId);
+        this.gameService.deleteViewer(client.id);
+        client.leave(dto.gameId);
+    }
 }

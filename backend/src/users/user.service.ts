@@ -1,11 +1,10 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable, Res} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import {User, UserStatus} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {ChangeDataDTO} from "./dto/change-data.dto";
-import {FriendDto} from "./dto/friend.dto";
-
+import { join } from 'path';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -22,7 +21,6 @@ export class UserService {
         user.pendingFriends = [];
         user.bannedUsers = [];
         user.friends = [];
-        user.messages = [];
         user.chats = [];
         user.matchHistory = [];
         return this.userRepository.save(user);
@@ -41,28 +39,54 @@ export class UserService {
         return user;
     }
 
-    async findById(userId: number): Promise<User> {
+    async findById(userId: string): Promise<User> {
         const user = await this.userRepository.findOneBy({id: userId});
         if (!user)
             throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
         return user;
     }
 
+    async findByName(name: string): Promise<User> {
+        const user = await this.userRepository.findOneBy({displayName: name});
+        if (!user)
+            throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+        return user;
+    }
+
+
     async remove(user: User) : Promise<void> {
         await this.userRepository.remove(user);
-    }
+    }//todo need to implement?
 
     //USER INFO
-    async changeName(changeDataDTO : ChangeDataDTO) : Promise<User> {
-        const user = await this.findById(changeDataDTO.userId);
-        user.displayName = changeDataDTO.value;
-        return this.userRepository.save(user);
+    async changeName(id: string, newName: string) : Promise<any> {
+        try {
+            await this.userRepository.update(id, { displayName: newName});
+            await this.userRepository.update(id, {first: false});
+        } catch (e) {
+            throw new HttpException("Username already exists!", HttpStatus.CONFLICT);
+        }
     }
 
-    async changePhoto(changeDataDTO : ChangeDataDTO) : Promise<User> {
-        const user = await this.findById(changeDataDTO.userId);
-        user.photo = changeDataDTO.value;
-        return this.userRepository.save(user);
+    async uploadAvatar(id: string, filename: string) : Promise<any> {
+        return this.userRepository.update(id, {photo: filename});
+    }
+
+    deleteImage(imagename: string) : void {
+		let fs = require('fs');
+		let filePath = "./uploads/image/" + imagename;
+		fs.stat(filePath, function (err, stats) {
+			if (err) {
+				return console.error(err);
+			}
+			fs.unlinkSync(filePath);
+		})
+	}
+
+    async getImage(@Res() res, imagename: string): Promise<Observable<Object>> {
+        if (imagename === 'null' || imagename === 'undefined')
+            return of(res.sendFile(join(process.cwd(), './uploads/image/' + 'littleman.png')));
+        return of(res.sendFile(join(process.cwd(), './uploads/image/' + imagename)));
     }
 
     async changeStatus(user : User, status : UserStatus) : Promise<User> {
@@ -70,21 +94,9 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    //MESSAGES
-    addMessage(messageId: number, user : User) : void {
-        user.messages.push(messageId);
-        this.userRepository.save(user);
-    }
-
-    deleteMessage(messageId: number, user : User) : void {
-        user.messages = user.messages.filter((message) => message != messageId);
-        this.userRepository.save(user);
-    }
-
     //FRIEND LIST
-    async acceptFriendRequest(dto : FriendDto) : Promise<void> {
-        const friend = await this.findById(dto.friendId);
-        const user = await this.findById(dto.userId);
+    async acceptFriendRequest(user : User, friendId : string) : Promise<void> {
+        const friend = await this.findById(friendId);
         if (user.pendingFriends.includes(friend.id)) {
             user.friends.push(friend.id);
             friend.friends.push(user.id);
@@ -101,7 +113,7 @@ export class UserService {
         }
     }
 
-    deleteFriend(user : User, friend : User) {
+    deleteFriend(user : User, friend : User) : void {
         if (user.friends.includes(friend.id)) {
             user.friends = user.friends.filter((id) => id !== friend.id);
             friend.friends = friend.friends.filter((id) => id !== user.id);
@@ -144,53 +156,57 @@ export class UserService {
     }
 
     //GAME
-    wonGame(user : User, matchId : number) : void {
+    async wonGame(userId : string, matchId : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.matchHistory.push(matchId);
         user.wins += 1;
         user.score += 3;
         this.userRepository.save(user);
     }
 
-    draw(user : User, matchId : number) : void {
+    async draw(userId : string, matchId : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.matchHistory.push(matchId);
         user.draws += 1;
         user.score += 1;
         this.userRepository.save(user);
     }
 
-    lostGame(user : User, matchId : number) : void {
+    async lostGame(userId : string, matchId : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.matchHistory.push(matchId);
         user.losses += 1;
         this.userRepository.save(user);
     }
 
     //CHAT
-    addChat (user : User, chat : number) : void {
+    async addChat (user : User, chat : string) : Promise<void> {
         if (!user.chats.includes(chat)) {
             user.chats.push(chat);
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
-    deleteChat (user : User, chat : number) : void {
+    async deleteChat (userId : string, chat : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.chats = user.chats.filter(chatId => chatId !== chat);
         this.userRepository.save(user);
     }
 
 	//TwoFactorAuthentication
-	async setTwoFactorAuthenticationSecret(secret: string, Id: number) {
+	async setTwoFactorAuthenticationSecret(secret: string, Id: string) {
 		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: secret});
 	}
 
-	async unsetTwoFactorAuthenticationSecret(Id: number) {
+	async unsetTwoFactorAuthenticationSecret(Id: string) {
 		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: null});
 	}
 
-	async enableTwoFactorAuthentication(Id: number) {
+	async enableTwoFactorAuthentication(Id: string) {
 		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: true});
 	}
 
-	async disableTwoFactorAuthentication(Id: number) {
+	async disableTwoFactorAuthentication(Id: string) {
 		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: false});
 	}
 }

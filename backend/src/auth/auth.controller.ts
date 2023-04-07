@@ -1,7 +1,7 @@
-import { Controller, Get, HttpException, HttpStatus, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AuthGuard } from "@nestjs/passport";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { TwoFactorAuthenticationService } from "./twoFactorAuthentication.service";
 
 @Controller('auth')
@@ -16,16 +16,24 @@ export class AuthController {
 	login() {
 	}
 
+	@Get('logout')
+	@UseGuards(AuthGuard('2FA'))
+	logout(@Res({ passthrough: true}) res: Response) {
+		res.clearCookie('jwt', { httpOnly: true});
+	}
+
 	@Get('redirect')
 	@UseGuards(AuthGuard('42'))
-	async redirect(@Res({passthrough: true}) res: Response, @Req() req: any) {
+	async redirect(@Res({passthrough: true}) res: Response, @Req() req: Request) {
 		const payload = {
-			email: req.user.email,
+			email: req.user['email'],
 			isTwoFactorAuthenticated: false,
 		};
 		const accessToken = this.jwtService.sign(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true});
-		res.redirect('http://localhost:5000/users');
+		if (req.user['isTwoFactorAuthenticationEnabled'])
+			res.redirect(`http://${process.env.HOST_IP}:3000/auth/2FA`);
+		res.redirect(`http://${process.env.HOST_IP}:3000`);
 	}
 
 	@UseGuards(AuthGuard('jwt'))
@@ -56,8 +64,8 @@ export class AuthController {
 	}
 
 	@UseGuards(AuthGuard('jwt'))
-	@Get('validate')
-	async verify(@Req() req: any, @Res({passthrough: true}) res: Response, @Query('code') code: string | null) {
+	@Post('validate')
+	async verify(@Req() req: any, @Res({passthrough: true}) res: Response, @Body('code') code: string | null) {
 		const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(code, req.user);
 		if (!isCodeValid)
 			throw new HttpException('Wrong 2FA code', HttpStatus.NOT_ACCEPTABLE);
@@ -67,7 +75,7 @@ export class AuthController {
 		};
 		const accessToken = this.jwtService.sign(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true});
-		return { isTwoFactorAuthenticated: true};
+		return { valid: true};
 	}
 
 }

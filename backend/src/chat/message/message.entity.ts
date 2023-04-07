@@ -2,8 +2,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'message'})
 export class Message {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column()
   content: string;
@@ -12,11 +12,11 @@ export class Message {
   displayName: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  date: Date;
 
-  @Column({type: "integer", nullable:true})
-  user: number;
+  @Column({nullable:true})
+  user: string;
 
-  @Column({type: "integer", array: true, nullable:true})
-  chat: number[];
+  @Column({nullable:true})
+  chat: string;
 }

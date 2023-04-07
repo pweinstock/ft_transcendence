@@ -1,4 +1,4 @@
-interface Paddle {
+export interface Paddle {
     x: number;
     y: number;
     width: number;
@@ -6,7 +6,7 @@ interface Paddle {
     dy: number;
 }
 
-interface Ball {
+export interface Ball {
     x: number;
     y: number;
     width: number;
@@ -16,7 +16,7 @@ interface Ball {
     dy: number;
 }
 
-interface Players {
+export interface Players {
     firstPlayer : string
     firstScore : number
     secondPlayer : string
@@ -32,4 +32,3 @@ export interface GameDataDto {
     timer : number;
     paddleSpeed :number;
 }
-

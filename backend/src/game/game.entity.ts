@@ -1,9 +1,9 @@
 import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
 
-@Entity({name: 'history'})
+@Entity({name: 'game'})
 export class Game {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Column()
     firstPlayer: string;
@@ -12,11 +12,14 @@ export class Game {
     secondPlayer: string;
 
     @Column()
-    firstPlayerScore: number;
+    firstPlayerScore: string;
 
     @Column()
-    secondPlayerScore: number;
+    secondPlayerScore: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+    date: Date;
+
+    @Column({default: false})
+    finished : boolean
 }

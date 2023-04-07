@@ -1,5 +1,5 @@
 export class JoinChatDto {
-    readonly userId: number;
-    readonly chatId : number;
+    readonly userId : string;
+    readonly chatId : string;
     readonly password: string;
 }

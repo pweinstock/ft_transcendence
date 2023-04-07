@@ -8,49 +8,46 @@ export enum UserStatus {
 
 @Entity({name: 'user'})
 export class User {
-   @PrimaryGeneratedColumn()
-    id: number;
+   @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Column({ unique: true })
     email: string;
 
-    @Column()
+    @Column({ unique: true })
     displayName: string;    
 
-    @Column({ nullable: true })
-    photo?: string;
+    @Column({ nullable: true , default: "littleman.png"})
+    photo: string;
 
     @Column({type: 'enum', enum: UserStatus, default: [UserStatus.ONLINE]})
     status: UserStatus;
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    bannedUsers: number[];
+    @Column("text", {array: true, default: null, nullable: true})
+    bannedUsers: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    pendingFriends: number[];
+    @Column("text", {array: true, default: null, nullable: true})
+    pendingFriends: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    friends: number[];
+    @Column("text", {array: true, default: null, nullable: true})
+    friends: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    messages: number[];
+    @Column("text", {array: true, default: null, nullable: true})
+    chats: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    chats: number[];
+    @Column("text", {array: true, default: null, nullable: true})
+    matchHistory : string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    matchHistory : number[];
-
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     wins : number;
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     losses : number;
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     draws : number;
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     score : number;
 
 	@Column({default: false})
@@ -58,4 +55,7 @@ export class User {
 
 	@Column({nullable: true})
 	TwoFactorAuthenticationSecret: string;
+
+    @Column({default: true})
+	first: boolean;
 }
