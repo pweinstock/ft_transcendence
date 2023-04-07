@@ -203,6 +203,13 @@ export class ChatService {
         }
     }
 
+    clientInChat(clientId : string, userId : string, chatId : string) : boolean {
+        const room = this.clienttoUser.get(clientId);
+        if (room && room.userId === userId && room.chatId === clientId)
+            return true;
+        return false;
+    }
+
     disconnectClient(client : Socket) : void {
         if (this.clienttoUser.has(client.id)) {
             const room = this.getClientRoom(client.id);
