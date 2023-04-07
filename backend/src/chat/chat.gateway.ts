@@ -47,7 +47,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() dto: CreateMessageDto,
         @ConnectedSocket() client: Socket
     ): void {
-        this.server.to(dto.chatId).emit('message', dto);
+        console.log(dto);
+        this.server.to(dto.chatId).emit('message', dto.content);
     }
 
     @SubscribeMessage('delete')
