@@ -37,7 +37,7 @@ export default function App() {
         }
         catch(e) {
           //error handling
-          console.log("error");
+          console.log("fetchChatrooms error");
         }
 
         
@@ -73,8 +73,8 @@ export default function App() {
                     ))}
             </Routes>
             <aside>
-                {/* <Login /> */}
-                {/* <User /> */}
+                <Login />
+                <User />
                 <h3 style={{color:"white"}}>Here will put the loged in user and maybe even the active chats?</h3>
                 {/* <Groupabout /> */}
             </aside>
