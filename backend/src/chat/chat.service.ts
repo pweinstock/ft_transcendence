@@ -14,8 +14,8 @@ import { Socket } from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 
 interface Room {
-    userId : number,
-    chatId : number
+    userId : string,
+    chatId : string
 }
 
 @Injectable()
@@ -43,7 +43,7 @@ export class ChatService {
         return chat;
     }
 
-    async deleteChat(owner : User, chatId: number): Promise<void> {
+    async deleteChat(owner : User, chatId: string): Promise<void> {
         const chat = await this.findChatById(chatId);
         if (chat.owner !== owner.id)
             throw new HttpException('Not Allowed!', HttpStatus.FORBIDDEN);
@@ -54,7 +54,7 @@ export class ChatService {
         this.chatRepository.remove(chat);
     }
 
-    async findChatById(chatId: number): Promise<Chat> {
+    async findChatById(chatId: string): Promise<Chat> {
         const chat = await this.chatRepository.findOneBy({id: chatId});
         if (!chat)
             throw new HttpException('Chat not found!', HttpStatus.NOT_FOUND);
@@ -67,7 +67,7 @@ export class ChatService {
         return chats;
     }
 
-    async findChatUsers(chatId : number) : Promise<User[]> {
+    async findChatUsers(chatId : string) : Promise<User[]> {
         // const users = await this.userServices.findUsersByIds(chat.users);
         // return users;
         const chat = await this.findChatById(chatId);
@@ -93,7 +93,7 @@ export class ChatService {
         return chats;
     }
 
-    async addUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async addUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         this.checkAdmin(chat, adminId);
         this.checkBan(chat, dto.userId);
@@ -139,7 +139,7 @@ export class ChatService {
         return chat;
     }
 
-    async addAdmin(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async addAdmin(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if (chat.owner === dto.userId)
             return;
@@ -153,7 +153,7 @@ export class ChatService {
         }
     }
 
-    async removeAdmin(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async removeAdmin(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         this.checkAdmin(chat, adminId);
         if (chat.admins.includes(dto.userId)) {
@@ -162,7 +162,7 @@ export class ChatService {
         }
     }
 
-    async banUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async banUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
@@ -171,13 +171,13 @@ export class ChatService {
         this.addBan(chat, user.id);
     }
 
-    async unbanUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async unbanUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         this.checkAdmin(chat, adminId);
         this.removeBan(chat, dto.userId);
     }
 
-    async muteUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async muteUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         if (!dto.timeoutMinutes)
             return;
         const chat = await this.findChatById(dto.chatId);
@@ -188,7 +188,7 @@ export class ChatService {
         this.addMute(chat, user.id, dto.timeoutMinutes);
     }
 
-    async unmuteUser(adminId : number, dto: ChangeStatusDTO) : Promise<void> {
+    async unmuteUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         this.checkAdmin(chat, adminId);
         this.removeMute(chat, dto.userId);
@@ -210,7 +210,7 @@ export class ChatService {
         }
     }
 
-    async getChatMessages(user : User, chatId : number) : Promise<Message[]> {
+    async getChatMessages(user : User, chatId : string) : Promise<Message[]> {
         const chat = await this.findChatById(chatId);
         if (!chat.users.includes(user.id))
             throw new HttpException('You are not authorised in chat', HttpStatus.FORBIDDEN);
@@ -254,43 +254,43 @@ export class ChatService {
     }
 
     //Helpers
-    checkAdmin(chat : Chat, userId : number) : void {
+    checkAdmin(chat : Chat, userId : string) : void {
         if (chat.owner !== userId && !chat.admins.includes(userId))
             throw new HttpException('For Admins only!', HttpStatus.FORBIDDEN);
     }
 
-    checkBan(chat : Chat, userId : number) : void {
+    checkBan(chat : Chat, userId : string) : void {
         if (chat.bannedUsers.includes(userId))
             throw new HttpException('User Banned in this chat!', HttpStatus.FORBIDDEN);
     }
 
-    addBan(chat : Chat, userId : number) : void {
+    addBan(chat : Chat, userId : string) : void {
         if (!chat.bannedUsers.includes(userId)) {
             chat.bannedUsers.push(userId);
             this.chatRepository.save(chat);
         }
     }
 
-    removeBan(chat : Chat, userId: number) : void {
+    removeBan(chat : Chat, userId: string) : void {
         if (chat.bannedUsers.includes(userId)) {
             chat.bannedUsers.filter(user => user !== userId);
             this.chatRepository.save(chat);
         }
     }
 
-    addMute(chat : Chat, userId: number, timeoutMinutes : number) : void {
+    addMute(chat : Chat, userId: string, timeoutMinutes : string) : void {
         const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
         if (mutedUser) {
             chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
             const newMutedUser: MutedUser = {
                 userId: userId,
-                unmuteDate: new Date(Date.now() + timeoutMinutes * 60000),
+                unmuteDate: new Date(Date.now() + Number(timeoutMinutes) * 60000),
             };
             chat.mutedUsers.push(newMutedUser);
         }
     }
 
-    removeMute(chat : Chat, userId: number) : void {
+    removeMute(chat : Chat, userId: string) : void {
         const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
         if (mutedUser) {
             chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
@@ -298,7 +298,7 @@ export class ChatService {
         }
     }
 
-    isMuted(chat : Chat, userId : number) : boolean {
+    isMuted(chat : Chat, userId : string) : boolean {
         const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
         if (mutedUser) {
             const currentDate = new Date();

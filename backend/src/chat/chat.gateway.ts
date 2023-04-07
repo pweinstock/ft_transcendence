@@ -34,7 +34,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto: JoinChatDto
     ): Promise<void> {
-        client.join(String(dto.chatId));
+        client.join(dto.chatId);
         this.chatService.identify(client, dto);
     }
 
@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() dto: CreateMessageDto,
         @ConnectedSocket() client: Socket
     ): void {
-        this.server.to(String(dto.chatId)).emit('message', dto);
+        this.server.to(dto.chatId).emit('message', dto);
     }
 
     @SubscribeMessage('delete')
@@ -56,6 +56,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() dto: CreateMessageDto,
         @ConnectedSocket() client: Socket
     ): void {
-        this.server.to(String(dto.chatId)).emit('delete', dto);
+        this.server.to(dto.chatId).emit('delete', dto);
     }
 }

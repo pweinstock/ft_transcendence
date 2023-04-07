@@ -62,7 +62,7 @@ export class UserController {
     @Post('upload')
     @UseGuards(AuthGuard('2FA'))
     @UseInterceptors(FileInterceptor('file', storage))
-    uploadFile(@UploadedFile() file, @Req() req): Promise<string> {
+    uploadFile(@UploadedFile() file, @Req() req) : Promise<string> {
         console.log('req.user.photo: %s', req.user.photo);
         if (req.user.photo != 'null')
             this.usersService.deleteImage(req.user.photo); 
@@ -78,41 +78,41 @@ export class UserController {
 
     @Get('/image/:imagename')
     @UseGuards(AuthGuard('2FA'))
-    getImage(@Param('imagename') imagename, @Res() res): Promise<Observable<Object>> {
+    getImage(@Param('imagename') imagename : string, @Res() res): Promise<Observable<Object>> {
         return this.usersService.getImage(res, imagename);
     }
 
     //FriendList Interraction
     @Get('/acceptFriend/:id')
     @UseGuards(AuthGuard('2FA'))
-    acceptFriendRequest(@Req() request: any, @Param('id') friendId : number) : void {
+    acceptFriendRequest(@Req() request: any, @Param('id') friendId : string) : void {
         this.usersService.acceptFriendRequest(request.user, friendId);
     }
 
     @Get('/declineFriend/:id')
     @UseGuards(AuthGuard('2FA'))
-    async declineFriendRequest(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+    async declineFriendRequest(@Req() request: any, @Param('id') friendId : string) : Promise<void> {
         const friend = await this.usersService.findById(friendId);
         this.usersService.declineFriendRequest(request.user, friend);
     }
 
     @Get('/addFriend/:id')
     @UseGuards(AuthGuard('2FA'))
-    async sendFriendRequest(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+    async sendFriendRequest(@Req() request: any, @Param('id') friendId : string) : Promise<void> {
         const friend = await this.usersService.findById(friendId);
         this.usersService.sendFriendRequest(request.user, friend);
     }
 
     @Get('/ban/:id')
     @UseGuards(AuthGuard('2FA'))
-    async banUser(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+    async banUser(@Req() request: any, @Param('id') friendId : string) : Promise<void> {
         const friend = await this.usersService.findById(friendId);
         this.usersService.banUser(request.user, friend);
     }
 
     @Get('/unban/:id')
     @UseGuards(AuthGuard('2FA'))
-    async unbanUser(@Req() request: any, @Param('id') friendId : number) : Promise<void> {
+    async unbanUser(@Req() request: any, @Param('id') friendId : string) : Promise<void> {
         const friend = await this.usersService.findById(friendId);
         this.usersService.unbanUser(request.user, friend);
     }

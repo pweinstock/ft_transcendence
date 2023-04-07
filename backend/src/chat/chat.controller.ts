@@ -40,7 +40,7 @@ export class ChatController {
 
     @Post('/delete')
     @UseGuards(AuthGuard('2FA'))
-    delete(@Req() request, @Body() chatId : number) : void {
+    delete(@Req() request, @Body() chatId : string) : void {
         this.chatService.deleteChat(request.user, chatId);
     }
 
@@ -55,7 +55,7 @@ export class ChatController {
 
     @Get('/users/:id')
     @UseGuards(AuthGuard('2FA'))
-    async getUsersInChat(@Param('id') chatId: number) : Promise<User[]> {
+    async getUsersInChat(@Param('id') chatId: string) : Promise<User[]> {
         const users = await this.chatService.findChatUsers(chatId);
         return users;
     }
@@ -70,7 +70,7 @@ export class ChatController {
 
     @Get('/id/:id')
     @UseGuards(AuthGuard('2FA'))
-    async getChat(@Req() request, @Param('id') chatId : number) : Promise<Chat>{
+    async getChat(@Req() request, @Param('id') chatId : string) : Promise<Chat>{
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         if (!request.user.chats.includes(Number(chatId)))
@@ -82,7 +82,7 @@ export class ChatController {
     // MESSAGES
     @Get('/messages/:id')
     @UseGuards(AuthGuard('2FA'))
-    async getMessages(@Req() request, @Param('id') chatId : number) : Promise<Message[]>{
+    async getMessages(@Req() request, @Param('id') chatId : string) : Promise<Message[]>{
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         const messages = await this.chatService.getChatMessages(request.user, chatId);

@@ -18,9 +18,9 @@ export class GameService {
     constructor(@InjectRepository(Game) private gameRepository : Repository<Game>,
                 private userService : UserService) {}
 
-    private gameIdToMatchData = new Map<number, MatchData>();
-    private playerToGameId = new Map<string, number>();
-    private viewerToGameId = new Map<string, number>();
+    private gameIdToMatchData = new Map<string, MatchData>();
+    private playerToGameId = new Map<string, string>();
+    private viewerToGameId = new Map<string, string>();
 
     async joinGame (clientId : string, dto : JoinGameDto) : Promise<string> {
         const game = await this.findGamebyId(dto.gameId);
@@ -35,7 +35,7 @@ export class GameService {
         return "firstPlayer";
     }
 
-    isStarted(gameId : number) : boolean {
+    isStarted(gameId : string) : boolean {
         if (this.gameIdToMatchData.has(gameId))
             return this.gameIdToMatchData.get(gameId).isStarted;
         return false;
@@ -58,7 +58,7 @@ export class GameService {
         return games;
     }
 
-    async findGamebyId(gameId : number) : Promise<Game> {
+    async findGamebyId(gameId : string) : Promise<Game> {
         const gameData = this.gameRepository.findOneBy({id : gameId});
         if (!gameData)
             throw new HttpException('game is not exists', HttpStatus.BAD_REQUEST);
@@ -80,7 +80,7 @@ export class GameService {
         this.gameRepository.save(game);
     }
 
-    deleteGame(gameId : number) : void {
+    deleteGame(gameId : string) : void {
         if (this.gameIdToMatchData.has(gameId)) {
             this.gameIdToMatchData.delete(gameId);
             this.gameRepository.delete(gameId);
@@ -120,20 +120,23 @@ export class GameService {
         return false;
     }
 
-    getGameId(clientId : string) : number {
+    getGameId(clientId : string) : string {
         return this.playerToGameId.get(clientId);
     }
 
     sendScoreToUser(dto : GameScoreDto) : void {
-        this.gameIdToMatchData
+        const matchData = this.gameIdToMatchData.get(dto.gameId);
         if (dto.firstPlayerScore > dto.secondPlayerScore){
-
+            this.userService.wonGame(matchData.firstPlayer, dto.gameId);
+            this.userService.lostGame(matchData.secondPlayer, dto.gameId);
         }
         else if (dto.firstPlayerScore < dto.secondPlayerScore) {
-
+            this.userService.lostGame(matchData.firstPlayer, dto.gameId);
+            this.userService.wonGame(matchData.secondPlayer, dto.gameId);
         }
         else {
-
+            this.userService.draw(matchData.firstPlayer, dto.gameId);
+            this.userService.draw(matchData.secondPlayer, dto.gameId);
         }
     }
 }
