@@ -61,8 +61,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() dto : JoinGameDto
     ) : Promise<void> {
         const status = await this.gameService.joinGame(client.id, dto);
-        client.join(String(dto.gameId));
-        this.server.to(String(dto.gameId)).emit(status, dto.gameId);
+        client.join(dto.gameId);
+        this.server.to(dto.gameId).emit(status, dto.gameId);
     }
 
     @SubscribeMessage('end')
@@ -72,8 +72,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     ) : void {
         const isEnded = this.gameService.endOfGame(client.id, dto);
         if (isEnded)
-            this.server.to(String(dto.gameId)).emit('finished', dto.gameId);
-        client.leave(String(dto.gameId));
+            this.server.to(dto.gameId).emit('finished', dto.gameId);
+        client.leave(dto.gameId);
     }
 
     @SubscribeMessage('leave')
@@ -83,8 +83,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     ) : void {
         const isEnded = this.gameService.endOfGame(client.id, dto);
         if (isEnded)
-            this.server.to(String(dto.gameId)).emit('finished', dto.gameId);
+            this.server.to(dto.gameId).emit('finished', dto.gameId);
         this.gameService.deleteViewer(client.id);
-        client.leave(String(dto.gameId));
+        client.leave(dto.gameId);
     }
 }
