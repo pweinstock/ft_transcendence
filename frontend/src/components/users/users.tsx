@@ -16,6 +16,7 @@ function Users() {
       .catch((error) => {
         console.error(error);
         if (error.response && error.response.status === 401) {
+          // better != 200
           navigate('/auth');
         }
       });

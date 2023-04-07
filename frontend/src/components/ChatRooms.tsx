@@ -130,7 +130,7 @@ export default function ChatRooms()
                     <button onClick={handOnClickSend}>CreatTestChat</button>
                 </div>
                 <div className="changingtext">
-                    <button onClick={joinbuttonHandler}>join</button>
+                    {/* <button onClick={joinbuttonHandler}>join</button> */}
                 </div>
             </section>
         </>
