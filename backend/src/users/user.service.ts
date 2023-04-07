@@ -3,11 +3,8 @@ import { UserDTO } from './dto/user.dto';
 import {User, UserStatus} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {FriendDto} from "./dto/friend.dto";
 import { join } from 'path';
 import { Observable, of } from 'rxjs';
-import {Chat} from "../chat/chat.entity";
-
 
 @Injectable()
 export class UserService {
@@ -49,18 +46,17 @@ export class UserService {
         return user;
     }
 
-    // async findUsersByIds(ids: number[]): Promise<User[]> {
-    //     const users: User[] = [];
-    //     for (const id of ids) {
-    //         const user = await this.findById(id);
-    //         users.push(user);
-    //     }
-    //     return users;
-    // }
+    async findByName(name: string): Promise<User> {
+        const user = await this.userRepository.findOneBy({displayName: name});
+        if (!user)
+            throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+        return user;
+    }
+
 
     async remove(user: User) : Promise<void> {
         await this.userRepository.remove(user);
-    }
+    }//todo need to implement?
 
     //USER INFO
     async changeName(id: number, newName: string) : Promise<any> {
@@ -76,7 +72,7 @@ export class UserService {
         return this.userRepository.update(id, {photo: filename});
     }
 
-    deleteImage(imagename: string) {
+    deleteImage(imagename: string) : void {
 		let fs = require('fs');
 		let filePath = "./uploads/image/" + imagename;
 		fs.stat(filePath, function (err, stats) {
@@ -99,9 +95,8 @@ export class UserService {
     }
 
     //FRIEND LIST
-    async acceptFriendRequest(dto : FriendDto) : Promise<void> {
-        const friend = await this.findById(dto.friendId);
-        const user = await this.findById(dto.userId);
+    async acceptFriendRequest(user : User, friendId : number) : Promise<void> {
+        const friend = await this.findById(friendId);
         if (user.pendingFriends.includes(friend.id)) {
             user.friends.push(friend.id);
             friend.friends.push(user.id);
@@ -118,7 +113,7 @@ export class UserService {
         }
     }
 
-    deleteFriend(user : User, friend : User) {
+    deleteFriend(user : User, friend : User) : void {
         if (user.friends.includes(friend.id)) {
             user.friends = user.friends.filter((id) => id !== friend.id);
             friend.friends = friend.friends.filter((id) => id !== user.id);

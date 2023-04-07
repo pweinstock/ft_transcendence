@@ -1,6 +1,6 @@
 import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
 
-@Entity({name: 'history'})
+@Entity({name: 'game'})
 export class Game {
     @PrimaryGeneratedColumn()
     id: number;
@@ -18,5 +18,8 @@ export class Game {
     secondPlayerScore: number;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+    date: Date;
+
+    @Column({default: false})
+    finished : boolean
 }
