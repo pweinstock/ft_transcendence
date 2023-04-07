@@ -8,14 +8,14 @@ export enum ChatType {
 };
 
 export interface MutedUser {
-    userId: number;
+    userId: string;
     unmuteDate: Date;
 }
 
 @Entity({name: 'chat'})
 export class Chat {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Column()
     name: string;
@@ -26,21 +26,21 @@ export class Chat {
     @Column({type: 'enum', enum: ChatType, default: [ChatType.PUBLIC]})
     type: ChatType;
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    admins: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    admins: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    bannedUsers: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    bannedUsers: string[];
 
     @Column('simple-json', {array: true, default: null, nullable: true})
     mutedUsers: MutedUser[];
 
-    @Column('integer', {nullable: true})
-    owner: number;
+    @Column('string', {nullable: true})
+    owner: string;
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    users: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    users: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    messages: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    messages: string[];
 }

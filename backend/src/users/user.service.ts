@@ -39,7 +39,7 @@ export class UserService {
         return user;
     }
 
-    async findById(userId: number): Promise<User> {
+    async findById(userId: string): Promise<User> {
         const user = await this.userRepository.findOneBy({id: userId});
         if (!user)
             throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
@@ -59,7 +59,7 @@ export class UserService {
     }//todo need to implement?
 
     //USER INFO
-    async changeName(id: number, newName: string) : Promise<any> {
+    async changeName(id: string, newName: string) : Promise<any> {
         try {
             await this.userRepository.update(id, { displayName: newName});
             await this.userRepository.update(id, {first: false});
@@ -68,7 +68,7 @@ export class UserService {
         }
     }
 
-    async uploadAvatar(id: number, filename: string) : Promise<any> {
+    async uploadAvatar(id: string, filename: string) : Promise<any> {
         return this.userRepository.update(id, {photo: filename});
     }
 
@@ -95,7 +95,7 @@ export class UserService {
     }
 
     //FRIEND LIST
-    async acceptFriendRequest(user : User, friendId : number) : Promise<void> {
+    async acceptFriendRequest(user : User, friendId : string) : Promise<void> {
         const friend = await this.findById(friendId);
         if (user.pendingFriends.includes(friend.id)) {
             user.friends.push(friend.id);
@@ -156,54 +156,57 @@ export class UserService {
     }
 
     //GAME
-    wonGame(user : User, matchId : number) : void {
+    async wonGame(userId : string, matchId : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.matchHistory.push(matchId);
         user.wins += 1;
         user.score += 3;
         this.userRepository.save(user);
     }
 
-    draw(user : User, matchId : number) : void {
+    async draw(userId : string, matchId : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.matchHistory.push(matchId);
         user.draws += 1;
         user.score += 1;
         this.userRepository.save(user);
     }
 
-    lostGame(user : User, matchId : number) : void {
+    async lostGame(userId : string, matchId : string) : Promise<void> {
+        const user = await this.findById(userId);
         user.matchHistory.push(matchId);
         user.losses += 1;
         this.userRepository.save(user);
     }
 
     //CHAT
-    async addChat (user : User, chat : number) : Promise<void> {
+    async addChat (user : User, chat : string) : Promise<void> {
         if (!user.chats.includes(chat)) {
             user.chats.push(chat);
             await this.userRepository.save(user);
         }
     }
 
-    async deleteChat (userId : number, chat : number) : Promise<void> {
+    async deleteChat (userId : string, chat : string) : Promise<void> {
         const user = await this.findById(userId);
         user.chats = user.chats.filter(chatId => chatId !== chat);
         this.userRepository.save(user);
     }
 
 	//TwoFactorAuthentication
-	async setTwoFactorAuthenticationSecret(secret: string, Id: number) {
+	async setTwoFactorAuthenticationSecret(secret: string, Id: string) {
 		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: secret});
 	}
 
-	async unsetTwoFactorAuthenticationSecret(Id: number) {
+	async unsetTwoFactorAuthenticationSecret(Id: string) {
 		return this.userRepository.update(Id, {TwoFactorAuthenticationSecret: null});
 	}
 
-	async enableTwoFactorAuthentication(Id: number) {
+	async enableTwoFactorAuthentication(Id: string) {
 		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: true});
 	}
 
-	async disableTwoFactorAuthentication(Id: number) {
+	async disableTwoFactorAuthentication(Id: string) {
 		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: false});
 	}
 }

@@ -32,4 +32,3 @@ export interface GameDataDto {
     timer : number;
     paddleSpeed :number;
 }
-

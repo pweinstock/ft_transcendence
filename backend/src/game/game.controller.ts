@@ -19,22 +19,15 @@ export class UserController {
 
     @Get('/:id')
     @UseGuards(AuthGuard('2FA'))
-    async getGame(@Req() request: any, @Param() gameId : number) : Promise<Game> {
+    async getGame(@Req() request: any, @Param() gameId : string) : Promise<Game> {
         const game = await this.gameService.findGamebyId(gameId);
         return game;
     }
 
     @Post()
     @UseGuards(AuthGuard('2FA'))
-    async createGame(@Req() request: any, @Body() dto : createGameDto) : Promise<Game>{
+    async createGame(@Req() request: any, @Body() dto : createGameDto) : Promise<Game> {
         const game = await this.gameService.createGame(dto);
         return game;
-    }
-
-    @Post('delete')
-    @UseGuards(AuthGuard('2FA'))
-    deleteGame(@Req() request: any, @Body() gameId : number) : void {
-
-        this.gameService.deleteGame(request.user.id, gameId);
     }
 }

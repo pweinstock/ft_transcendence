@@ -8,8 +8,8 @@ export enum UserStatus {
 
 @Entity({name: 'user'})
 export class User {
-   @PrimaryGeneratedColumn()
-    id: number;
+   @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Column({ unique: true })
     email: string;
@@ -23,31 +23,31 @@ export class User {
     @Column({type: 'enum', enum: UserStatus, default: [UserStatus.ONLINE]})
     status: UserStatus;
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    bannedUsers: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    bannedUsers: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    pendingFriends: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    pendingFriends: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    friends: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    friends: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    chats: number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    chats: string[];
 
-    @Column('integer', {array: true, default: null, nullable: true})
-    matchHistory : number[];
+    @Column('string', {array: true, default: null, nullable: true})
+    matchHistory : string[];
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     wins : number;
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     losses : number;
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     draws : number;
 
-    @Column({default: 0})
+    @Column('integer', {default: 0})
     score : number;
 
 	@Column({default: false})

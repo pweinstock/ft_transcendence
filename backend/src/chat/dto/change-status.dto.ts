@@ -1,5 +1,5 @@
 export class ChangeStatusDTO {
-    readonly chatId: number;
-    readonly userId: number;
-    readonly timeoutMinutes: number;
+    readonly chatId: string;
+    readonly userId: string;
+    readonly timeoutMinutes: string;
 }

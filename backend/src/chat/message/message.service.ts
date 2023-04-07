@@ -13,14 +13,14 @@ export class MessageService {
         return this.messageRepository.save(message);
     }
 
-    async findMessageById(messageId : number) : Promise<Message> {
+    async findMessageById(messageId : string) : Promise<Message> {
         const message = await this.messageRepository.findOneBy({id : messageId});
         if (!message)
             throw new HttpException('Message not found!', HttpStatus.NOT_FOUND);
         return message;
     }
 
-    async deleteMessage(messageId : number) : Promise<void> {
+    async deleteMessage(messageId : string) : Promise<void> {
         await this.messageRepository.delete(messageId);
     }
 }
