@@ -20,7 +20,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly chatService: ChatService) {}
 
-
     afterInit(server: Server) {}
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -34,8 +33,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto: JoinChatDto
     ): Promise<void> {
-        client.join(dto.chatId);
         this.chatService.identify(client, dto);
+        client.join(dto.chatId);
     }
 
     @SubscribeMessage('leaveRoom')
