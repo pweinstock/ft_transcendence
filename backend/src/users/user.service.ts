@@ -84,7 +84,7 @@ export class UserService {
 	}
 
     async getImage(@Res() res, imagename: string): Promise<Observable<Object>> {
-        if (imagename === 'null')
+        if (imagename === 'null' || imagename === 'undefined')
             return of(res.sendFile(join(process.cwd(), './uploads/image/' + 'littleman.png')));
         return of(res.sendFile(join(process.cwd(), './uploads/image/' + imagename)));
     }
