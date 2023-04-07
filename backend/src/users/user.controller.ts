@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
-import {FriendDto} from "./dto/friend.dto";
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -76,35 +75,44 @@ export class UserController {
         this.usersService.uploadAvatar(req.user.id, null)
     }
 
-    @Get('image/:imagename')
+    @Get('/image/:imagename')
     @UseGuards(AuthGuard('2FA'))
     getImage(@Param('imagename') imagename, @Res() res): Promise<Observable<Object>> {
         return this.usersService.getImage(res, imagename);
     }
 
-    @Post('acceptFriendRequest')
-    acceptFriendRequest(@Body() dto : FriendDto) {
-        this.usersService.acceptFriendRequest(dto);
+    //FriendList Interraction
+    @Get('/acceptFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    acceptFriendRequest(@Req() request: any, @Param('id') friendId) {
+        this.usersService.acceptFriendRequest(request.user, friendId);
     }
 
-    @Post('declineFriendRequest')
-    async declineFriendRequest(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.declineFriendRequest(user, friend);
+    @Get('/declineFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async declineFriendRequest(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.declineFriendRequest(request.user, friend);
     }
 
-    @Post('sendFriendRequest')
-    async sendFriendRequest(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.sendFriendRequest(user, friend);
+    @Get('/addFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async sendFriendRequest(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.sendFriendRequest(request.user, friend);
     }
 
-    @Post('unbanUser')
-    async unbanUser(@Body() dto : FriendDto) {
-        const user = await this.usersService.findById(dto.userId);
-        const friend = await this.usersService.findById(dto.friendId);
-        return this.usersService.unbanUser(user, friend);
+    @Get('/ban/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async banUser(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.banUser(request.user, friend);
+    }
+
+    @Get('/unban/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async unbanUser(@Req() request: any, @Param('id') friendId) {
+        const friend = await this.usersService.findById(friendId);
+        return this.usersService.unbanUser(request.user, friend);
     }
 }

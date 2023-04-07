@@ -50,7 +50,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGame(gameId);
             }
-            client.leave(String(gameId));
         }
         else
             this.gameService.deleteViewer(client.id);
