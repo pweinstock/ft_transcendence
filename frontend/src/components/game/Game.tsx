@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
-import {socket} from "../../socket";
 
 
 interface Paddle {
@@ -39,7 +38,6 @@ interface GameData {
 }
 
 
-
 export default function PingPong() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
@@ -55,6 +53,16 @@ export default function PingPong() {
     const gameUpdate = (data : GameData) => {
         socket.emit('gameUpdate', data);
     }
+
+    // const playerDisconnected = (data : GameData) => {
+    //     socket.emit('gameUpdate', data);
+    // }
+    //
+    // const playerReconnected = () => {
+    //
+    // }
+
+    const [isPaused, setIsPaused] = useState(true);
 
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -96,9 +104,9 @@ export default function PingPong() {
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
-            context.moveTo(canvas.width / 2, 20);
+            context.moveTo(canvas.width / 2, 30);
             context.lineTo(canvas.width / 2, canvas.height);
-            context.strokeStyle = 'black';
+            context.strokeStyle = 'grey';
             context.lineWidth = 2;
             context.stroke();
         };
@@ -114,17 +122,17 @@ export default function PingPong() {
 
         const drawTimer = () => {
             context.font = "bold 18px Arial";
-            context.fillStyle = "black";
-            const x = 360;
+            context.fillStyle = "red";
+            const x = 400;
             const y= 15;
-            context.fillText("Time: " + gameData.timer, x, y);
+            context.fillText(String(gameData.timer), x, y);
         };
 
         const drawScore = (players: Players) => {
             context.font = "bold 18px Arial";
-            context.fillStyle = "black";
-            const x1 = 10;
-            const x2 = 650;
+            context.fillStyle = "green";
+            const x1 = 70;
+            const x2 = 720;
             const y= 20;
             context.fillText("Player 1: " + players.firstScore, x1, y);
             context.fillText("Player 2: " + players.secondScore, x2, y);
@@ -135,7 +143,8 @@ export default function PingPong() {
                 gameData.ball.x = canvas.width / 2;
                 gameData.ball.y = canvas.height / 2;
                 gameData.ball.resetting = false;
-            } else {
+            }
+            else {
                 gameData.ball.x += gameData.ball.dx;
                 gameData.ball.y += gameData.ball.dy;
             }
@@ -261,22 +270,17 @@ export default function PingPong() {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        socket.on("gameUpdate", (data : GameData) => {
-                gameData = data
-            }
-        );
+        socket.on("gameUpdate", (data : GameData) => gameData = data);
+        socket.on('disconnect', () => setIsPaused(true));
+        socket.on('reconnect', () => setIsPaused(false));
 
-        // socket.on("rightPaddleUpdate", (data : number) => {
-        //         gameData.rightPaddle.dy = data
-        //     }
-        // );
-        //
-        // socket.on("leftPaddleUpdate", (data : number) => {
-        //         gameData.leftPaddle.dy = data
-        //     }
-        // );
-
-        update();
+        if (isPaused) {
+            context.font = "30px Arial";
+            context.fillStyle = "red";
+            context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        }
+        else
+            update();
         return () => {
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('keyup', onKeyUp);

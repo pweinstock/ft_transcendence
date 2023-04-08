@@ -91,7 +91,7 @@ export class GameService {
     checkPlayerStatus (clientId : string, dto : JoinGameDto) : string {
         let match = this.gameIdToMatchData.get(dto.gameId);
         if (match.secondPlayer === dto.displayName || match.firstPlayer === dto.displayName)
-            return "reconnected";
+            return "reconnect";
         if (match.secondPlayer) {
             this.viewerToGameId.set(clientId, dto.gameId);
             return "viewer";
