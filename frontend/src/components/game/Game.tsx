@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {io, Socket} from "socket.io-client";
+import axios from "axios";
 
 
 interface Paddle {
@@ -37,6 +38,11 @@ interface GameData {
     paddleSpeed :number;
 }
 
+interface JoinGame {
+    displayName : string,
+    gameId : string
+}
+
 
 export default function PingPong() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,12 +52,25 @@ export default function PingPong() {
     let paddleSpeed = 6;
     let ballSpeed = 5;
 
-    const socket = io("localhost:5002/game", {
+    const socket = io(`http://${window.location.hostname}:5000/game/`, {
         transports: ["websocket"],
     });
 
-    const gameUpdate = (data : GameData) => {
-        socket.emit('gameUpdate', data);
+
+    const join = (data : JoinGame) => {
+        socket.emit("join", data);
+    }
+
+    const keyUp = (data : GameData) => {
+        socket.emit("KeyUp", data);
+    }
+
+    const wKeyDown = (data : GameData) => {
+        socket.emit("wKey", data);
+    }
+
+    const sKeyDown = (data : GameData) => {
+        socket.emit("sKey", data);
     }
 
     // const playerDisconnected = (data : GameData) => {
@@ -66,7 +85,7 @@ export default function PingPong() {
 
     useEffect(() => {
         const canvas = canvasRef.current!;
-        const context = canvas.getContext('2d')!;
+        const context = canvas.getContext("2d")!;
         let gameData = {
             leftPaddle : {
                 x: grid * 2,
@@ -99,43 +118,46 @@ export default function PingPong() {
                 secondScore : 0
             },
             timer : 0,
-            paddleSpeed : 6
+            paddleSpeed : paddleSpeed
         }
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
             context.moveTo(canvas.width / 2, 30);
             context.lineTo(canvas.width / 2, canvas.height);
-            context.strokeStyle = 'grey';
+            context.strokeStyle = "grey";
             context.lineWidth = 2;
             context.stroke();
         };
 
         const drawPaddle = (paddle: Paddle) => {
-            context.fillStyle = 'black';
+            context.fillStyle = "black";
             context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         };
         const drawBall = (ball: Ball) => {
-            context.fillStyle = 'black';
+            context.fillStyle = "black";
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
         };
 
         const drawTimer = () => {
             context.font = "bold 18px Arial";
             context.fillStyle = "red";
+            context.textAlign = "center";
             const x = 400;
             const y= 15;
             context.fillText(String(gameData.timer), x, y);
         };
 
         const drawScore = (players: Players) => {
-            context.font = "bold 18px Arial";
+            context.font = "bold 22px Arial";
             context.fillStyle = "green";
-            const x1 = 70;
-            const x2 = 720;
-            const y= 20;
-            context.fillText("Player 1: " + players.firstScore, x1, y);
-            context.fillText("Player 2: " + players.secondScore, x2, y);
+            const x1 = 20;
+            const x2 = 780;
+            const y= 30;
+            context.textAlign = "left";
+            context.fillText( String(players.firstScore), x1, y);
+            context.textAlign = "right";
+            context.fillText(String(players.secondScore), x2, y);
         };
 
         const moveBall = () => {
@@ -234,21 +256,21 @@ export default function PingPong() {
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
                 case 'w':
-                    gameData.leftPaddle.dy = -paddleSpeed;
-                    gameUpdate(gameData);
+                    // gameData.leftPaddle.dy = -paddleSpeed;
+                    wKeyDown(gameData);
                     break;
                 case 's':
-                    gameData.leftPaddle.dy = paddleSpeed;
-                    gameUpdate(gameData);
+                    // gameData.leftPaddle.dy = paddleSpeed;
+                    sKeyDown(gameData);
                     break;
-                case 'ArrowUp':
-                    gameData.rightPaddle.dy = -paddleSpeed;
-                    gameUpdate(gameData);
-                    break;
-                case 'ArrowDown':
-                    gameData.rightPaddle.dy = paddleSpeed;
-                    gameUpdate(gameData);
-                    break;
+                // case 'ArrowUp':
+                //     gameData.rightPaddle.dy = -paddleSpeed;
+                //     gameUpdate(gameData);
+                //     break;
+                // case 'ArrowDown':
+                //     gameData.rightPaddle.dy = paddleSpeed;
+                //     gameUpdate(gameData);
+                //     break;
             }
         };
 
@@ -256,34 +278,36 @@ export default function PingPong() {
             switch (event.key) {
                 case 'w':
                 case 's':
-                    gameData.leftPaddle.dy = 0;
-                    gameUpdate(gameData);
+                    //gameData.leftPaddle.dy = 0;
+                    keyUp(gameData);
                     break;
-                case 'ArrowUp':
-                case 'ArrowDown':
-                    gameData.rightPaddle.dy = 0;
-                    gameUpdate(gameData);
-                    break;
+                // case 'ArrowUp':
+                // case 'ArrowDown':
+                //     gameData.rightPaddle.dy = 0;
+                //     gameUpdate(gameData);
+                //     break;
             }
-        };
+    };
 
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("gameUpdate", (data : GameData) => gameData = data);
-        socket.on('disconnect', () => setIsPaused(true));
-        socket.on('reconnect', () => setIsPaused(false));
+        socket.on("disconnect", () => setIsPaused(true));
+        socket.on("reconnect", () => setIsPaused(false));
 
         if (isPaused) {
-            context.font = "30px Arial";
+            context.font = "40px Roboto bold";
             context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
             context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
         }
         else
             update();
         return () => {
-            document.removeEventListener('keydown', onKeyDown);
-            document.removeEventListener('keyup', onKeyUp);
+            document.removeEventListener("keydown", onKeyDown);
+            document.removeEventListener("keyup", onKeyUp);
         };
     }, [socket]);
 
