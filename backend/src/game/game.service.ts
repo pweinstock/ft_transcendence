@@ -50,7 +50,7 @@ export class GameService {
     }
 
     async viewGame (clientId : string, gameId : string) : Promise<boolean> {
-        const gameData = this.gameRepository.findOneBy({id : gameId});
+        const gameData = await this.findGamebyId(gameId);
         if (!gameData)
             return false;
         this.viewerToGameId.set(clientId, gameId);
@@ -82,9 +82,7 @@ export class GameService {
     }
 
     async findGamebyId(gameId : string) : Promise<Game> {
-        const gameData = this.gameRepository.findOneBy({id : gameId});
-        if (!gameData)
-            throw new HttpException("game is not exists", HttpStatus.BAD_REQUEST);
+        const gameData = await this.gameRepository.findOneBy({id : gameId});
         return gameData;
     }
 
@@ -144,7 +142,6 @@ export class GameService {
     getClientRoom(clientId : string) : ClientRoom {
         return this.playerToGameId.get(clientId);
     }
-
 
     sendScoreToUser(dto : GameScoreDto) : void {
         const matchData = this.gameIdToMatchData.get(dto.gameId);
