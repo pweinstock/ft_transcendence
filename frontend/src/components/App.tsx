@@ -31,45 +31,20 @@ export default function App() {
 
   const [value, setValue] = useState<{id: number, name: string }[]>([]); 
   const [currentUsersData, setcurrentUsersData] = useState<UserTest | null>(null);
-  // const [baseS, setbaseS] = useState<BaseInterface>({currentUser: null, });
-  // let bob : BaseInterface = {};
-  // bob.currentUser = {};
 
   useEffect(() => {
     axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
       .then((response) => {
-        // setcurrentUsersData(response.data);
-        // console.log("curernt user");
-        // temp.currentUser.userId;
-        // const user : UserTest = response.data;
         setcurrentUsersData(response.data);
-        // setbaseS({currentUser : currentUsersData,});
-        // console.log(user);
-        // console.log(currentUsersData);
       })
       .catch((error) => {
         console.error(error);
         if (error.response && error.response.status !== 200) {
-            console.log("Error get current user....");
+          console.log("Error get current user....");
         }
       });
   }, []);
 
-  useEffect(() => {
-    async function fetchChatrooms() {
-
-        try{
-        const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
-        if (response)
-          console.log(response.data);
-          setValue(response.data);
-        }
-        catch(e) {
-          console.log("fetchChatrooms error");
-        }
-    }
-    fetchChatrooms();
-},[]);
     return (
         <>
         <Router>
@@ -83,7 +58,6 @@ export default function App() {
             <Routes>
                 <Route path="/"  element={<Basic />}/>
                 <Route path="/gameview" element={<GameView/>}/>
-                {/* <Route path="/chatrooms" element={<ChatRooms curentUser={[currentUsersData.id, "b", [], []]}/>}/> */}
                 <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
                 <Route path="/chat" element={<Chat/>}/>
                 {/* <Route path="/newchat" element={<NewChat/>}/> */}
@@ -92,15 +66,13 @@ export default function App() {
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                 <Route path="/settings" element={<Settings2/>}/>
-                     {value && value.map((item, index) => (
-                        <Route key = {item.id} path={"/chat/id/" + item.id} element={<NewChat chatidp={item.id}/>}/>
+                     {currentUsersData && currentUsersData?.chats.map((item, index) => (
+                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat chatidp={item}/>}/>
                     ))}
             </Routes>
             <aside>
               {!currentUsersData && <Login />}
               {currentUsersData && <User />}
-                <h3 style={{color:"white"}}>Here will put the loged in user and maybe even the active chats?</h3>
-                {/* <Groupabout /> */}
             </aside>
           </main>
           <footer>
