@@ -20,31 +20,31 @@ import Settings from "./settings/settings1";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
 import User from './users/users';
+import BaseUser from './users/BaseUser';
 import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
+import { BaseInterface, UserTest } from "./BaseInterface";
+
+
 
 export default function App() {
 
   const [value, setValue] = useState<{id: number, name: string }[]>([]); 
+  const [currentUsersData, setcurrentUsersData] = useState<UserTest | null>(null);
+
   useEffect(() => {
-    async function fetchChatrooms() {
-
-        try{
-        const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
-        if (response)
-          console.log(response.data);
-          setValue(response.data);
+    axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
+      .then((response) => {
+        setcurrentUsersData(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+        if (error.response && error.response.status !== 200) {
+          console.log("Error get current user....");
         }
-        catch(e) {
-          //error handling
-          console.log("fetchChatrooms error");
-        }
+      });
+  }, []);
 
-        
-        
-    }
-    fetchChatrooms();
-},[]);
     return (
         <>
         <Router>
@@ -58,25 +58,21 @@ export default function App() {
             <Routes>
                 <Route path="/"  element={<Basic />}/>
                 <Route path="/gameview" element={<GameView/>}/>
-                <Route path="/chatrooms" element={<ChatRooms/>}/>
+                <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
                 <Route path="/chat" element={<Chat/>}/>
                 {/* <Route path="/newchat" element={<NewChat/>}/> */}
                 <Route path="/test" element={<Test/>}/>
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
-                <Route path="/users" element={<Users/>}/>
+                <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                 <Route path="/settings" element={<Settings2/>}/>
-                     {value && value.map((item, index) => (
-                        // <Route key = {item.id} path={"/chat/id/:id"} element={<NewChat chatidp={42}/>}/>
-                        // <Route key = {item.id} path={"/chat/id/:id"} element={<NewChat chatidp={item.id}/>}/>
-                        <Route key = {item.id} path={"/chat/id/" + item.id} element={<NewChat chatidp={item.id}/>}/>
+                     {currentUsersData && currentUsersData?.chats.map((item, index) => (
+                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat chatidp={item}/>}/>
                     ))}
             </Routes>
             <aside>
-                <Login />
-                <User />
-                <h3 style={{color:"white"}}>Here will put the loged in user and maybe even the active chats?</h3>
-                {/* <Groupabout /> */}
+              {!currentUsersData && <Login />}
+              {currentUsersData && <User />}
             </aside>
           </main>
           <footer>
