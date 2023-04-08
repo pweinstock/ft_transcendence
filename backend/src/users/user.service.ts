@@ -157,26 +157,32 @@ export class UserService {
 
     //GAME
     async wonGame(userId : string, matchId : string) : Promise<void> {
-        const user = await this.findById(userId);
-        user.matchHistory.push(matchId);
-        user.wins += 1;
-        user.score += 3;
-        this.userRepository.save(user);
+        const user = await this.userRepository.findOneBy({id: userId});
+        if (user) {
+            user.matchHistory.push(matchId);
+            user.wins += 1;
+            user.score += 3;
+            this.userRepository.save(user);
+        }
     }
 
     async draw(userId : string, matchId : string) : Promise<void> {
-        const user = await this.findById(userId);
-        user.matchHistory.push(matchId);
-        user.draws += 1;
-        user.score += 1;
-        this.userRepository.save(user);
+        const user = await this.userRepository.findOneBy({id: userId});
+        if (user) {
+            user.matchHistory.push(matchId);
+            user.draws += 1;
+            user.score += 1;
+            this.userRepository.save(user);
+        }
     }
 
     async lostGame(userId : string, matchId : string) : Promise<void> {
-        const user = await this.findById(userId);
-        user.matchHistory.push(matchId);
-        user.losses += 1;
-        this.userRepository.save(user);
+        const user = await this.userRepository.findOneBy({id: userId});
+        if (user) {
+            user.matchHistory.push(matchId);
+            user.losses += 1;
+            this.userRepository.save(user);
+        }
     }
 
     //CHAT

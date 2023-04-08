@@ -27,16 +27,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly gameService: GameService) {}
 
-    @SubscribeMessage('update')
-    gameUpdate(@MessageBody() dto: GameDataDto,
-               @ConnectedSocket() client: Socket) {
-        if (this.gameService.isPlayer(client.id)) {
-            const gameId = this.gameService.getGameId(client.id);
-            if (gameId)
-                this.server.to(gameId).emit('update', dto);
-        }
-    }
-
     afterInit(server: Server) {}
 
     handleConnection() {}
@@ -55,14 +45,81 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.gameService.deleteViewer(client.id);
     }
 
+    @SubscribeMessage('create')
+    async createGame (
+        @ConnectedSocket() client: Socket,
+        @MessageBody() displayName : string
+    ) : Promise<void> {
+        const gameId = await this.gameService.newGame(client.id, displayName);
+        if (gameId) {
+            client.join(gameId);
+            this.server.to(gameId).emit('newGame',);
+        }
+    }
+
     @SubscribeMessage('join')
-    async handleJoin(
+    async joinGame (
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
     ) : Promise<void> {
         const status = await this.gameService.joinGame(client.id, dto);
         client.join(dto.gameId);
         this.server.to(dto.gameId).emit(status, dto.gameId);
+    }
+
+    @SubscribeMessage('view')
+    async viewGame(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() gameId : string
+    ) : Promise<void> {
+        const status = await this.gameService.viewGame(client.id, gameId);
+        if (status === true)
+            client.join(gameId);
+    }
+
+    @SubscribeMessage('KeyUp')
+    onKeyUp(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameDataDto
+    ) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            if (clientRoom.isFirst)
+                dto.leftPaddle.dy = 0;
+            else
+                dto.rightPaddle.dy = 0;
+            this.server.to(clientRoom.gameId).emit("update", dto);
+        }
+    }
+
+    @SubscribeMessage('wKey')
+    wKeyPressed(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameDataDto
+    ) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            if (clientRoom.isFirst)
+                dto.leftPaddle.dy = - dto.paddleSpeed;
+            else
+                dto.rightPaddle.dy = - dto.paddleSpeed;
+            this.server.to(clientRoom.gameId).emit("update", dto);
+        }
+    }
+
+    @SubscribeMessage('sKey')
+    sKeyPressed(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameDataDto
+    ) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            if (clientRoom.isFirst)
+                dto.leftPaddle.dy = dto.paddleSpeed;
+            else
+                dto.rightPaddle.dy = dto.paddleSpeed;
+            this.server.to(clientRoom.gameId).emit("update", dto);
+        }
     }
 
     @SubscribeMessage('end')

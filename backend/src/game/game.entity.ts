@@ -11,10 +11,10 @@ export class Game {
     @Column()
     secondPlayer: string;
 
-    @Column()
+    @Column({default: "0"})
     firstPlayerScore: string;
 
-    @Column()
+    @Column({default: "0"})
     secondPlayerScore: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
