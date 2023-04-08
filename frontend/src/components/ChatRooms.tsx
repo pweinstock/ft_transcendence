@@ -28,10 +28,6 @@ export enum ChatType {
   const ChatRooms: React.FC<BaseInterface> = ({currentUser}) => {
     const [value, setValue] = useState<{id: number, name: string }[]>([]);
 
-            // console.log("curernt user");
-            // console.log(currentUser?.chats[0]);
-
- 
 
     useEffect(() => {
         async function fetchChatrooms() {
@@ -98,15 +94,3 @@ export enum ChatType {
     );
 }
 export default ChatRooms;
-
-/*
-    MESSAGES JSON
-    {
-        id: number;
-        content: string;
-        displayName: string;
-        createdAt: Date;
-        user: number;
-        chat: number[];
-    }
- */
