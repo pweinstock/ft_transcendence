@@ -9,8 +9,10 @@ import {
     Routes,
     Link
   } from "react-router-dom";
-  import NewChat from './NewChat';
-  import { BrowserRouter } from "react-router-dom";
+import NewChat from './NewChat';
+import { BrowserRouter } from "react-router-dom";
+import { BaseInterface, UserTest } from "./BaseInterface";
+
 
 export enum ChatType {
     PUBLIC = "public",
@@ -27,9 +29,11 @@ export enum ChatType {
     chatidp: number;
   }
 
-export default function ChatRooms()
-{
+  const ChatRooms: React.FC<BaseInterface> = ({currentUser}) => {
+// export default function ChatRooms()
     const [value, setValue] = useState<{id: number, name: string }[]>([]); //set with basic value 0
+            console.log("curernt user");
+            console.log(currentUser);
 
     // const chatfuck: ChatData = {
     //     chatidp = 1
@@ -136,6 +140,7 @@ export default function ChatRooms()
         </>
     );
 }
+export default ChatRooms;
 
 /*
     MESSAGES JSON
