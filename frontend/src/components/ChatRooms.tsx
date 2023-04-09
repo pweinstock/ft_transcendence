@@ -46,6 +46,24 @@ useEffect(() => {
 	fetchChatrooms();
 },[]);
 
+useEffect(() => {
+	async function getAllPubliChat() {
+		try{
+			const response = await axios.get(`http://${window.location.hostname}:5000/chat/all`, {withCredentials: true});
+			if (response)
+				// console.log("getAllPubliChat");
+				// console.log(response.data);
+				// setValue(response.data);
+				console.log("chat All");
+				console.log(response.data);
+			}
+			catch(e) {
+				console.log("error");
+			}
+	}
+	getAllPubliChat();
+},[]);
+
 
 function handOnClickSend() {
 	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.PUBLIC,  name : 'testchat', password: null}, {withCredentials: true});
