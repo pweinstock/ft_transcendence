@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import {
     Link
 } from "react-router-dom";
-import PingPong from "./game/Game"
+import PingPong from "./game/PingPong"
 import Login from './auth/login/Login';
 import User from './users/users';
+import {io} from "socket.io-client";
+import CreateGame from "./game/CreateGame";
 // import Groupabout from './groupabout';
 // import BuildPost from './postbuilder';
 
@@ -16,7 +18,7 @@ export default function Basic() {
     return (
         <>
             <section>
-                 <PingPong/>
+                 <CreateGame/>
             </section>
         </>
     );

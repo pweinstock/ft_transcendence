@@ -8,7 +8,7 @@ import {
     Link
   } from "react-router-dom";
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
-import GameView from "./game/GameView"
+import GameView from "./game/PingPongView"
 import Test from "./Test"
 import './App.css';
 import Basic from './basic';
