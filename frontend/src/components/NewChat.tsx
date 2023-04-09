@@ -3,18 +3,28 @@ import { Link } from "react-router-dom";
 import astroman from './img/littleman.png';
 import axios from "axios";
 import Chat from "./chat/Chat"
-import { BaseInterface, UserTest } from "./BaseInterface";
+import {UserTest} from "./BaseInterface";
+// const user = ;
 
-const NewChat: React.FC<BaseInterface> = ({currentUser}) => {
+interface ChatProps {
+    user : UserTest;
+    chatidp: string;
+  }
+
+//   export default function NewChat({chatidp}) {
+  const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
 
     const [msg, setmsg] = useState([]); //set with basic value 0
+    // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
+    // const chatId = chatidp;
+    //   console.log(props.user);
 
     useEffect(() => {
         async function printassages() {
-            const response = await axios.get("http://localhost:5000/chat/id/" + pchatId, {withCredentials: true});
+            const response = await axios.get("http://localhost:5000/chat/id/" + props.chatidp, {withCredentials: true});
             setmsg(response.data);
             
             // const messages = response.data;
@@ -34,7 +44,7 @@ const NewChat: React.FC<BaseInterface> = ({currentUser}) => {
         <section>
 
             <div className='formholder'>
-                <h1>Room {pchatId} Content goes here</h1>
+                <h1>Room {props.chatidp} Content goes here</h1>
                 {/* <form>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
@@ -48,7 +58,7 @@ const NewChat: React.FC<BaseInterface> = ({currentUser}) => {
                         </div>
                     </Link>
                 </form> */}
-                <Chat currentUser={currentUser} />
+                <Chat  user={props.user} chatidp={props.chatidp} />
             </div>
         </section>
         </>

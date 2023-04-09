@@ -8,7 +8,7 @@ import {
     Link
   } from "react-router-dom";
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
-import GameView from "./game/GameView"
+import GameView from "./game/PingPongView"
 import Test from "./Test"
 import './App.css';
 import Basic from './basic';
@@ -57,17 +57,17 @@ export default function App() {
           <main>
             <Routes>
                 <Route path="/"  element={<Basic />}/>
-                <Route path="/gameview" element={<GameView/>}/>
+                {/*<Route path="/gameview" element={<GameView/>}/>*/}
                 <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
-                {/* <Route path="/chat" element={<Chat/>}/> */}
+                {/*<Route path="/chat" element={<Chat/>}/>*/}
                 {/* <Route path="/newchat" element={<NewChat/>}/> */}
-                <Route path="/test" element={<Test/>}/>
+                {/*<Route path="/test" element={<Test/>}/>*/}
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                 <Route path="/settings" element={<Settings2/>}/>
-                     {currentUsersData && currentUsersData?.chats.map((item, index) => (
-                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat currentUser={currentUsersData}/>}/>
+                     {currentUsersData && currentUsersData.chats.map((item, index) => (
+                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat user={currentUsersData} chatidp={item}/>}/>
                     ))}
             </Routes>
             <aside>
@@ -89,9 +89,9 @@ export default function App() {
               <Link className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
                 </Link>
-                <Link className="newpostlink" to="/test">
-                    <button className='navbutton'>Friends</button>
-                </Link>
+                {/*<Link className="newpostlink" to="/friends">*/}
+                    {/*<button className='navbutton'>Friends</button>*/}
+                {/*</Link>*/}
                 <Link className="newpostlink" to="/settings">
                     <button className='navbutton'>Settings</button>
                 </Link>

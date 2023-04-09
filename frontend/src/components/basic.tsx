@@ -1,18 +1,12 @@
-import { color } from '@mui/system';
-import React, { useState, useEffect } from 'react';
-import {
-    Link
-} from "react-router-dom";
-import PingPong from "./game/Game"
-import Login from './auth/login/Login';
-import User from './users/users';
+import React from 'react';
+import Game from "./game/Game";
 
 export default function Basic() {
 
     return (
         <>
             <section>
-                 <PingPong/>
+                 <Game/>
             </section>
         </>
     );
