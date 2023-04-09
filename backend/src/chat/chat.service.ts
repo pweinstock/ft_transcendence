@@ -73,7 +73,7 @@ export class ChatService {
         const visibleChats : ChatPublicDataDto[] = [];
         chats.forEach(chat => {
             if (chat.type === ChatType.PUBLIC || ChatType.PROTECTED)
-                visibleChats.push(chat);
+                visibleChats.push({id : chat.id, name : chat.name, type : chat.type});
         })
         return visibleChats;
     }
