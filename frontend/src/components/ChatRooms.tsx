@@ -28,6 +28,7 @@ chatidp: number;
 
 const ChatRooms: React.FC<BaseInterface> = ({currentUser}) => {
 const [value, setValue] = useState<{id: number, name: string }[]>([]);
+const [allChat, setallChat] = useState<{id: string, name: string, type :string }[]>([]);
 
 
 useEffect(() => {
@@ -51,14 +52,12 @@ useEffect(() => {
 		try{
 			const response = await axios.get(`http://${window.location.hostname}:5000/chat/all`, {withCredentials: true});
 			if (response)
-				// console.log("getAllPubliChat");
-				// console.log(response.data);
-				// setValue(response.data);
+				setallChat(response.data);
 				console.log("chat All");
 				console.log(response.data);
 			}
 			catch(e) {
-				console.log("error");
+				console.log("getAllPubliChat chat error");
 			}
 	}
 	getAllPubliChat();
@@ -115,6 +114,11 @@ return (
 					</div>
 					<div className='publicchatlist'>
 						<p>List of public chats</p>
+						{allChat && allChat.map((item, index) => (
+							<div  style={{color: "white"}}>
+									<button className='chatroombutton'>{item.name} {item.type}</button>
+							</div>
+						))}
 						<div className="changingtext">
 							<button onClick={joinbuttonHandler}>join</button>
 						</div>  
