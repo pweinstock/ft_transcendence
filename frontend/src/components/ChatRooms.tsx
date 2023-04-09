@@ -34,8 +34,8 @@ export enum ChatType {
             try{
                 const response = await axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true});
                 if (response)
-                  console.log("fetchchatrooms");
-                  console.log(response.data);
+                  // console.log("fetchchatrooms");
+                  // console.log(response.data);
                   setValue(response.data);
                 }
                 catch(e) {
@@ -47,18 +47,18 @@ export enum ChatType {
 
 
     function handOnClickSend() {
-        axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.PUBLIC,  name : 'testchat'}, {withCredentials: true});
+        axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.PUBLIC,  name : 'testchat', password: null}, {withCredentials: true});
 
     }
 
     function joinbuttonHandler() {
             // console.log('joinButton pressed');
-            axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : "561bdb88-9164-4a34-91a6-0ceb00d1bf6f",  chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"}, {withCredentials: true}).then( () => {
+            axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : "561bdb88-9164-4a34-91a6-0ceb00d1bf6f",  chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4", password : null }, {withCredentials: true}).then( () => {
                 const socket = io("http://localhost:5001/chat" );
                 const chatId = "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4";
                 socket?.emit('joinRoom', chatId);
 
-    }).catch((reason) => {
+            }).catch((reason) => {
                 if (reason.response!.status === 400) {
                   // Handle 400
                 } else {
@@ -78,7 +78,7 @@ export enum ChatType {
                      {value && value.map((item, index) => (
                         <div  style={{color: "white"}}>
                             <Link key = {item.id} className="newpostlink" to={"/chat/id/" + item.id}>
-                                <button className='chatroombutton'>{item.name} {item.id}</button>
+                                <button className='chatroombutton'>{item.name}</button>
                             </Link>
                         </div>
                     ))}

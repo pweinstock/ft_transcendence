@@ -12,7 +12,7 @@ interface ChatProps {
   }
 
 //   export default function NewChat({chatidp}) {
-  const NewChat: React.FC<ChatProps> = ({user, chatidp}) => {
+  const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
@@ -20,12 +20,12 @@ interface ChatProps {
     const [msg, setmsg] = useState([]); //set with basic value 0
     // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
     // const chatId = chatidp;
-      console.log(user);
+    //   console.log(props.user);
 
     useEffect(() => {
+        console.log("massage log");
         async function printassages() {
-            // const chatId = '1';
-            const response = await axios.get("http://localhost:5000/chat/id/" + chatidp, {withCredentials: true});
+            const response = await axios.get("http://localhost:5000/chat/id/" + props.chatidp, {withCredentials: true});
             setmsg(response.data);
             
             // const messages = response.data;
@@ -37,10 +37,7 @@ interface ChatProps {
     function handOnClickSend() {
         let temp = "Anonymus";
         let anopic = astroman;
-        // if (user) {
-        //     temp = user.displayName;
-        //     anopic = user.photoURL;
-        // }
+    
     }
 
     return (
@@ -48,7 +45,7 @@ interface ChatProps {
         <section>
 
             <div className='formholder'>
-                <h1>Room {chatidp} Content goes here</h1>
+                <h1>Room  Content goes here</h1>
                 {/* <form>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
@@ -62,7 +59,7 @@ interface ChatProps {
                         </div>
                     </Link>
                 </form> */}
-                <Chat/>
+                <Chat  user={props.user} chatidp={props.chatidp} />
             </div>
         </section>
         </>
