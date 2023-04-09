@@ -21,12 +21,10 @@ export default function Chat() {
     }, [setSocket]);
 
     const messageListener = (message: any) => {
-        console.log("message listener");
-        console.log(message.content);
         setMessages([...messages, message.content])
     }
     useEffect(() => {
-        console.log("hello listen");
+
         socket?.on('message', messageListener)
         return () => {
             socket?.off('message', messageListener)

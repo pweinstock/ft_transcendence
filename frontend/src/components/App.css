@@ -100,6 +100,7 @@ main {
 
 
 section {
+  color: #d8cccc;
   display: flex;
   flex: 70%;
   flex-direction: column;

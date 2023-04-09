@@ -6,7 +6,7 @@ import Chat from "./chat/Chat"
 // const user = ;
 
 interface Props {
-    chatidp: number;
+    chatidp: string;
   }
 
 //   export default function NewChat({chatidp}) {
