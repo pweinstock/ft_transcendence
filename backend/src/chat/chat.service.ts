@@ -71,9 +71,11 @@ export class ChatService {
     async findAllChats(): Promise<ChatPublicDataDto[]> {
         const chats = await this.chatRepository.find();
         const visibleChats : ChatPublicDataDto[] = [];
-        chats.forEach(chat => {
-            if (chat.type === ChatType.PUBLIC || ChatType.PROTECTED)
-                visibleChats.push({id : chat.id, name : chat.name, type : chat.type});
+        chats.forEach(async chat => {
+            if (chat.type === ChatType.PUBLIC || ChatType.PROTECTED) {
+                const owner = await this.userServices.findById(chat.owner);
+                visibleChats.push({id: chat.id, name: chat.name, type: chat.type, owner : owner.displayName});
+            }
         })
         return visibleChats;
     }
