@@ -51,7 +51,7 @@ export default function JoinGame(props : JoinGameProps) {
 
     setInterval(refreshGames, 1000);
     return (
-        {gameStarted === GameStatus} ?
+        gameStarted === GameStatus.NOT_CONNECTED ?
             <div style={{color: "white"}}>
             {gamestoJoin && gamestoJoin.map((item) => (
                 <button className='navbutton' onClick={() => joinServer({displayName : props.user.displayName, gameId : item.gameId})}>
