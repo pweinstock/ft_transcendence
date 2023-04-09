@@ -21,11 +21,11 @@ const Chat: React.FC<ChatProps> = (props : ChatProps) => {
     // console.log(props.chatidp);
 
     const send = (value: string) => {
-        socket?.emit("message", {content : value, userId: "0acaf517-5050-467d-b4f9-5380547105c2", chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"});
+        socket?.emit("message", {content : value, userId: props.user.id, chatId : props.chatidp});
+        
     }
 
-    const chatId = "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4";
-    socket?.emit('joinRoom',  {userId: "0acaf517-5050-467d-b4f9-5380547105c2", chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"});
+    socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
     useEffect(() => {
         const newSocket = io("http://localhost:5001/chat");
