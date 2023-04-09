@@ -38,25 +38,16 @@ interface GameData {
     paddleSpeed :number;
 }
 
-interface JoinGame {
-    displayName : string,
-    gameId : string
+
+interface PingPongProps {
+    socket: Socket;
 }
 
 
 
 
 
-export default function PingPong() {
-
-    const socket = io(`http://${window.location.hostname}:5000/game/`, {
-        transports: ["websocket"],
-    });
-
-
-    const join = (data : JoinGame) => {
-        socket.emit("join", data);
-    }
+export default function PingPong(props : PingPongProps) {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
@@ -68,15 +59,15 @@ export default function PingPong() {
 
 
     const keyUp = (data : GameData) => {
-        socket.emit("KeyUp", data);
+        props.socket.emit("KeyUp", data);
     }
 
     const wKeyDown = (data : GameData) => {
-        socket.emit("wKey", data);
+        props.socket.emit("wKey", data);
     }
 
     const sKeyDown = (data : GameData) => {
-        socket.emit("sKey", data);
+        props.socket.emit("sKey", data);
     }
 
     const [isPaused, setIsPaused] = useState(true);
@@ -290,9 +281,9 @@ export default function PingPong() {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        socket.on("gameUpdate", (data : GameData) => gameData = data);
-        socket.on("disconnect", () => setIsPaused(true));
-        socket.on("reconnect", () => setIsPaused(false));
+        props.socket.on("gameUpdate", (data : GameData) => gameData = data);
+        props.socket.on("disconnect", () => setIsPaused(true));
+        props.socket.on("reconnect", () => setIsPaused(false));
 
         if (isPaused) {
             context.font = "40px Roboto bold";
@@ -307,7 +298,7 @@ export default function PingPong() {
             document.removeEventListener("keydown", onKeyDown);
             document.removeEventListener("keyup", onKeyUp);
         };
-    }, [socket]);
+    }, [props.socket]);
 
     return (
         <canvas ref={canvasRef} width={800} height={530} />

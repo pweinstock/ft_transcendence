@@ -2,19 +2,33 @@ import { Controller, Get, UseGuards} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {GameService} from "./game.service";
 import {Game} from "./game.entity";
+import {GameInfoDto} from "./dto/game-info.dto";
 
-@Controller('game')
+
+@Controller("game")
 export class UserController {
 
     constructor(private gameService: GameService) {}
 
-    @Get()
+    @Get("all")
 	@UseGuards(AuthGuard('2FA'))
     async getAll() : Promise<Game[]> {
         const games = this.gameService.findAllGame();
         return games;
     }
-    //
+
+    @Get("toWatch")
+    @UseGuards(AuthGuard('2FA'))
+    gamesToWatch() : GameInfoDto[] {
+        return this.gameService.getGamesToWatch();
+    }
+
+    @Get("toJoin")
+    @UseGuards(AuthGuard('2FA'))
+    gamesToJoin() : GameInfoDto[] {
+        return this.gameService.getGamesToJoin();
+    }
+
     // @Get('/:id')
     // @UseGuards(AuthGuard('2FA'))
     // async getGame(@Req() request: any, @Param() gameId : string) : Promise<Game> {

@@ -1,10 +1,12 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Game} from "./game.entity";
 import {JoinGameDto} from "./dto/join-game.dto";
 import {GameScoreDto} from "./dto/game-score.dto";
 import {UserService} from "../users/user.service";
+import {GameInfoDto} from "./dto/game-info.dto";
+
 
 interface MatchData {
     firstPlayer : string;
@@ -61,6 +63,26 @@ export class GameService {
         if (this.gameIdToMatchData.has(gameId))
             return this.gameIdToMatchData.get(gameId).isStarted;
         return false;
+    }
+
+    getGamesToWatch() : GameInfoDto[] {
+        const gameIds: GameInfoDto[] = [];
+        for (const [gameId, matchData] of this.gameIdToMatchData.entries()) {
+            if (matchData.isStarted) {
+                gameIds.push({firstPlayer : matchData.firstPlayer, secondPlayer : matchData.secondPlayer, gameId : gameId});
+            }
+        }
+        return gameIds;
+    }
+
+    getGamesToJoin() : GameInfoDto[] {
+        const games: GameInfoDto[] = [];
+        for (const [gameId, matchData] of this.gameIdToMatchData.entries()) {
+            if (!matchData.isStarted) {
+                games.push({firstPlayer : matchData.firstPlayer, secondPlayer : matchData.secondPlayer, gameId : gameId});
+            }
+        }
+        return games;
     }
 
     endOfGame(clientId : string, dto : GameScoreDto) : boolean {
