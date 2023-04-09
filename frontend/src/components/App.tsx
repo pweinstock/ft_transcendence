@@ -59,7 +59,7 @@ export default function App() {
                 <Route path="/"  element={<Basic />}/>
                 <Route path="/gameview" element={<GameView/>}/>
                 <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
-                <Route path="/chat" element={<Chat/>}/>
+                {/* <Route path="/chat" element={<Chat/>}/> */}
                 {/* <Route path="/newchat" element={<NewChat/>}/> */}
                 <Route path="/test" element={<Test/>}/>
                 <Route path="/auth" element={<Login/>}/>
@@ -67,7 +67,7 @@ export default function App() {
                 <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                 <Route path="/settings" element={<Settings2/>}/>
                      {currentUsersData && currentUsersData?.chats.map((item, index) => (
-                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat chatidp={item}/>}/>
+                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat currentUser={currentUsersData}/>}/>
                     ))}
             </Routes>
             <aside>

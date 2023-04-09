@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BaseInterface, UserTest } from "../BaseInterface";
 
 const BaseUser: React.FC<BaseInterface> = ({currentUser}) => {
+	
 	return (
 		<section>
 			<h1>Hello {currentUser?.displayName}</h1>

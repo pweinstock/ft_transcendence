@@ -2,9 +2,10 @@ import {useEffect, useState} from "react";
 import {Socket, io} from "socket.io-client";
 import MesageInput from "./messageInput";
 import Messages from "./messages";
+import { BaseInterface, UserTest } from "../BaseInterface";
 
-
-export default function Chat() {
+const Chat: React.FC<BaseInterface> = ({currentUser}, pchatId : string) => {
+// export default function Chat() {
     const [socket, setSocket] = useState<Socket>();
     const [messages, setMessages] = useState<string[]>([]);
 
@@ -41,3 +42,5 @@ export default function Chat() {
         </>
     )
 }
+
+export default Chat;

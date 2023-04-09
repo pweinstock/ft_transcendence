@@ -3,26 +3,18 @@ import { Link } from "react-router-dom";
 import astroman from './img/littleman.png';
 import axios from "axios";
 import Chat from "./chat/Chat"
-// const user = ;
+import { BaseInterface, UserTest } from "./BaseInterface";
 
-interface Props {
-    chatidp: string;
-  }
-
-//   export default function NewChat({chatidp}) {
-  const NewChat: React.FC<Props> = ({chatidp}) => {
+const NewChat: React.FC<BaseInterface> = ({currentUser}) => {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
 
     const [msg, setmsg] = useState([]); //set with basic value 0
-    // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
-    // const chatId = chatidp;
 
     useEffect(() => {
         async function printassages() {
-            // const chatId = '1';
-            const response = await axios.get("http://localhost:5000/chat/id/" + chatidp, {withCredentials: true});
+            const response = await axios.get("http://localhost:5000/chat/id/" + pchatId, {withCredentials: true});
             setmsg(response.data);
             
             // const messages = response.data;
@@ -34,10 +26,7 @@ interface Props {
     function handOnClickSend() {
         let temp = "Anonymus";
         let anopic = astroman;
-        // if (user) {
-        //     temp = user.displayName;
-        //     anopic = user.photoURL;
-        // }
+    
     }
 
     return (
@@ -45,7 +34,7 @@ interface Props {
         <section>
 
             <div className='formholder'>
-                <h1>Room {chatidp} Content goes here</h1>
+                <h1>Room {pchatId} Content goes here</h1>
                 {/* <form>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
@@ -59,7 +48,7 @@ interface Props {
                         </div>
                     </Link>
                 </form> */}
-                <Chat/>
+                <Chat currentUser={currentUser} />
             </div>
         </section>
         </>
