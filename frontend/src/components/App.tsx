@@ -8,22 +8,18 @@ import {
     Link
   } from "react-router-dom";
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
-import GameView from "./game/PingPongView"
-import Test from "./Test"
 import './App.css';
 import Basic from './basic';
 import NewChat from './NewChat';
 import ChatRooms from './ChatRooms';
 import Login from "./auth/login/Login";
-import Users from "./users/users";
-import Settings from "./settings/settings1";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
 import User from './users/users';
 import BaseUser from './users/BaseUser';
 import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
-import { BaseInterface, UserTest } from "./BaseInterface";
+import { UserTest } from "./BaseInterface";
 
 
 
