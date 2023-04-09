@@ -34,8 +34,8 @@ export enum ChatType {
             try{
                 const response = await axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true});
                 if (response)
-                  console.log("fetchchatrooms");
-                  console.log(response.data);
+                  // console.log("fetchchatrooms");
+                  // console.log(response.data);
                   setValue(response.data);
                 }
                 catch(e) {

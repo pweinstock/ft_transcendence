@@ -17,8 +17,8 @@ const Chat: React.FC<ChatProps> = (props : ChatProps) => {
     const [socket, setSocket] = useState<Socket>();
     const [messages, setMessages] = useState<string[]>([]);
 
-    console.log("from Caht component");
-    console.log(props.chatidp);
+    // console.log("from Caht component");
+    // console.log(props.chatidp);
 
     const send = (value: string) => {
         socket?.emit("message", {content : value, userId: "0acaf517-5050-467d-b4f9-5380547105c2", chatId : "5564f6ae-6b85-4160-ba54-bf8ed7d5ccf4"});

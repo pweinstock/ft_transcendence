@@ -23,6 +23,7 @@ interface ChatProps {
     //   console.log(props.user);
 
     useEffect(() => {
+        console.log("massage log");
         async function printassages() {
             const response = await axios.get("http://localhost:5000/chat/id/" + props.chatidp, {withCredentials: true});
             setmsg(response.data);
@@ -44,7 +45,7 @@ interface ChatProps {
         <section>
 
             <div className='formholder'>
-                <h1>Room {props.chatidp} Content goes here</h1>
+                <h1>Room  Content goes here</h1>
                 {/* <form>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
