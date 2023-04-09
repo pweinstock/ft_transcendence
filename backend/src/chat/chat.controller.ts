@@ -5,7 +5,7 @@ import {ChangeStatusDTO} from "./dto/change-status.dto";
 import {User} from "../users/user.entity";
 import {Message} from "./message/message.entity";
 import {AuthGuard} from '@nestjs/passport';
-import {Chat} from "./chat.entity";
+import {Chat, ChatType} from "./chat.entity";
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
@@ -18,7 +18,7 @@ export class ChatController {
 
     @Get('/allchats')
     getAll() {
-        return this.chatService.findAllChats();
+        return this.chatService.findAll();
     }// todo for testing only delete later
 
 
