@@ -6,7 +6,8 @@ export default function Basic() {
     return (
         <>
             <section>
-                 <Game/>
+                <h1> BASIC! </h1>
+                {/*<Game/>*/}
             </section>
         </>
     );

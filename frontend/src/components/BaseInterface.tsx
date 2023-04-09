@@ -26,5 +26,5 @@ export interface UserTest {
 }
 
 export interface BaseInterface {
-	currentUser : UserTest | null;
+	currentUser : UserTest;
 }

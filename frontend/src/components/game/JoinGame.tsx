@@ -1,6 +1,8 @@
 import {Socket} from "socket.io-client";
 import axios from "axios";
 import {useState} from "react";
+import {UserTest} from "../BaseInterface";
+import {GameInfo} from "./interfaces/game-info";
 
 
 interface JoinGame {
@@ -10,19 +12,14 @@ interface JoinGame {
 
 interface JoinGameProps {
     socket: Socket;
-    displayName : string,
-    gameId : string
-}
-
-interface GameInfo {
-    firstPlayer : string;
-    gameId : string;
+    user : UserTest;
 }
 
 
-export default async function JoinGame(props : JoinGameProps) {
-    const [gamestoJoin, setGamestoJoin] = useState<string[]>([]);
-    const join = (data : JoinGame) => {
+export default function JoinGame(props : JoinGameProps) {
+    const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
+
+    const joinServer = (data : JoinGame) => {
         props.socket.emit("join", data);
     }
     const refreshGames = async () => {
@@ -32,5 +29,15 @@ export default async function JoinGame(props : JoinGameProps) {
         }
     }
 
-    return
+    //toimpement refresh
+
+    return (
+        <div style={{color: "white"}}>
+            {gamestoJoin && gamestoJoin.map((item) => (
+                <button className='navbutton' onClick={() => joinServer({displayName : props.user.displayName, gameId : item.gameId})}>
+                    {"Play Against " + item.firstPlayer}
+                </button>
+            ))}
+        </div>
+    )
 }

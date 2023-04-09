@@ -24,14 +24,15 @@ interface ChatProps {
 
     useEffect(() => {
         console.log("massage log");
-        async function printassages() {
+        async function printmessages() {
+            console.log(props.chatidp);
             const response = await axios.get("http://localhost:5000/chat/id/" + props.chatidp, {withCredentials: true});
             setmsg(response.data);
             
             // const messages = response.data;
             console.log(response.data);
         }
-        printassages();
+        printmessages();
     }, []);
 
     function handOnClickSend() {
