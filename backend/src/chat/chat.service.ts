@@ -10,8 +10,9 @@ import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {Message} from "./message/message.entity";
 import {User, UserStatus} from "../users/user.entity";
-import { Socket } from 'socket.io';
+import {Socket} from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
+import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
 
 interface Room {
     userId : string,
@@ -62,9 +63,19 @@ export class ChatService {
     }
 
     //todo remove later(only debugging function)
-    async findAllChats(): Promise<Chat[]> {
+    async findAll(): Promise<Chat[]> {
         const chats = await this.chatRepository.find();
         return chats;
+    }
+
+    async findAllChats(): Promise<ChatPublicDataDto[]> {
+        const chats = await this.chatRepository.find();
+        const visibleChats : ChatPublicDataDto[] = [];
+        chats.forEach(chat => {
+            if (chat.type === ChatType.PUBLIC || ChatType.PROTECTED)
+                visibleChats.push(chat);
+        })
+        return visibleChats;
     }
 
     async findChatUsers(chatId : string) : Promise<User[]> {

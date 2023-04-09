@@ -8,29 +8,26 @@ import {
     Link
   } from "react-router-dom";
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
-import GameView from "./game/PingPongView"
-import Test from "./Test"
 import './App.css';
 import Basic from './basic';
 import NewChat from './NewChat';
 import ChatRooms from './ChatRooms';
 import Login from "./auth/login/Login";
-import Users from "./users/users";
-import Settings from "./settings/settings1";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
 import User from './users/users';
 import BaseUser from './users/BaseUser';
 import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
-import { BaseInterface, UserTest } from "./BaseInterface";
+import { UserTest } from "./BaseInterface";
+import Game from "./game/Game";
 
 
 
 export default function App() {
 
   const [value, setValue] = useState<{id: number, name: string }[]>([]); 
-  const [currentUsersData, setcurrentUsersData] = useState<UserTest | null>(null);
+  const [currentUsersData, setcurrentUsersData] = useState<UserTest>();
 
   useEffect(() => {
     axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
@@ -56,19 +53,25 @@ export default function App() {
           </header>
           <main>
             <Routes>
-                <Route path="/"  element={<Basic />}/>
-                {/*<Route path="/gameview" element={<GameView/>}/>*/}
-                <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
-                {/*<Route path="/chat" element={<Chat/>}/>*/}
-                {/* <Route path="/newchat" element={<NewChat/>}/> */}
-                {/*<Route path="/test" element={<Test/>}/>*/}
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
-                <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
-                <Route path="/settings" element={<Settings2/>}/>
-                     {currentUsersData && currentUsersData.chats.map((item, index) => (
-                        <Route key = {item} path={"/chat/id/" + item} element={<NewChat user={currentUsersData} chatidp={item}/>}/>
-                    ))}
+                <Route path="/"  element={<Basic />}/>
+                {/*<Route path="/chat" element={<Chat/>}/>*/}
+                {/*<Route path="/newchat" element={<NewChat/>}/> */}
+                {/*<Route path="/test" element={<Test/>}/>*/}
+                {/*<Route path="/gameview" element={<GameView/>}/>*/}
+                {currentUsersData &&
+                    <>
+                    <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
+                    <Route path="/game" element={<Game user={currentUsersData}/>}/>
+
+                    <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
+                    <Route path="/settings" element={<Settings2/>}/>
+                         {currentUsersData && currentUsersData.chats.map((item) => (
+                            <Route key = {item} path={"/chat/id/" + item} element={<NewChat user={currentUsersData} chatidp={item}/>}/>
+                        ))}
+                    </>
+                }
             </Routes>
             <aside>
               {!currentUsersData && <Login />}
@@ -83,8 +86,8 @@ export default function App() {
               <Link className="newpostlink" to="/chatrooms">
                     <button className='navbutton'>ChatRooms</button>
               </Link>
-              <Link className="newpostlink" to="/gameview">
-                    <button className='navbutton'>WatchGame</button>
+              <Link className="newpostlink" to="/game">
+                    <button className='navbutton'>Game</button>
               </Link>
               <Link className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>

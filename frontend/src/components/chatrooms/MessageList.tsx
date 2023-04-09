@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import './chatstart.css';
 
 
-// interface user {
+// interfaces user {
 //   displayName: string;
 // }
 
-// interface message {
+// interfaces message {
 //   sender: string;
 //   photoURL: string;
 //   date: string;

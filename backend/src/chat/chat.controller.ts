@@ -9,16 +9,25 @@ import {Chat} from "./chat.entity";
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
+import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
 
 
 @Controller('chat')
 export class ChatController {
     constructor (private chatService: ChatService) {}
 
-    @Get('/all')
-    getAllchats() {
+    @Get('/allchats')
+    getAll() {
         return this.chatService.findAllChats();
     }// todo for testing only delete later
+
+
+    @Get('/all')
+    @UseGuards(AuthGuard('2FA'))
+    async getAllchats() : Promise<ChatPublicDataDto[]> {
+        const chats = await this.chatService.findAllChats();
+        return chats;
+    }
 
     @Get()
     @UseGuards(AuthGuard('2FA'))
