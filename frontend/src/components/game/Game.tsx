@@ -1,7 +1,5 @@
 import React, {useState} from "react";
-import {io, Socket} from "socket.io-client";
-import PingPong from "./PingPong";
-import {Link} from "react-router-dom";
+import {io} from "socket.io-client";
 import JoinGame from "./JoinGame";
 import {UserTest} from "../BaseInterface";
 

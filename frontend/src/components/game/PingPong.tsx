@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {io, Socket} from "socket.io-client";
-import axios from "axios";
+import {Socket} from "socket.io-client";
 
 
 interface Paddle {
@@ -48,7 +47,6 @@ interface PingPongProps {
 
 
 export default function PingPong(props : PingPongProps) {
-
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const paddleHeight = 75;
