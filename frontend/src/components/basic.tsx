@@ -12,7 +12,7 @@ export default function Basic() {
     return (
         <>
             <section>
-                 <CreateGame/>
+                 <PingPong/>
             </section>
         </>
     );
