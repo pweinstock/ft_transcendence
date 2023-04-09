@@ -1,0 +1,27 @@
+.chatbox {
+	display: flex;
+}
+
+.chatside {
+	flex: 20%;
+	/* position: ; */
+	margin: 2px;
+	border-style: solid;
+}
+
+.chatside p {
+	font-size: small;
+	margin-top: 0;
+}
+
+.mychatlist, .createchat, .publicchatlist {
+	border-style: dashed;
+	margin: 1px;
+}
+
+.chatcontent {
+	margin: 2px;
+	flex: 80%;
+	border-style: dotted;
+
+}
