@@ -1,92 +1,24 @@
-import React, { useEffect, useRef } from 'react';
-import {io} from "socket.io-client";
+import React, {useContext, useEffect, useRef, useState} from 'react';
+import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
+import {GameSocketContext} from "../context/game-socket";
 
-
-interface Paddle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    dy: number;
-}
-
-interface Ball {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    resetting: boolean;
-    dx: number;
-    dy: number;
-}
-
-interface Players {
-    firstPlayer : string
-    firstScore : number
-    secondPlayer : string
-    secondScore : number
-}
-
-interface GameData {
-    leftPaddle : Paddle;
-    rightPaddle : Paddle;
-    maxPaddleY : number;
-    ball : Ball;
-    players : Players;
-    timer : number;
-    paddleSpeed :number;
+interface PingPongViewProps {
+    gameData : GameData;
 }
 
 
-
-export default function PingPong() {
+export default function PingPongView(props : PingPongViewProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isPaused, setIsPaused] = useState(false);
     const grid = 15;
-    const paddleHeight = 75;
     const startTime = new Date().getTime();
-    let ballSpeed = 5;
+    const socket = useContext(GameSocketContext);
 
-    const socket = io("localhost:5002/game", {
-        transports: ["websocket"],
-    });
 
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!;
-        let gameData = {
-            leftPaddle : {
-                x: grid * 2,
-                y: canvas.height / 2 - paddleHeight / 2,
-                width: grid,
-                height: paddleHeight,
-                dy: 0,
-            },
-            rightPaddle : {
-                x: canvas.width - grid * 3,
-                y: canvas.height / 2 - paddleHeight / 2,
-                width: grid,
-                height: paddleHeight,
-                dy: 0,
-            },
-            maxPaddleY : canvas.height - grid - paddleHeight,
-            ball : {
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                width: grid,
-                height: grid,
-                resetting: false,
-                dx: ballSpeed,
-                dy: -ballSpeed,
-            },
-            players : {
-                firstPlayer : "",
-                firstScore : 0,
-                secondPlayer : "",
-                secondScore : 0
-            },
-            timer : 0,
-            paddleSpeed : 6
-        }
+        let gameData : GameData = props.gameData;
 
         const drawNet = () => {
             context.beginPath();
@@ -189,8 +121,8 @@ export default function PingPong() {
                     bounceAngle = Math.PI - bounceAngle; // flip angle
                 }
 
-                gameData.ball.dx = ballSpeed * Math.cos(bounceAngle);
-                gameData.ball.dy = ballSpeed * -Math.sin(bounceAngle);
+                gameData.ball.dx = gameData.ballSpeed * Math.cos(bounceAngle);
+                gameData.ball.dy = gameData.ballSpeed * -Math.sin(bounceAngle);
                 gameData.ball.dx *= -1; // switch direction
             }
         };
@@ -220,13 +152,19 @@ export default function PingPong() {
 
 
         draw();
-        socket.on("gameUpdate", (data : GameData) => {
-                gameData = data
-            }
-        );
-
-        update();
-    }, [socket]);
+        socket.on("gameUpdate", (data : GameData) => gameData = data);
+        socket.on("playerDisconnected", () => setIsPaused(true));
+        socket.on("reconnect", () => setIsPaused(false));
+        if (isPaused) {
+            context.font = "40px Roboto bold";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        }
+        else
+            update();
+    }, []);
 
     return (
         <canvas ref={canvasRef} width={1200} height={800} />

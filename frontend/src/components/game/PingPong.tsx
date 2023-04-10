@@ -1,70 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
+import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
+import {GameOption} from "./interfaces/game-option";
+import {GameSocketContext} from "../context/game-socket";
 import {Socket} from "socket.io-client";
 
 
-interface Paddle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    dy: number;
-}
-
-interface Ball {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    resetting: boolean;
-    dx: number;
-    dy: number;
-}
-
-interface Players {
-    firstPlayer : string
-    firstScore : number
-    secondPlayer : string
-    secondScore : number
-}
-
-interface GameData {
-    leftPaddle : Paddle;
-    rightPaddle : Paddle;
-    maxPaddleY : number;
-    ball : Ball;
-    players : Players;
-    timer : number;
-    paddleSpeed :number;
-}
-
-
 interface PingPongProps {
-    socket: Socket;
-    paddleHeight : number;
-    paddleSpeed : number;
-    ballSpeed : number;
+    gameOption : GameOption;
 }
 
 export default function PingPong(props : PingPongProps) {
+    const socket : Socket = useContext(GameSocketContext);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
+    console.log(props.gameOption.ballSpeed);
 
-
+    const initGame = (data : GameData) => {
+        socket.emit("init", data);
+    }
 
     const keyUp = (data : GameData) => {
-        props.socket.emit("KeyUp", data);
+        socket.emit("KeyUp", data);
     }
 
     const wKeyDown = (data : GameData) => {
-        props.socket.emit("wKey", data);
+        socket.emit("wKey", data);
     }
 
     const sKeyDown = (data : GameData) => {
-        props.socket.emit("sKey", data);
+        socket.emit("sKey", data);
     }
 
-    const [isPaused, setIsPaused] = useState(true);
+    const [isPaused, setIsPaused] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -72,36 +40,37 @@ export default function PingPong(props : PingPongProps) {
         let gameData = {
             leftPaddle : {
                 x: grid * 2,
-                y: canvas.height / 2 - props.paddleHeight / 2,
+                y: canvas.height / 2 - props.gameOption.paddleHeight / 2,
                 width: grid,
-                height: props.paddleHeight,
+                height: props.gameOption.paddleHeight,
                 dy: 0,
             },
             rightPaddle : {
                 x: canvas.width - grid * 3,
-                y: canvas.height / 2 - props.paddleHeight / 2,
+                y: canvas.height / 2 - props.gameOption.paddleHeight / 2,
                 width: grid,
-                height: props.paddleHeight,
+                height: props.gameOption.paddleHeight,
                 dy: 0,
             },
-            maxPaddleY : canvas.height - grid - props.paddleHeight,
+            maxPaddleY : canvas.height - grid - props.gameOption.paddleHeight,
             ball : {
                 x: canvas.width / 2,
                 y: canvas.height / 2,
                 width: grid,
                 height: grid,
                 resetting: false,
-                dx: props.ballSpeed,
-                dy: -props.ballSpeed,
+                dx: props.gameOption.ballSpeed,
+                dy: -props.gameOption.ballSpeed,
             },
             players : {
-                firstPlayer : "",
+                firstPlayer : props.gameOption.firstPlayer,
                 firstScore : 0,
-                secondPlayer : "",
+                secondPlayer : props.gameOption.secondPlayer,
                 secondScore : 0
             },
             timer : 0,
-            paddleSpeed : props.paddleSpeed
+            paddleSpeed : props.gameOption.paddleSpeed,
+            ballSpeed : props.gameOption.ballSpeed,
         }
         const drawNet = () => {
             context.beginPath();
@@ -138,9 +107,9 @@ export default function PingPong(props : PingPongProps) {
             const x2 = 780;
             const y= 30;
             context.textAlign = "left";
-            context.fillText( String(players.firstScore), x1, y);
+            context.fillText( players.firstPlayer + " " + players.firstScore, x1, y);
             context.textAlign = "right";
-            context.fillText(String(players.secondScore), x2, y);
+            context.fillText(players.secondPlayer + " " + players.secondScore, x2, y);
         };
 
         const moveBall = () => {
@@ -208,8 +177,8 @@ export default function PingPong(props : PingPongProps) {
                     bounceAngle = Math.PI - bounceAngle; // flip angle
                 }
 
-                gameData.ball.dx = props.ballSpeed * Math.cos(bounceAngle);
-                gameData.ball.dy = props.ballSpeed * -Math.sin(bounceAngle);
+                gameData.ball.dx = gameData.ballSpeed * Math.cos(bounceAngle);
+                gameData.ball.dy = gameData.ballSpeed * -Math.sin(bounceAngle);
                 gameData.ball.dx *= -1; // switch direction
             }
         };
@@ -239,21 +208,11 @@ export default function PingPong(props : PingPongProps) {
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
                 case 'w':
-                    // gameData.leftPaddle.dy = -paddleSpeed;
                     wKeyDown(gameData);
                     break;
                 case 's':
-                    // gameData.leftPaddle.dy = paddleSpeed;
                     sKeyDown(gameData);
                     break;
-                // case 'ArrowUp':
-                //     gameData.rightPaddle.dy = -paddleSpeed;
-                //     gameUpdate(gameData);
-                //     break;
-                // case 'ArrowDown':
-                //     gameData.rightPaddle.dy = paddleSpeed;
-                //     gameUpdate(gameData);
-                //     break;
             }
         };
 
@@ -261,23 +220,18 @@ export default function PingPong(props : PingPongProps) {
             switch (event.key) {
                 case 'w':
                 case 's':
-                    //gameData.leftPaddle.dy = 0;
                     keyUp(gameData);
                     break;
-                // case 'ArrowUp':
-                // case 'ArrowDown':
-                //     gameData.rightPaddle.dy = 0;
-                //     gameUpdate(gameData);
-                //     break;
             }
     };
 
+        initGame(gameData);
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        props.socket.on("gameUpdate", (data : GameData) => gameData = data);
-        props.socket.on("disconnect", () => setIsPaused(true));
-        props.socket.on("reconnect", () => setIsPaused(false));
+        socket.on("update", (data : GameData) => gameData = data);
+        socket.on("playerDisconnected", () => setIsPaused(true));
+        socket.on("reconnect", () => setIsPaused(false));
 
         if (isPaused) {
             context.font = "40px Roboto bold";
@@ -292,7 +246,7 @@ export default function PingPong(props : PingPongProps) {
             document.removeEventListener("keydown", onKeyDown);
             document.removeEventListener("keyup", onKeyUp);
         };
-    }, [props.socket]);
+    }, []);
 
     return (
         <canvas ref={canvasRef} width={800} height={530} />

@@ -13,14 +13,14 @@ import {GameService} from "./game.service";
 import {GameDataDto} from "./dto/game-data.dto";
 import {JoinGameDto} from "./dto/join-game.dto";
 import {GameScoreDto} from "./dto/game-score.dto";
+import {GameOptionDto} from "./dto/game-option.dto";
 
 
-@WebSocketGateway(Number(process.env.GAME_PORT) | 5002, {
+@WebSocketGateway(Number(process.env.GAME_PORT), {
     namespace: "game",
     transports: ["websocket"],
     cors: {	origin: '*' },
 })
-
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server : Server;
@@ -33,12 +33,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         if (this.gameService.isPlayer(client.id)) {
-            const gameId = this.gameService.getGameId(client.id);
-            if (this.gameService.isStarted(gameId))
-                this.server.to(gameId).emit("disconnect", gameId);
+            const gameId : string = this.gameService.getGameId(client.id);
+            if (gameId && this.gameService.isStarted(gameId))
+                this.server.to(gameId).emit("playerDisconnected", gameId);
             else {
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGame(gameId);
+                this.gameService.deleteGameData(gameId);
             }
         }
         else
@@ -48,13 +49,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('create')
     async createGame (
         @ConnectedSocket() client: Socket,
-        @MessageBody() displayName : string
+        @MessageBody() gameOptions : GameOptionDto
     ) : Promise<void> {
-        const gameId = await this.gameService.newGame(client.id, displayName);
+        const gameId = await this.gameService.newGame(client.id, gameOptions);
         if (gameId) {
             client.join(gameId);
-            this.server.to(gameId).emit('newGame',);
+            client.emit('created');
         }
+        else
+            client.emit('notCreated');
     }
 
     @SubscribeMessage('join')
@@ -62,19 +65,39 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
     ) : Promise<void> {
-        const status = await this.gameService.joinGame(client.id, dto);
-        client.join(dto.gameId);
-        this.server.to(dto.gameId).emit(status, dto.gameId);
+        const gameOption : GameOptionDto = await this.gameService.joinGame(client.id, dto);
+        if (gameOption) {
+            client.join(dto.gameId);
+            this.server.to(dto.gameId).emit("started", gameOption);
+        }
+        else
+            client.emit("notStarted");
     }
 
-    @SubscribeMessage('view')
+    @SubscribeMessage('watch')
     async viewGame(
         @ConnectedSocket() client: Socket,
         @MessageBody() gameId : string
     ) : Promise<void> {
         const status = await this.gameService.viewGame(client.id, gameId);
-        if (status === true)
+        if (status) {
+            const gameData = this.gameService.getGameData(gameId);
             client.join(gameId);
+            client.emit("viewerJoined", gameData);
+        }
+        else
+            client.emit("viewerNotJoined")
+    }
+
+    @SubscribeMessage('init')
+    initialData(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameDataDto
+    ) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            this.gameService.setGameData(clientRoom.gameId, dto)
+        }
     }
 
     @SubscribeMessage('KeyUp')
@@ -103,6 +126,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 dto.leftPaddle.dy = - dto.paddleSpeed;
             else
                 dto.rightPaddle.dy = - dto.paddleSpeed;
+            console.log(dto.ballSpeed);
             this.server.to(clientRoom.gameId).emit("update", dto);
         }
     }

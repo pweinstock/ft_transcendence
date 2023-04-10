@@ -1,65 +1,92 @@
-import React, { useState } from "react";
-import Slider from "@mui/material/Slider/Slider";
-import Box from "@mui/material/Box/Box";
+import React, {useContext, useState} from "react";
 import {User} from "../BaseInterface";
-import {Socket} from "socket.io-client";
+import PingPong from "./PingPong";
+import {GameOption} from "./interfaces/game-option";
+import {GameSocketContext, GameSocketProvider} from "../context/game-socket";
 
-
-interface Options {
-    ballSpeed: number;
-    paddleSize: number;
-    paddleSpeed : number;
-    score: number;
-}
 
 interface CreateGameProps {
-    socket : Socket;
     user : User;
 }
 
+enum GameState {
+    NOTCREATED,
+    START,
+    WAITING
+}
+
 export default function CreateGame(props : CreateGameProps) {
-    const marks = [
-        {
-            value: 3,
-            label: 'Slow',
-        },
-        {
-            value: 6,
-            label: 'Normal',
-        },
-        {
-            value: 10,
-            label: 'Fast',
-        },
-        {
-            value: 14,
-            label: 'Super Fast',
-        },
-    ];
 
-    function valuetext(value: number) {
-        return `${value}`;
+    const socket = useContext(GameSocketContext);
+    const [gameOption, setGameOption] = useState<GameOption>({
+        firstPlayer : props.user.displayName,
+        secondPlayer : "",
+        paddleHeight : 75,
+        ballSpeed : 5,
+        paddleSpeed : 6,
+        isStarted : false
+    });
+    const [gameStatus, setGameStatus] = useState<GameState>(GameState.NOTCREATED);
+    const easyMode = () => {
+        setGameOption({
+            firstPlayer : props.user.displayName,
+            secondPlayer : "",
+            paddleHeight : 100,
+            ballSpeed : 3,
+            paddleSpeed : 6,
+            isStarted : false
+        })
     }
 
-    function valueLabelFormat(value: number) {
-        return marks.findIndex((mark) => mark.value === value) + 1;
+    const normalMode = () => {
+        setGameOption({
+            firstPlayer : props.user.displayName,
+            secondPlayer : "",
+            paddleHeight : 75,
+            ballSpeed : 5,
+            paddleSpeed : 6,
+            isStarted : false
+        })
     }
+
+    const hardMode = () => {
+        setGameOption({
+            firstPlayer : props.user.displayName,
+            secondPlayer : "",
+            paddleHeight : 50,
+            ballSpeed : 7,
+            paddleSpeed : 5,
+            isStarted : false
+        })
+    }
+
+    const handleError = () => {} //todo handle error
+
+    const createGame = () => socket.emit('create', gameOption);
+
+    socket.on('started', (gameData : GameOption) => {
+        setGameOption(gameData);
+        setGameStatus(GameState.START)
+    });
+    socket.on('created', () => setGameStatus(GameState.WAITING));
+    socket.on('notCreated', handleError);
 
 
     return (
-        <div>
-            <h2>Create Game</h2>
-            <Box sx={{ width: 300 }}>
-                <Slider
-                    aria-label="Restricted values"
-                    defaultValue={20}
-                    valueLabelFormat={valueLabelFormat}
-                    getAriaValueText={valuetext}
-                    step={null}
-                    valueLabelDisplay="auto"
-                    marks={marks}
-                />
-            </Box>
-        </div>
-    );
+        <>
+            {gameStatus === GameState.NOTCREATED &&
+                <div>
+                    <button onClick={easyMode}>Easy</button>
+                    <button onClick={normalMode}>Normal</button>
+                    <button onClick={hardMode}>Hard</button>
+                    <button onClick={createGame}>Create Game</button>
+                </div>}
+            {gameStatus === GameState.WAITING &&
+                <div>WAITING SECOND PLAYER!</div>}
+            {gameStatus === GameState.START &&
+                <GameSocketProvider>
+                    <PingPong gameOption={gameOption}/>
+                </GameSocketProvider>}
+        </>
+    )
 };
