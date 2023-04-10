@@ -16,12 +16,11 @@ import {GameScoreDto} from "./dto/game-score.dto";
 import {GameOptionDto} from "./dto/game-option.dto";
 
 
-@WebSocketGateway(Number(process.env.GAME_PORT) | 5002, {
+@WebSocketGateway(Number(process.env.GAME_PORT), {
     namespace: "game",
     transports: ["websocket"],
     cors: {	origin: '*' },
 })
-
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server : Server;
@@ -30,7 +29,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     afterInit(server: Server) {}
 
-    handleConnection() {}
+    handleConnection() {
+        console.log('someone connected');
+    }
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         if (this.gameService.isPlayer(client.id)) {
@@ -53,6 +54,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() gameOptions : GameOptionDto
     ) : Promise<void> {
         const gameId = await this.gameService.newGame(client.id, gameOptions);
+        console.log('create requested');
         if (gameId)
             client.join(gameId);
         else
@@ -64,17 +66,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
     ) : Promise<void> {
-        const gameId : string = await this.gameService.joinGame(client.id, dto);
-        if (gameId) {
-            const gameData : GameDataDto = this.gameService.getGameData(gameId);
+        const gameOption : GameOptionDto = await this.gameService.joinGame(client.id, dto);
+        if (gameOption) {
             client.join(dto.gameId);
-            this.server.to(dto.gameId).emit('connected', gameData);
+            this.server.to(dto.gameId).emit("joined", gameOption);
         }
         else
-            client.emit('not connected');
+            client.emit("notJoined");
     }
 
-    @SubscribeMessage('view')
+    @SubscribeMessage('watch')
     async viewGame(
         @ConnectedSocket() client: Socket,
         @MessageBody() gameId : string
@@ -83,10 +84,21 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (status) {
             const gameData = this.gameService.getGameData(gameId);
             client.join(gameId);
-            client.emit('viewer', gameData);
+            client.emit("viewerJoined", gameData);
         }
         else
-            client.emit('notconnected')
+            client.emit("viewerNotJoined")
+    }
+
+    @SubscribeMessage('update')
+    initialData(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : GameDataDto
+    ) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            this.gameService.setGameData(clientRoom.gameId, dto)
+        }
     }
 
     @SubscribeMessage('KeyUp')

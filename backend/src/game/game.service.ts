@@ -20,9 +20,9 @@ export class GameService {
     constructor(@InjectRepository(Game) private gameRepository : Repository<Game>,
                 private userService : UserService) {}
 
-    private gameIdToMatchData = new Map<string, GameOptionDto>();
     private playerToGameId = new Map<string, ClientRoom>();
     private viewerToGameId = new Map<string, string>();
+    private gameIdToGameOption = new Map<string, GameOptionDto>();
     private gameIdtoGameData = new Map<string, GameDataDto>();
 
     async newGame (clientId : string, dto : GameOptionDto ) : Promise<string> {
@@ -31,7 +31,7 @@ export class GameService {
             return null;
         const game = await this.gameRepository.save({firstPlayer : dto.firstPlayer, secondPlayer : null});
         this.playerToGameId.set(clientId, {gameId : game.id, isFirst : true});
-        this.gameIdToMatchData.set(game.id, dto);
+        this.gameIdToGameOption.set(game.id, dto);
         return game.id;
     }
 
@@ -47,16 +47,15 @@ export class GameService {
         this.gameIdtoGameData.delete(gameId);
     }
 
-    async joinGame (clientId : string, dto : JoinGameDto) : Promise<string> {
+    async joinGame (clientId : string, dto : JoinGameDto) : Promise<GameOptionDto> {
         const game = await this.findGamebyId(dto.gameId);
         if (!game || game.finished)
             return null;
-        if (this.gameIdToMatchData.has(game.id)) {
+        if (this.gameIdToGameOption.has(game.id))
             return this.checkPlayerStatus(clientId, dto);
-        }
         this.deletePlayer(clientId);
         this.deleteGameData(game.id);
-        this.gameIdToMatchData.delete(game.id);
+        this.gameIdToGameOption.delete(game.id);
         this.gameRepository.delete(game.id);
         return null;
     }
@@ -70,14 +69,14 @@ export class GameService {
     }
 
     isStarted(gameId : string) : boolean {
-        if (this.gameIdToMatchData.has(gameId))
-            return this.gameIdToMatchData.get(gameId).isStarted;
+        if (this.gameIdToGameOption.has(gameId))
+            return this.gameIdToGameOption.get(gameId).isStarted;
         return false;
     }
 
     getGamesToWatch() : GameInfoDto[] {
         const gameIds: GameInfoDto[] = [];
-        for (const [gameId, matchData] of this.gameIdToMatchData.entries()) {
+        for (const [gameId, matchData] of this.gameIdToGameOption.entries()) {
             if (matchData.isStarted) {
                 gameIds.push({firstPlayer : matchData.firstPlayer, secondPlayer : matchData.secondPlayer, gameId : gameId});
             }
@@ -87,7 +86,7 @@ export class GameService {
 
     getGamesToJoin() : GameInfoDto[] {
         const games: GameInfoDto[] = [];
-        for (const [gameId, matchData] of this.gameIdToMatchData.entries()) {
+        for (const [gameId, matchData] of this.gameIdToGameOption.entries()) {
             if (!matchData.isStarted) {
                 games.push({firstPlayer : matchData.firstPlayer, secondPlayer : matchData.secondPlayer, gameId : gameId});
             }
@@ -99,7 +98,7 @@ export class GameService {
         if (!this.playerToGameId.has(clientId) || this.playerToGameId.get(clientId).gameId !== dto.gameId)
             return false;
         this.deletePlayer(clientId);
-        if (!this.gameIdToMatchData.has(dto.gameId))
+        if (!this.gameIdToGameOption.has(dto.gameId))
             return false;
         this.deleteGame(dto.gameId);
         this.finalScore(dto);
@@ -127,25 +126,25 @@ export class GameService {
     }
 
     deleteGame(gameId : string) : void {
-        if (this.gameIdToMatchData.has(gameId)) {
-            this.gameIdToMatchData.delete(gameId);
+        if (this.gameIdToGameOption.has(gameId)) {
+            this.gameIdToGameOption.delete(gameId);
             this.gameRepository.delete(gameId);
         }
     }
 
     //Helpers
-    checkPlayerStatus (clientId : string, dto : JoinGameDto) : string {
-        let match : GameOptionDto = this.gameIdToMatchData.get(dto.gameId);
+    checkPlayerStatus (clientId : string, dto : JoinGameDto) : GameOptionDto {
+        let match : GameOptionDto = this.gameIdToGameOption.get(dto.gameId);
         if (match.secondPlayer === dto.displayName || match.firstPlayer === dto.displayName)
-            return dto.gameId;
+            return match;
         if (match.secondPlayer)
             return null;
         match.secondPlayer = dto.displayName;
         match.isStarted = true;
-        this.gameIdToMatchData.set(dto.gameId, match);
+        this.gameIdToGameOption.set(dto.gameId, match);
         this.deletePlayer(clientId);
         this.playerToGameId.set(clientId, {gameId : dto.gameId, isFirst : false});
-        return dto.gameId;
+        return match;
     }
 
     deletePlayer(clientId : string) : void {
@@ -174,7 +173,7 @@ export class GameService {
     }
 
     sendScoreToUser(dto : GameScoreDto) : void {
-        const matchData = this.gameIdToMatchData.get(dto.gameId);
+        const matchData = this.gameIdToGameOption.get(dto.gameId);
         if (dto.firstPlayerScore > dto.secondPlayerScore) {
             this.userService.wonGame(matchData.firstPlayer, dto.gameId);
             this.userService.lostGame(matchData.secondPlayer, dto.gameId);

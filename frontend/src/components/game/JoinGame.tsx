@@ -23,21 +23,19 @@ export default function JoinGame(props : JoinGameProps) {
     useEffect(() => {
         axios.get(`http://${window.location.hostname}:5000/game/join`, {withCredentials: true})
             .then(response => {
-                if (response && response.status === 200) {
+                if (response && response.status === 200)
                     setGamestoJoin(response.data);
-                    console.log(response);
-                }
             })
             .catch(e => {
                 //todo : handle error
             })
     },[joinServer])
 
-    props.socket.on("connected", (data : GameOption) => {
+    props.socket.on("joined", (data : GameOption) => {
         setGameData(data);
     });
 
-    props.socket.on("notconnected", () => {
+    props.socket.on("notJoined", () => {
         //todo : handle error
     });
 

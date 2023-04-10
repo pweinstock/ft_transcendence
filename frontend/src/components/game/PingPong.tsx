@@ -14,6 +14,10 @@ export default function PingPong(props : PingPongProps) {
     const grid = 15;
     const startTime = new Date().getTime();
 
+    const dataUpdate = (data : GameData) => {
+        props.socket.emit("update", data);
+    }
+
     const keyUp = (data : GameData) => {
         props.socket.emit("KeyUp", data);
     }
@@ -235,6 +239,7 @@ export default function PingPong(props : PingPongProps) {
             }
     };
 
+        dataUpdate(gameData);
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);

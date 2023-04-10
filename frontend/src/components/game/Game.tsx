@@ -20,6 +20,7 @@ export default function Game(props : GameProps) {
     const socket = io(`http://${window.location.hostname}:5002/game/`, {
         transports: ["websocket"],
     });
+    console.log(socket);
     const [gameUIState, setGameUIState] = useState<GameUIState>(GameUIState.NOTHING);
 
     const newGameClick = () => {

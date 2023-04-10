@@ -18,7 +18,7 @@ export default function WatchGame(props : WatchGameProps) {
 
 
     const joinServer = (gameId : string) => {
-        props.socket.emit("view", gameId);
+        props.socket.emit("watch", gameId);
     }
 
     useEffect(() => {
@@ -37,13 +37,15 @@ export default function WatchGame(props : WatchGameProps) {
         //todo : handle error
     }
 
-    props.socket.on("viewer", (data : GameData) => {
+    props.socket.on("viewerJoined", (data : GameData) => {
         setGameData(data);
     });
-    props.socket.on("notconnected", handleError);
+    props.socket.on("viewerNotJoined", handleError);
 
     return (
         gameData ?
+            <PingPongView socket={props.socket} gameData={gameData} />
+            :
             <div style={{color: "white"}}>
                 {gamestoWatch && gamestoWatch.map((item) => (
                     <button className='navbutton' onClick={() => joinServer(item.gameId)}>
@@ -51,7 +53,5 @@ export default function WatchGame(props : WatchGameProps) {
                     </button>
                 ))}
             </div>
-            :
-            gameData && <PingPongView socket={props.socket} gameData={gameData} />
     )
 }
