@@ -4,13 +4,7 @@ import {useEffect, useState} from "react";
 import {User} from "../BaseInterface";
 import {GameInfo} from "./interfaces/game-info";
 import PingPong from "./PingPong";
-import {GameData} from "./interfaces/game-data-props";
 import {GameOption} from "./interfaces/game-option";
-
-interface JoinGame {
-    displayName : string,
-    gameId : string
-}
 
 interface JoinGameProps {
     socket: Socket;
@@ -22,8 +16,8 @@ export default function JoinGame(props : JoinGameProps) {
     const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
     const [gameOption, setGameData] = useState<GameOption>();
 
-    const joinServer = (data : JoinGame) => {
-        props.socket.emit("join", data);
+    const joinServer = (id : string) => {
+        props.socket.emit("join", {displayName : props.user.displayName, gameId : id});
     }
 
     useEffect(() => {
@@ -52,11 +46,11 @@ export default function JoinGame(props : JoinGameProps) {
             <PingPong socket={props.socket} gameOption={gameOption}/>
             :
             <div style={{color: "white"}}>
-            {gamestoJoin && gamestoJoin.map((item) => (
+            {gamestoJoin && gamestoJoin.map((game) => (
                 <button className='navbutton' onClick={() => {
-                    joinServer({displayName : props.user.displayName, gameId : item.gameId})
+                    joinServer(game.gameId)
                 }}>
-                    {"Play Against " + item.firstPlayer}
+                    {"Play Against " + game.firstPlayer}
                 </button>
             ))}
             </div>
