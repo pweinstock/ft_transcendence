@@ -1,32 +1,34 @@
 import {Socket} from "socket.io-client";
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {UserTest} from "../BaseInterface";
+import {User} from "../BaseInterface";
 import {GameInfo} from "./interfaces/game-info";
 import PingPong from "./PingPong";
-import {socket} from "../../socket";
 
 interface JoinGame {
     displayName : string,
     gameId : string
 }
 
-interface JoinGameProps {
-    socket: Socket;
-    user : UserTest;
-}
-
 enum GameStatus {
     NOT_CONNECTED,
     START,
-    VIEW,
-    RECONNECT
+    VIEW
+}
+
+interface JoinGameProps {
+    socket: Socket;
+    user : User;
 }
 
 
 export default function JoinGame(props : JoinGameProps) {
     const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
-    const [gameStarted, setGameStarted] = useState<GameStatus>(GameStatus.NOT_CONNECTED)
+    const [gameStarted, setGameStarted] = useState<GameStatus>(GameStatus.NOT_CONNECTED);
+    const [paddleHeight, setPaddleHeight] = useState<number>(75);
+    const [ballSpeed, setBallSpeed] = useState<number>(5);
+    const [paddleSpeed, setPaddleSpeed] = useState<number>(6);
+
 
     const joinServer = (data : JoinGame) => {
         props.socket.emit("join", data);
@@ -42,18 +44,18 @@ export default function JoinGame(props : JoinGameProps) {
             .catch(e => {
                 //todo : handle error
             })
+    },[joinServer])
 
-    },[])
-
-    const gameStart = () => setGameStarted(GameStatus.START);
-    // const gameReconnect = () => setGameStarted(GameStatus.RECONNECTED);
+    const gameStart = () => {
+        setGameStarted(GameStatus.START);//todo add data recieving from socket
+    }
     const gameView = () => setGameStarted(GameStatus.VIEW);
 
 
     // socket.on("not available", );
-    socket.on("reconnect", gameStart);
-    socket.on("secondPlayer", gameStart);
-    socket.on("viewer", gameView);
+    props.socket.on("reconnect", gameStart);
+    props.socket.on("secondPlayer", gameStart);
+    props.socket.on("viewer", gameView);
 
     return (
         gameStarted === GameStatus.NOT_CONNECTED ?
@@ -65,6 +67,6 @@ export default function JoinGame(props : JoinGameProps) {
             ))}
             </div>
             :
-            <PingPong socket={props.socket}/>
+            <PingPong socket={props.socket} paddleHeight={paddleHeight} ballSpeed={ballSpeed} paddleSpeed={paddleSpeed}/>
     )
 }

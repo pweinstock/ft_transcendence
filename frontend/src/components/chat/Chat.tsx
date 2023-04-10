@@ -2,10 +2,10 @@ import {useEffect, useState} from "react";
 import {Socket, io} from "socket.io-client";
 import MesageInput from "./messageInput";
 import Messages from "./messages";
-import { BaseInterface, UserTest } from "../BaseInterface";
+import { User } from "../BaseInterface";
 
 interface ChatProps {
-    user : UserTest;
+    user : User;
     chatidp: string;
   }
 

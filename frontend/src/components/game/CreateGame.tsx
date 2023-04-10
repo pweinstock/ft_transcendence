@@ -1,15 +1,23 @@
 import React, { useState } from "react";
-import {func} from "prop-types";
 import Slider from "@mui/material/Slider/Slider";
 import Box from "@mui/material/Box/Box";
+import {User} from "../BaseInterface";
+import {Socket} from "socket.io-client";
+
 
 interface Options {
     ballSpeed: number;
     paddleSize: number;
+    paddleSpeed : number;
     score: number;
 }
 
-export default function CreateGame () {
+interface CreateGameProps {
+    socket : Socket;
+    user : User;
+}
+
+export default function CreateGame(props : CreateGameProps) {
     const marks = [
         {
             value: 3,

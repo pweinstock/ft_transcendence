@@ -1,5 +1,4 @@
 // import PingPong from "./game/Game"
-import Chat from "./chat/Chat"
 import astroman from './img/littleman.png';
 import {
     BrowserRouter as Router,
@@ -15,11 +14,10 @@ import ChatRooms from './ChatRooms';
 import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
-import User from './users/users';
 import BaseUser from './users/BaseUser';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from "axios";
-import { UserTest } from "./BaseInterface";
+import { User } from "./BaseInterface";
 import Game from "./game/Game";
 
 
@@ -27,7 +25,7 @@ import Game from "./game/Game";
 export default function App() {
 
   const [value, setValue] = useState<{id: number, name: string }[]>([]); 
-  const [currentUsersData, setcurrentUsersData] = useState<UserTest>();
+  const [currentUsersData, setcurrentUsersData] = useState<User>();
 
   useEffect(() => {
     axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
@@ -62,7 +60,7 @@ export default function App() {
                 {/*<Route path="/gameview" element={<GameView/>}/>*/}
                 {currentUsersData &&
                     <>
-                    <Route path="/chatrooms" element={<ChatRooms currentUser={currentUsersData}/>}/>
+                    <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<Game user={currentUsersData}/>}/>
 
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
@@ -75,7 +73,7 @@ export default function App() {
             </Routes>
             <aside>
               {!currentUsersData && <Login />}
-              {currentUsersData && <User />}
+              {/*{currentUsersData && <User />}*/}
             </aside>
           </main>
           <footer>

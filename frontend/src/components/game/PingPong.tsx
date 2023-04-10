@@ -40,19 +40,15 @@ interface GameData {
 
 interface PingPongProps {
     socket: Socket;
+    paddleHeight : number;
+    paddleSpeed : number;
+    ballSpeed : number;
 }
-
-
-
-
 
 export default function PingPong(props : PingPongProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
-    const paddleHeight = 75;
     const startTime = new Date().getTime();
-    let paddleSpeed = 6;
-    let ballSpeed = 5;
 
 
 
@@ -76,27 +72,27 @@ export default function PingPong(props : PingPongProps) {
         let gameData = {
             leftPaddle : {
                 x: grid * 2,
-                y: canvas.height / 2 - paddleHeight / 2,
+                y: canvas.height / 2 - props.paddleHeight / 2,
                 width: grid,
-                height: paddleHeight,
+                height: props.paddleHeight,
                 dy: 0,
             },
             rightPaddle : {
                 x: canvas.width - grid * 3,
-                y: canvas.height / 2 - paddleHeight / 2,
+                y: canvas.height / 2 - props.paddleHeight / 2,
                 width: grid,
-                height: paddleHeight,
+                height: props.paddleHeight,
                 dy: 0,
             },
-            maxPaddleY : canvas.height - grid - paddleHeight,
+            maxPaddleY : canvas.height - grid - props.paddleHeight,
             ball : {
                 x: canvas.width / 2,
                 y: canvas.height / 2,
                 width: grid,
                 height: grid,
                 resetting: false,
-                dx: ballSpeed,
-                dy: -ballSpeed,
+                dx: props.ballSpeed,
+                dy: -props.ballSpeed,
             },
             players : {
                 firstPlayer : "",
@@ -105,7 +101,7 @@ export default function PingPong(props : PingPongProps) {
                 secondScore : 0
             },
             timer : 0,
-            paddleSpeed : paddleSpeed
+            paddleSpeed : props.paddleSpeed
         }
         const drawNet = () => {
             context.beginPath();
@@ -212,8 +208,8 @@ export default function PingPong(props : PingPongProps) {
                     bounceAngle = Math.PI - bounceAngle; // flip angle
                 }
 
-                gameData.ball.dx = ballSpeed * Math.cos(bounceAngle);
-                gameData.ball.dy = ballSpeed * -Math.sin(bounceAngle);
+                gameData.ball.dx = props.ballSpeed * Math.cos(bounceAngle);
+                gameData.ball.dy = props.ballSpeed * -Math.sin(bounceAngle);
                 gameData.ball.dx *= -1; // switch direction
             }
         };

@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import {io} from "socket.io-client";
 import JoinGame from "./JoinGame";
-import {UserTest} from "../BaseInterface";
+import {User} from "../BaseInterface";
+import CreateGame from "./CreateGame";
 
 enum GameUIState {
     NOTHING,
@@ -11,7 +12,7 @@ enum GameUIState {
 }
 
 interface GameProps {
-    user : UserTest,
+    user : User,
 }
 
 export default function Game(props : GameProps) {
@@ -37,7 +38,7 @@ export default function Game(props : GameProps) {
             <button className='navbutton' onClick={newGameClick}>New Game</button>
             <button className='navbutton' onClick={joinGameClick}>Join Game</button>
             <button className='navbutton' onClick={watchGameClick}>Watch Game</button>
-            {gameUIState === GameUIState.NEW && <JoinGame user={props.user} socket={socket}/>}
+            {gameUIState === GameUIState.NEW && <CreateGame user={props.user} socket={socket}/>}
             {gameUIState === GameUIState.JOIN && <JoinGame user={props.user} socket={socket}/>}
             {gameUIState === GameUIState.WATCH && <JoinGame user={props.user} socket={socket}/>}
         </>
