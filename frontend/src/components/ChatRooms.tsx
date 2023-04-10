@@ -126,16 +126,16 @@ return (
 					<div className='mychatlist'>
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
-							<div  style={{color: "white"}}>
+							<div className='buttonholder' style={{color: "white"}}>
 								{/* <Link key = {item.id} className="newpostlink" to={"/chat/id/" + item.id}> */}
-									<button className='chatroombutton' onClick={() => {
+									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
 									}} >{item.name}</button>
 								{/* </Link> */}
 								{/* <button onClick={deleteChatNutton(item.id)} >delete</button> */}
-								<button onClick={() => {
+								<button className='chatbuttondel' onClick={() => {
 									deleteChatNutton(item.id);
-									}} >delete</button>
+									}} >X</button>
 							</div>
 						))}
 					</div>
@@ -161,7 +161,7 @@ return (
 								<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 							</label>
 							<br/>
-							<input type="submit" value="Create Chat" />
+							<input className='chatbutton' type="submit" value="Create Chat" />
 						</form>
 						</div>
 
@@ -171,7 +171,7 @@ return (
 						{allChat && allChat.map((item, index) => (
 								<div  style={{color: "white"}}>
 									{item.owner !== props.user.displayName && 
-										<button className='chatroombutton' onClick={() => {
+										<button className='navbutton' onClick={() => {
 											joinbuttonHandler(item.id);
 											}}>Join {item.name} chat! with: {item.owner} ({item.type})</button>
 									}
