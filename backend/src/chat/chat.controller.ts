@@ -10,6 +10,7 @@ import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
+import { NewMessageDto } from './dto/new-message.dto';
 
 
 @Controller('chat')
@@ -47,9 +48,9 @@ export class ChatController {
         return chat;
     }
 
-    @Post('/delete')
+    @Get('/delete/:id')
     @UseGuards(AuthGuard('2FA'))
-    delete(@Req() request, @Body() chatId : string) : void {
+    delete(@Req() request, @Param('id') chatId: string) : void {
         this.chatService.deleteChat(request.user, chatId);
     }
 
@@ -100,7 +101,7 @@ export class ChatController {
 
     @Post('/messages')
     @UseGuards(AuthGuard('2FA'))
-    async newMessage(@Req() request, @Body() dto : CreateMessageDto) : Promise<Message> {
+    async newMessage(@Req() request, @Body() dto : NewMessageDto) : Promise<Message> {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         const message = await this.chatService.createMessage(request.user, dto);
