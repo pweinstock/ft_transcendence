@@ -1,6 +1,6 @@
 import {Socket} from "socket.io-client";
 import axios from "axios";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {UserTest} from "../BaseInterface";
 import {GameInfo} from "./interfaces/game-info";
 import PingPong from "./PingPong";
@@ -31,12 +31,19 @@ export default function JoinGame(props : JoinGameProps) {
     const joinServer = (data : JoinGame) => {
         props.socket.emit("join", data);
     }
-    const refreshGames = async () => {
-        const response = await axios.get(`http://${window.location.hostname}:5000/game/`, {withCredentials: true});
-        if (response && response.status === 200) {
-            setGamestoJoin(response.data);
-        }
-    }
+    useEffect(() => {
+        axios.get(`http://${window.location.hostname}:5000/game/join`, {withCredentials: true})
+            .then(response => {
+                if (response && response.status === 200) {
+                    setGamestoJoin(response.data);
+                    console.log(response);
+                }
+            })
+            .catch(e => {
+                //todo : handle error
+            })
+
+    },[])
 
     const gameStart = () => setGameStarted(GameStatus.START);
     // const gameReconnect = () => setGameStarted(GameStatus.RECONNECTED);
@@ -48,8 +55,6 @@ export default function JoinGame(props : JoinGameProps) {
     socket.on("secondPlayer", gameStart);
     socket.on("viewer", gameView);
 
-
-    setInterval(refreshGames, 1000);
     return (
         gameStarted === GameStatus.NOT_CONNECTED ?
             <div style={{color: "white"}}>

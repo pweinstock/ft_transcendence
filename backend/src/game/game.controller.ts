@@ -5,25 +5,25 @@ import {Game} from "./game.entity";
 import {GameInfoDto} from "./dto/game-info.dto";
 
 
-@Controller("game")
-export class UserController {
+@Controller('game')
+export class GameController {
 
     constructor(private gameService: GameService) {}
 
-    @Get("all")
+    @Get('all')
 	@UseGuards(AuthGuard('2FA'))
     async getAll() : Promise<Game[]> {
         const games = this.gameService.findAllGame();
         return games;
     }
 
-    @Get("toWatch")
+    @Get('watch')
     @UseGuards(AuthGuard('2FA'))
     gamesToWatch() : GameInfoDto[] {
         return this.gameService.getGamesToWatch();
     }
 
-    @Get("toJoin")
+    @Get('join')
     @UseGuards(AuthGuard('2FA'))
     gamesToJoin() : GameInfoDto[] {
         return this.gameService.getGamesToJoin();
