@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef, useContext} from 'react';
 import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
 import {GameOption} from "./interfaces/game-option";
 import {GameSocketContext} from "../context/game-socket";
+import {Socket} from "socket.io-client";
 
 
 interface PingPongProps {
@@ -9,7 +10,7 @@ interface PingPongProps {
 }
 
 export default function PingPong(props : PingPongProps) {
-    const socket = useContext(GameSocketContext);
+    const socket : Socket = useContext(GameSocketContext);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
