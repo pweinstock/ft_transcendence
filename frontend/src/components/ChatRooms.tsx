@@ -28,7 +28,7 @@ chatidp: number;
 
 const ChatRooms: React.FC<BaseInterface> = ({currentUser}) => {
 const [value, setValue] = useState<{id: number, name: string }[]>([]);
-const [allChat, setallChat] = useState<{id: string, name: string, type :string }[]>([]);
+const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
 
 
 useEffect(() => {
@@ -116,7 +116,7 @@ return (
 						<p>List of public chats</p>
 						{allChat && allChat.map((item, index) => (
 							<div  style={{color: "white"}}>
-									<button className='chatroombutton'>{item.name} {item.type}</button>
+									<button className='chatroombutton'>{item.name} chat with: {item.owner} ({item.type})</button>
 							</div>
 						))}
 						<div className="changingtext">
