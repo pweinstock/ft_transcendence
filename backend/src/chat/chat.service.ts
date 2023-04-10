@@ -35,7 +35,7 @@ export class ChatService {
         chat.owner = owner.id;
         chat.admins = [];
         chat.bannedUsers = [];
-        // chat.mutedUsers = new Array<MutedUser>(); //todo find solution for this
+        // chat.mutedUsers = new Array<MutedUser>(); //todo find solution for thi
         chat.users = [];
         chat.messages = [];
         chat.users.push(owner.id);
@@ -56,7 +56,7 @@ export class ChatService {
     }
 
     async findChatById(chatId: string): Promise<Chat> {
-        const chat = await this.chatRepository.findOneBy({id: chatId});
+        const chat : Chat = await this.chatRepository.findOneBy({id: chatId});
         if (!chat)
             throw new HttpException('Chat not found!', HttpStatus.NOT_FOUND);
         return chat;

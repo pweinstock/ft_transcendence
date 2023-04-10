@@ -19,9 +19,22 @@
 	margin: 1px;
 }
 
+.createchat label {
+	font-size: small;
+}
+
 .chatcontent {
 	margin: 2px;
 	flex: 80%;
 	border-style: dotted;
 
 }
+
+.formholder {
+	display: flex;
+	flex-direction: column;
+	background-color: #dfdfdf46;
+	padding: 1%;
+	/* width: 100%; */
+  }
+  

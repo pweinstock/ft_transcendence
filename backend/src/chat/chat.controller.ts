@@ -47,9 +47,9 @@ export class ChatController {
         return chat;
     }
 
-    @Post('/delete')
+    @Get('/delete/:id')
     @UseGuards(AuthGuard('2FA'))
-    delete(@Req() request, @Body() chatId : string) : void {
+    delete(@Req() request, @Param('id') chatId: string) : void {
         this.chatService.deleteChat(request.user, chatId);
     }
 

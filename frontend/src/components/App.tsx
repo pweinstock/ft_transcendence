@@ -19,6 +19,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { User } from "./BaseInterface";
 import Game from "./game/Game";
+import Users from "./users/users";
 
 
 
@@ -73,7 +74,7 @@ export default function App() {
             </Routes>
             <aside>
               {!currentUsersData && <Login />}
-              {/*{currentUsersData && <User />}*/}
+              {currentUsersData && <Users />}
             </aside>
           </main>
           <footer>
