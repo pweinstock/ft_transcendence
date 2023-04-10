@@ -244,7 +244,7 @@ export default function PingPong(props : PingPongProps) {
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("update", (data : GameData) => gameData = data);
-        socket.on("disconnect", () => setIsPaused(true));
+        socket.on("playerDisconnected", () => setIsPaused(true));
         socket.on("reconnect", () => setIsPaused(false));
 
         if (isPaused) {

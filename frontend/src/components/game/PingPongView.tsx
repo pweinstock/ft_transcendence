@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
 import {GameSocketContext} from "../context/game-socket";
 
@@ -9,6 +9,7 @@ interface PingPongViewProps {
 
 export default function PingPongView(props : PingPongViewProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [isPaused, setIsPaused] = useState(false);
     const grid = 15;
     const startTime = new Date().getTime();
     const socket = useContext(GameSocketContext);
@@ -152,7 +153,17 @@ export default function PingPongView(props : PingPongViewProps) {
 
         draw();
         socket.on("gameUpdate", (data : GameData) => gameData = data);
-        update();
+        socket.on("playerDisconnected", () => setIsPaused(true));
+        socket.on("reconnect", () => setIsPaused(false));
+        if (isPaused) {
+            context.font = "40px Roboto bold";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        }
+        else
+            update();
     }, []);
 
     return (

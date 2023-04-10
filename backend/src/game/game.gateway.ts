@@ -16,9 +16,7 @@ import {GameScoreDto} from "./dto/game-score.dto";
 import {GameOptionDto} from "./dto/game-option.dto";
 
 
-//todo addd this Number(process.env.GAME_PORT
-
-@WebSocketGateway(5002, {
+@WebSocketGateway(Number(process.env.GAME_PORT), {
     namespace: "game",
     transports: ["websocket"],
     cors: {	origin: '*' },
@@ -31,15 +29,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     afterInit(server: Server) {}
 
-    handleConnection() {
-        console.log('someone connected');
-    }
+    handleConnection() {}
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         if (this.gameService.isPlayer(client.id)) {
             const gameId : string = this.gameService.getGameId(client.id);
             if (gameId && this.gameService.isStarted(gameId))
-                this.server.to(gameId).emit("disconnect", gameId);
+                this.server.to(gameId).emit("playerDisconnected", gameId);
             else {
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGame(gameId);
@@ -56,7 +52,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() gameOptions : GameOptionDto
     ) : Promise<void> {
         const gameId = await this.gameService.newGame(client.id, gameOptions);
-        console.log('create requested');
         if (gameId)
             client.join(gameId);
         else
@@ -71,10 +66,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const gameOption : GameOptionDto = await this.gameService.joinGame(client.id, dto);
         if (gameOption) {
             client.join(dto.gameId);
-            this.server.to(dto.gameId).emit("joined", gameOption);
+            this.server.to(dto.gameId).emit("started", gameOption);
         }
         else
-            client.emit("notJoined");
+            client.emit("notStarted");
     }
 
     @SubscribeMessage('watch')

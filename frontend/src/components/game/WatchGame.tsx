@@ -2,7 +2,6 @@ import {useContext, useEffect, useState} from "react";
 import {GameInfo} from "./interfaces/game-info";
 import axios from "axios";
 import PingPongView from "./PingPongView";
-import {io} from "socket.io-client";
 import {User} from "../BaseInterface";
 import {GameData} from "./interfaces/game-data-props";
 import {GameSocketContext, GameSocketProvider} from "../context/game-socket";

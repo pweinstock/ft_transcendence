@@ -32,11 +32,11 @@ export default function JoinGame(props : JoinGameProps) {
             })
     },[joinServer])
 
-    socket.on("joined", (data : GameOption) => {
+    socket.on("started", (data : GameOption) => {
         setGameData(data);
     });
 
-    socket.on("notJoined", () => {
+    socket.on("notStarted", () => {
         //todo : handle error
     });
 
