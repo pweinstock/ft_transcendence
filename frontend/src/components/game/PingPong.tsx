@@ -1,36 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {Socket} from "socket.io-client";
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
 import {GameOption} from "./interfaces/game-option";
+import {GameSocketContext} from "../context/game-socket";
 
 
 interface PingPongProps {
-    socket: Socket;
     gameOption : GameOption;
 }
 
 export default function PingPong(props : PingPongProps) {
+    const socket = useContext(GameSocketContext);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
 
     const dataUpdate = (data : GameData) => {
-        props.socket.emit("update", data);
+        socket.emit("update", data);
     }
 
     const keyUp = (data : GameData) => {
-        props.socket.emit("KeyUp", data);
+        socket.emit("KeyUp", data);
     }
 
     const wKeyDown = (data : GameData) => {
-        props.socket.emit("wKey", data);
+        socket.emit("wKey", data);
     }
 
     const sKeyDown = (data : GameData) => {
-        props.socket.emit("sKey", data);
+        socket.emit("sKey", data);
     }
 
-    const [isPaused, setIsPaused] = useState(true);
+    const [isPaused, setIsPaused] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -243,9 +243,9 @@ export default function PingPong(props : PingPongProps) {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        props.socket.on("update", (data : GameData) => gameData = data);
-        props.socket.on("disconnect", () => setIsPaused(true));
-        props.socket.on("reconnect", () => setIsPaused(false));
+        socket.on("update", (data : GameData) => gameData = data);
+        socket.on("disconnect", () => setIsPaused(true));
+        socket.on("reconnect", () => setIsPaused(false));
 
         if (isPaused) {
             context.font = "40px Roboto bold";
@@ -260,7 +260,7 @@ export default function PingPong(props : PingPongProps) {
             document.removeEventListener("keydown", onKeyDown);
             document.removeEventListener("keyup", onKeyUp);
         };
-    }, [props.socket]);
+    }, []);
 
     return (
         <canvas ref={canvasRef} width={800} height={530} />

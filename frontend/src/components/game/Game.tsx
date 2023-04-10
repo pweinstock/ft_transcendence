@@ -1,9 +1,9 @@
 import React, {useState} from "react";
-import {io} from "socket.io-client";
 import JoinGame from "./JoinGame";
 import {User} from "../BaseInterface";
 import CreateGame from "./CreateGame";
 import WatchGame from "./WatchGame";
+import {GameSocketProvider} from "../context/game-socket"
 
 enum GameUIState {
     NOTHING,
@@ -17,11 +17,7 @@ interface GameProps {
 }
 
 export default function Game(props : GameProps) {
-    const socket = io(`http://${window.location.hostname}:5002/game/`, {
-        transports: ["websocket"],
-    });
-    console.log(socket);
-    const [gameUIState, setGameUIState] = useState<GameUIState>(GameUIState.NOTHING);
+    const [gameUIState, setGameUIState] = useState(GameUIState.NOTHING);
 
     const newGameClick = () => {
         setGameUIState(GameUIState.NEW);
@@ -36,13 +32,17 @@ export default function Game(props : GameProps) {
     };
 
     return (
-        <>
-            <button className='navbutton' onClick={newGameClick}>New Game</button>
-            <button className='navbutton' onClick={joinGameClick}>Join Game</button>
-            <button className='navbutton' onClick={watchGameClick}>Watch Game</button>
-            {gameUIState === GameUIState.NEW && <CreateGame user={props.user} socket={socket}/>}
-            {gameUIState === GameUIState.JOIN && <JoinGame user={props.user} socket={socket}/>}
-            {gameUIState === GameUIState.WATCH && <WatchGame user={props.user} socket={socket}/>}
-        </>
+        gameUIState === GameUIState.NOTHING ?
+            <>
+                <button className='navbutton' onClick={newGameClick}>New Game</button>
+                <button className='navbutton' onClick={joinGameClick}>Join Game</button>
+                <button className='navbutton' onClick={watchGameClick}>Watch Game</button>
+            </>
+            :
+            <GameSocketProvider>
+                {gameUIState === GameUIState.NEW && <CreateGame user={props.user}/>}
+                {gameUIState === GameUIState.JOIN && <JoinGame user={props.user}/>}
+                {gameUIState === GameUIState.WATCH && <WatchGame user={props.user}/>}
+            </GameSocketProvider>
     );
 }

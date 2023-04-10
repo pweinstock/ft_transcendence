@@ -8,7 +8,7 @@ export class Game {
     @Column()
     firstPlayer: string;
 
-    @Column()
+    @Column({nullable : true})
     secondPlayer: string;
 
     @Column({default: "0"})

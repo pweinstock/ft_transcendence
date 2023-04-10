@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import {User} from "../BaseInterface";
-import {Socket} from "socket.io-client";
 import PingPong from "./PingPong";
 import {GameOption} from "./interfaces/game-option";
+import {GameSocketContext, GameSocketProvider} from "../context/game-socket";
 
 
 interface CreateGameProps {
-    socket : Socket;
     user : User;
 }
 
@@ -17,6 +16,7 @@ enum GameState {
 }
 
 export default function CreateGame(props : CreateGameProps) {
+    const socket = useContext(GameSocketContext);
     const [gameOption, setGameOption] = useState<GameOption>({
         firstPlayer : props.user.displayName,
         secondPlayer : "",
@@ -26,7 +26,6 @@ export default function CreateGame(props : CreateGameProps) {
         isStarted : false
     });
     const [gameStatus, setGameStatus] = useState<GameState>(GameState.NOTCREATED);
-
     const easyMode = () => {
         setGameOption({
             firstPlayer : props.user.displayName,
@@ -62,11 +61,11 @@ export default function CreateGame(props : CreateGameProps) {
 
     const handleError = () => {} //todo handle error
 
-    const createGame = () => props.socket.emit('create', gameOption);
+    const createGame = () => socket.emit('create', gameOption);
 
-    props.socket.on('started', () => setGameStatus(GameState.START));
-    props.socket.on('notCreated', () => setGameStatus(GameState.WAITING));
-    props.socket.on('notCreated', handleError);
+    socket.on('started', () => setGameStatus(GameState.START));
+    socket.on('notCreated', () => setGameStatus(GameState.WAITING));
+    socket.on('notCreated', handleError);
 
 
     return (
@@ -81,8 +80,9 @@ export default function CreateGame(props : CreateGameProps) {
             {gameStatus === GameState.WAITING &&
                 <p>WAITING SECOND PLAYER!</p>            }
             {gameStatus === GameState.START &&
-                <PingPong socket={props.socket} gameOption={gameOption}/>}
-
+                <GameSocketProvider>
+                    <PingPong gameOption={gameOption}/>
+                </GameSocketProvider>}
         </>
     )
 };

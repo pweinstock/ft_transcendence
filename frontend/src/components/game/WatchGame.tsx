@@ -1,13 +1,13 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {GameInfo} from "./interfaces/game-info";
 import axios from "axios";
 import PingPongView from "./PingPongView";
-import {Socket} from "socket.io-client";
+import {io} from "socket.io-client";
 import {User} from "../BaseInterface";
 import {GameData} from "./interfaces/game-data-props";
+import {GameSocketContext, GameSocketProvider} from "../context/game-socket";
 
 interface WatchGameProps {
-    socket: Socket;
     user : User;
 }
 
@@ -16,9 +16,9 @@ export default function WatchGame(props : WatchGameProps) {
     const [gamestoWatch, setGamestoWatch] = useState<GameInfo[]>([]);
     const [gameData, setGameData] = useState<GameData>()
 
-
+    const socket = useContext(GameSocketContext);
     const joinServer = (gameId : string) => {
-        props.socket.emit("watch", gameId);
+        socket.emit("watch", gameId);
     }
 
     useEffect(() => {
@@ -37,14 +37,16 @@ export default function WatchGame(props : WatchGameProps) {
         //todo : handle error
     }
 
-    props.socket.on("viewerJoined", (data : GameData) => {
+    socket.on("viewerJoined", (data : GameData) => {
         setGameData(data);
     });
-    props.socket.on("viewerNotJoined", handleError);
+    socket.on("viewerNotJoined", handleError);
 
     return (
         gameData ?
-            <PingPongView socket={props.socket} gameData={gameData} />
+            <GameSocketProvider>
+                <PingPongView gameData={gameData} />
+            </GameSocketProvider>
             :
             <div style={{color: "white"}}>
                 {gamestoWatch && gamestoWatch.map((item) => (

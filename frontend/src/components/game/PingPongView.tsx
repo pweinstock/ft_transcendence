@@ -1,9 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import {Socket} from "socket.io-client";
+import React, {useContext, useEffect, useRef} from 'react';
 import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
+import {GameSocketContext} from "../context/game-socket";
 
 interface PingPongViewProps {
-    socket: Socket;
     gameData : GameData;
 }
 
@@ -12,6 +11,7 @@ export default function PingPongView(props : PingPongViewProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
+    const socket = useContext(GameSocketContext);
 
 
     useEffect(() => {
@@ -151,9 +151,9 @@ export default function PingPongView(props : PingPongViewProps) {
 
 
         draw();
-        props.socket.on("gameUpdate", (data : GameData) => gameData = data);
+        socket.on("gameUpdate", (data : GameData) => gameData = data);
         update();
-    }, [props.socket]);
+    }, []);
 
     return (
         <canvas ref={canvasRef} width={1200} height={800} />

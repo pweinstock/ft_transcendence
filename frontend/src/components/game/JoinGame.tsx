@@ -1,13 +1,13 @@
-import {Socket} from "socket.io-client";
+import {io} from "socket.io-client";
 import axios from "axios";
-import {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {User} from "../BaseInterface";
 import {GameInfo} from "./interfaces/game-info";
 import PingPong from "./PingPong";
 import {GameOption} from "./interfaces/game-option";
+import {GameSocketContext, GameSocketProvider} from "../context/game-socket"
 
 interface JoinGameProps {
-    socket: Socket;
     user : User;
 }
 
@@ -16,8 +16,9 @@ export default function JoinGame(props : JoinGameProps) {
     const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
     const [gameOption, setGameData] = useState<GameOption>();
 
+    const socket = useContext(GameSocketContext);
     const joinServer = (id : string) => {
-        props.socket.emit("join", {displayName : props.user.displayName, gameId : id});
+        socket.emit("join", {displayName : props.user.displayName, gameId : id});
     }
 
     useEffect(() => {
@@ -31,17 +32,19 @@ export default function JoinGame(props : JoinGameProps) {
             })
     },[joinServer])
 
-    props.socket.on("joined", (data : GameOption) => {
+    socket.on("joined", (data : GameOption) => {
         setGameData(data);
     });
 
-    props.socket.on("notJoined", () => {
+    socket.on("notJoined", () => {
         //todo : handle error
     });
 
     return (
         gameOption ?
-            <PingPong socket={props.socket} gameOption={gameOption}/>
+            <GameSocketProvider>
+                <PingPong gameOption={gameOption}/>
+            </GameSocketProvider>
             :
             <div style={{color: "white"}}>
             {gamestoJoin && gamestoJoin.map((game) => (
