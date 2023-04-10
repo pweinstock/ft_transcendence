@@ -2,17 +2,12 @@ import {useContext, useEffect, useState} from "react";
 import {GameInfo} from "./interfaces/game-info";
 import axios from "axios";
 import PingPongView from "./PingPongView";
-import {User} from "../BaseInterface";
 import {GameData} from "./interfaces/game-data-props";
 import {GameSocketContext, GameSocketProvider} from "../context/game-socket";
 import {Socket} from "socket.io-client";
 
-interface WatchGameProps {
-    user : User;
-}
 
-
-export default function WatchGame(props : WatchGameProps) {
+export default function WatchGame() {
     const [gamestoWatch, setGamestoWatch] = useState<GameInfo[]>([]);
     const [gameData, setGameData] = useState<GameData>()
 

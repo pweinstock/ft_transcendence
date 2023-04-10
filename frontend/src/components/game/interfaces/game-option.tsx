@@ -1,4 +1,3 @@
-
 export interface GameOption {
     firstPlayer : string;
     secondPlayer : string;

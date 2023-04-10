@@ -42,7 +42,7 @@ export default function Game(props : GameProps) {
             <GameSocketProvider>
                 {gameUIState === GameUIState.NEW && <CreateGame user={props.user}/>}
                 {gameUIState === GameUIState.JOIN && <JoinGame user={props.user}/>}
-                {gameUIState === GameUIState.WATCH && <WatchGame user={props.user}/>}
+                {gameUIState === GameUIState.WATCH && <WatchGame/>}
             </GameSocketProvider>
     );
 }

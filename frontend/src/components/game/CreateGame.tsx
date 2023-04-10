@@ -16,6 +16,7 @@ enum GameState {
 }
 
 export default function CreateGame(props : CreateGameProps) {
+
     const socket = useContext(GameSocketContext);
     const [gameOption, setGameOption] = useState<GameOption>({
         firstPlayer : props.user.displayName,
