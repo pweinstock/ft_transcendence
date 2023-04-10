@@ -10,6 +10,12 @@ interface CreateGameProps {
     user : User;
 }
 
+enum GameState {
+    NOTCREATED,
+    START,
+    WAITING
+}
+
 export default function CreateGame(props : CreateGameProps) {
     const [gameOption, setGameOption] = useState<GameOption>({
         firstPlayer : props.user.displayName,
@@ -19,8 +25,7 @@ export default function CreateGame(props : CreateGameProps) {
         paddleSpeed : 6,
         isStarted : false
     });
-    const [gameStarted, setGameStarted] = useState<boolean>(false);
-
+    const [gameStatus, setGameStatus] = useState<GameState>(GameState.NOTCREATED);
 
     const easyMode = () => {
         setGameOption({
@@ -57,26 +62,27 @@ export default function CreateGame(props : CreateGameProps) {
 
     const handleError = () => {} //todo handle error
 
-    const createGame = () => {
-        props.socket.emit('create', )
-    };
+    const createGame = () => props.socket.emit('create', gameOption);
 
-    props.socket.on('started', (options) => {
-        setGameOption(options);
-        setGameStarted(true);
-    });
-    props.socket.on('failed', handleError);
+    props.socket.on('started', () => setGameStatus(GameState.START));
+    props.socket.on('notCreated', () => setGameStatus(GameState.WAITING));
+    props.socket.on('notCreated', handleError);
 
 
     return (
-        gameStarted ?
-            <div>
-                <button onClick={easyMode}>Easy</button>
-                <button onClick={normalMode}>Normal</button>
-                <button onClick={hardMode}>Hard</button>
-                <button onClick={createGame}>Create Game</button>
-            </div>
-            :
-            <PingPong socket={props.socket} gameOption={gameOption}/>
+        <>
+            {gameStatus === GameState.NOTCREATED &&
+                <div>
+                    <button onClick={easyMode}>Easy</button>
+                    <button onClick={normalMode}>Normal</button>
+                    <button onClick={hardMode}>Hard</button>
+                    <button onClick={createGame}>Create Game</button>
+                </div>}
+            {gameStatus === GameState.WAITING &&
+                <p>WAITING SECOND PLAYER!</p>            }
+            {gameStatus === GameState.START &&
+                <PingPong socket={props.socket} gameOption={gameOption}/>}
+
+        </>
     )
 };

@@ -56,7 +56,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (gameId)
             client.join(gameId);
         else
-            client.emit('not created');
+            client.emit('notCreated');
     }
 
     @SubscribeMessage('join')
