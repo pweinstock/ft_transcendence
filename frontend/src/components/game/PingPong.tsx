@@ -1,56 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {Socket} from "socket.io-client";
-
-
-interface Paddle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    dy: number;
-}
-
-interface Ball {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    resetting: boolean;
-    dx: number;
-    dy: number;
-}
-
-interface Players {
-    firstPlayer : string
-    firstScore : number
-    secondPlayer : string
-    secondScore : number
-}
-
-interface GameData {
-    leftPaddle : Paddle;
-    rightPaddle : Paddle;
-    maxPaddleY : number;
-    ball : Ball;
-    players : Players;
-    timer : number;
-    paddleSpeed :number;
-}
+import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
+import {GameOption} from "./interfaces/game-option";
 
 
 interface PingPongProps {
     socket: Socket;
-    paddleHeight : number;
-    paddleSpeed : number;
-    ballSpeed : number;
+    gameOption : GameOption;
 }
 
 export default function PingPong(props : PingPongProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
-
-
 
     const keyUp = (data : GameData) => {
         props.socket.emit("KeyUp", data);
@@ -72,36 +34,37 @@ export default function PingPong(props : PingPongProps) {
         let gameData = {
             leftPaddle : {
                 x: grid * 2,
-                y: canvas.height / 2 - props.paddleHeight / 2,
+                y: canvas.height / 2 - props.gameOption.paddleHeight / 2,
                 width: grid,
-                height: props.paddleHeight,
+                height: props.gameOption.paddleHeight,
                 dy: 0,
             },
             rightPaddle : {
                 x: canvas.width - grid * 3,
-                y: canvas.height / 2 - props.paddleHeight / 2,
+                y: canvas.height / 2 - props.gameOption.paddleHeight / 2,
                 width: grid,
-                height: props.paddleHeight,
+                height: props.gameOption.paddleHeight,
                 dy: 0,
             },
-            maxPaddleY : canvas.height - grid - props.paddleHeight,
+            maxPaddleY : canvas.height - grid - props.gameOption.paddleHeight,
             ball : {
                 x: canvas.width / 2,
                 y: canvas.height / 2,
                 width: grid,
                 height: grid,
                 resetting: false,
-                dx: props.ballSpeed,
-                dy: -props.ballSpeed,
+                dx: props.gameOption.ballSpeed,
+                dy: -props.gameOption.ballSpeed,
             },
             players : {
-                firstPlayer : "",
+                firstPlayer : props.gameOption.firstPlayer,
                 firstScore : 0,
-                secondPlayer : "",
+                secondPlayer : props.gameOption.secondPlayer,
                 secondScore : 0
             },
             timer : 0,
-            paddleSpeed : props.paddleSpeed
+            paddleSpeed : props.gameOption.paddleSpeed,
+            ballSpeed : props.gameOption.ballSpeed,
         }
         const drawNet = () => {
             context.beginPath();
@@ -208,8 +171,8 @@ export default function PingPong(props : PingPongProps) {
                     bounceAngle = Math.PI - bounceAngle; // flip angle
                 }
 
-                gameData.ball.dx = props.ballSpeed * Math.cos(bounceAngle);
-                gameData.ball.dy = props.ballSpeed * -Math.sin(bounceAngle);
+                gameData.ball.dx = gameData.ballSpeed * Math.cos(bounceAngle);
+                gameData.ball.dy = gameData.ballSpeed * -Math.sin(bounceAngle);
                 gameData.ball.dx *= -1; // switch direction
             }
         };
@@ -275,7 +238,7 @@ export default function PingPong(props : PingPongProps) {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        props.socket.on("gameUpdate", (data : GameData) => gameData = data);
+        props.socket.on("update", (data : GameData) => gameData = data);
         props.socket.on("disconnect", () => setIsPaused(true));
         props.socket.on("reconnect", () => setIsPaused(false));
 

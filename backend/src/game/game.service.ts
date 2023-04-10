@@ -6,13 +6,9 @@ import {JoinGameDto} from "./dto/join-game.dto";
 import {GameScoreDto} from "./dto/game-score.dto";
 import {UserService} from "../users/user.service";
 import {GameInfoDto} from "./dto/game-info.dto";
+import {GameDataDto} from "./dto/game-data.dto";
+import {GameOptionDto} from "./dto/game-option.dto";
 
-
-interface MatchData {
-    firstPlayer : string;
-    secondPlayer : string;
-    isStarted : boolean;
-}
 
 interface ClientRoom {
     gameId : string;
@@ -24,31 +20,45 @@ export class GameService {
     constructor(@InjectRepository(Game) private gameRepository : Repository<Game>,
                 private userService : UserService) {}
 
-    private gameIdToMatchData = new Map<string, MatchData>();
+    private gameIdToMatchData = new Map<string, GameOptionDto>();
     private playerToGameId = new Map<string, ClientRoom>();
     private viewerToGameId = new Map<string, string>();
+    private gameIdtoGameData = new Map<string, GameDataDto>();
 
-    async newGame (clientId : string, displayName : string ) : Promise<string> {
+    async newGame (clientId : string, dto : GameOptionDto ) : Promise<string> {
         const gameId = this.getGameId(clientId);
         if (gameId)
             return null;
-        const game = await this.gameRepository.save({firstPlayer : displayName, secondPlayer : null});
+        const game = await this.gameRepository.save({firstPlayer : dto.firstPlayer, secondPlayer : null});
         this.playerToGameId.set(clientId, {gameId : game.id, isFirst : true});
-        this.gameIdToMatchData.set(game.id, { firstPlayer : displayName, secondPlayer : null, isStarted: false });
+        this.gameIdToMatchData.set(game.id, dto);
         return game.id;
+    }
+
+    getGameData (gameId :string) : GameDataDto {
+        return this.gameIdtoGameData.get(gameId);
+    }
+
+    setGameData (gameId :string, gameData : GameDataDto) {
+        this.gameIdtoGameData.set(gameId, gameData);
+    }
+
+    deleteGameData (gameId : string) {
+        this.gameIdtoGameData.delete(gameId);
     }
 
     async joinGame (clientId : string, dto : JoinGameDto) : Promise<string> {
         const game = await this.findGamebyId(dto.gameId);
         if (!game || game.finished)
-            return "not available";
+            return null;
         if (this.gameIdToMatchData.has(game.id)) {
             return this.checkPlayerStatus(clientId, dto);
         }
         this.deletePlayer(clientId);
+        this.deleteGameData(game.id);
         this.gameIdToMatchData.delete(game.id);
         this.gameRepository.delete(game.id);
-        return "not available";
+        return null;
     }
 
     async viewGame (clientId : string, gameId : string) : Promise<boolean> {
@@ -99,7 +109,7 @@ export class GameService {
 
     //WORKING WITH DATABASE
     async findAllGame() : Promise<Game[]> {
-        const games = this.gameRepository.find();
+        const games = await this.gameRepository.find();
         return games;
     }
 
@@ -109,7 +119,7 @@ export class GameService {
     }
 
     async finalScore(dto : GameScoreDto) {
-        const game = await this.findGamebyId(dto.gameId);
+        const game : Game = await this.findGamebyId(dto.gameId);
         game.firstPlayerScore = dto.firstPlayerScore;
         game.secondPlayerScore = dto.secondPlayerScore;
         game.finished = true;
@@ -125,19 +135,17 @@ export class GameService {
 
     //Helpers
     checkPlayerStatus (clientId : string, dto : JoinGameDto) : string {
-        let match = this.gameIdToMatchData.get(dto.gameId);
+        let match : GameOptionDto = this.gameIdToMatchData.get(dto.gameId);
         if (match.secondPlayer === dto.displayName || match.firstPlayer === dto.displayName)
-            return "reconnect";
-        if (match.secondPlayer) {
-            this.viewerToGameId.set(clientId, dto.gameId);
-            return "viewer";
-        }
+            return dto.gameId;
+        if (match.secondPlayer)
+            return null;
         match.secondPlayer = dto.displayName;
         match.isStarted = true;
         this.gameIdToMatchData.set(dto.gameId, match);
         this.deletePlayer(clientId);
         this.playerToGameId.set(clientId, {gameId : dto.gameId, isFirst : false});
-        return "secondPlayer";
+        return dto.gameId;
     }
 
     deletePlayer(clientId : string) : void {

@@ -4,16 +4,11 @@ import {useEffect, useState} from "react";
 import {User} from "../BaseInterface";
 import {GameInfo} from "./interfaces/game-info";
 import PingPong from "./PingPong";
+import {GameData} from "./interfaces/game-data-props";
 
 interface JoinGame {
     displayName : string,
     gameId : string
-}
-
-enum GameStatus {
-    NOT_CONNECTED,
-    START,
-    VIEW
 }
 
 interface JoinGameProps {
@@ -24,15 +19,16 @@ interface JoinGameProps {
 
 export default function JoinGame(props : JoinGameProps) {
     const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
-    const [gameStarted, setGameStarted] = useState<GameStatus>(GameStatus.NOT_CONNECTED);
-    const [paddleHeight, setPaddleHeight] = useState<number>(75);
-    const [ballSpeed, setBallSpeed] = useState<number>(5);
-    const [paddleSpeed, setPaddleSpeed] = useState<number>(6);
+    const [gameData, setGameData] = useState<GameData>();
+    // const [paddleHeight, setPaddleHeight] = useState<number>(75);
+    // const [ballSpeed, setBallSpeed] = useState<number>(5);
+    // const [paddleSpeed, setPaddleSpeed] = useState<number>(6);
 
 
     const joinServer = (data : JoinGame) => {
         props.socket.emit("join", data);
     }
+
     useEffect(() => {
         axios.get(`http://${window.location.hostname}:5000/game/join`, {withCredentials: true})
             .then(response => {
@@ -46,19 +42,16 @@ export default function JoinGame(props : JoinGameProps) {
             })
     },[joinServer])
 
-    const gameStart = () => {
-        setGameStarted(GameStatus.START);//todo add data recieving from socket
-    }
-    const gameView = () => setGameStarted(GameStatus.VIEW);
+    props.socket.on("connected", (data : GameData) => {
+        setGameData(data);
+    });
 
-
-    // socket.on("not available", );
-    props.socket.on("reconnect", gameStart);
-    props.socket.on("secondPlayer", gameStart);
-    props.socket.on("viewer", gameView);
+    props.socket.on("notconnected", () => {
+        //todo : handle error
+    });
 
     return (
-        gameStarted === GameStatus.NOT_CONNECTED ?
+        gameData ?
             <div style={{color: "white"}}>
             {gamestoJoin && gamestoJoin.map((item) => (
                 <button className='navbutton' onClick={() => joinServer({displayName : props.user.displayName, gameId : item.gameId})}>
@@ -67,6 +60,7 @@ export default function JoinGame(props : JoinGameProps) {
             ))}
             </div>
             :
-            <PingPong socket={props.socket} paddleHeight={paddleHeight} ballSpeed={ballSpeed} paddleSpeed={paddleSpeed}/>
+            <PingPong socket={props.socket} gameData={gameData}/>
+
     )
 }
