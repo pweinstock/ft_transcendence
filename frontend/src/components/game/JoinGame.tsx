@@ -32,7 +32,7 @@ export default function JoinGame(props : JoinGameProps) {
         props.socket.emit("join", data);
     }
     const refreshGames = async () => {
-        const response = await axios.get(`http://${window.location.hostname}:5000/game/`);
+        const response = await axios.get(`http://${window.location.hostname}:5000/game/`, {withCredentials: true});
         if (response && response.status === 200) {
             setGamestoJoin(response.data);
         }
