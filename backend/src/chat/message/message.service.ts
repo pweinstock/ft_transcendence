@@ -10,7 +10,8 @@ export class MessageService {
 
     async createMessage(dto: CreateMessageDto) : Promise<Message> {
         const message = await this.messageRepository.create(dto);
-        return this.messageRepository.save(message);
+        this.messageRepository.save(message);
+        return message;
     }
 
     async findMessageById(messageId : string) : Promise<Message> {

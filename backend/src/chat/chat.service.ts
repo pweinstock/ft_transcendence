@@ -13,6 +13,7 @@ import {User, UserStatus} from "../users/user.entity";
 import {Socket} from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
+import { NewMessageDto } from './dto/new-message.dto';
 
 interface Room {
     userId : string,
@@ -250,18 +251,17 @@ export class ChatService {
         return room;
     }
 
-    async createMessage(user : User, dto : CreateMessageDto) : Promise<Message> {
-        if (user.id !== dto.userId || !user.chats.includes(dto.chatId))
+    async createMessage(user : User, dto : NewMessageDto) : Promise<Message> {
+        if (!user.chats.includes(dto.chatId))
             throw new HttpException('Not allowed!', HttpStatus.BAD_REQUEST);
         const chat = await this.findChatById(dto.chatId);
         if (chat.bannedUsers.includes(user.id))
             throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
-        if (this.isMuted(chat, user.id))
-            throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
-        const message = await this.messageServices.createMessage (dto);
-        message.displayName = user.displayName;
+        // if (this.isMuted(chat, user.id))
+        //     throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
+        const message = await this.messageServices.createMessage ({displayName : user.displayName, chatId : dto.chatId, userId : user.id, content: dto.content});
         chat.messages.push(message.id);
-        this.chatRepository.save(message);
+        this.chatRepository.save(chat);
         return message;
     }
 

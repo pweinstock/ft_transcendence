@@ -91,7 +91,7 @@ function deleteChatNutton(id : string) {
 			console.log("Error in deleteing chat, in chatid:");
 			console.log(id);
 		}
-		console.log(reason.message)
+		console.log(reason.message);
 		});
 }
 
@@ -111,7 +111,7 @@ function joinbuttonHandler(id :string) {
 			console.log("Error while joing chat, in chatid:");
 			console.log(id);
 		}
-		console.log(reason.message)
+		console.log(reason.message);
 		});
 	// const socket = io("http://localhost:5001/chat" );
 	// const chatId = 1;
