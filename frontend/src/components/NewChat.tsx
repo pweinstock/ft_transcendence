@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import astroman from './img/littleman.png';
 import axios from "axios";
 import Chat from "./chat/Chat"
-import {UserTest} from "./BaseInterface";
+import {User} from "./BaseInterface";
 // const user = ;
 
 interface ChatProps {
-    user : UserTest;
+    user : User;
     chatidp: string;
   }
 

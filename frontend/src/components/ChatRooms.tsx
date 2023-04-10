@@ -1,17 +1,8 @@
-import { colors } from '@mui/material';
-import { color } from '@mui/system';
-import React, { useState, useEffect, useRef } from 'react';
-import {io, Socket} from "socket.io-client";
+import React, { useState, useEffect } from 'react';
+import {io} from "socket.io-client";
 import axios from "axios";
-import {
-BrowserRouter as Router,
-Route,
-Routes,
-Link
-} from "react-router-dom";
-import NewChat from './NewChat';
-import { BrowserRouter } from "react-router-dom";
-import { BaseInterface, UserTest } from "./BaseInterface";
+import { Link } from "react-router-dom";
+import { User } from "./BaseInterface";
 import './chatstyle.css';
 
 
@@ -22,11 +13,13 @@ PROTECTED = "protected",
 DIRECT = "direct",
 };
 
-interface ChatData {
-chatidp: number;
+
+
+interface ChatProps {
+    user: User;
 }
 
-const ChatRooms: React.FC<BaseInterface> = ({currentUser}) => {
+const ChatRooms: React.FC<ChatProps> = (props) => {
 const [value, setValue] = useState<{id: number, name: string }[]>([]);
 const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
 
@@ -72,7 +65,7 @@ function handOnClickSend() {
 function joinbuttonHandler() {
 	// console.log('joinButton pressed');
 	const chatId = "4bbd1c9f-e6a4-4e79-b428-6740ba42eeb5";
-	axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : currentUser?.id,  chatId : chatId, password : null }, {withCredentials: true}).then( () => {
+	axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : props.user.id,  chatId : chatId, password : null }, {withCredentials: true}).then( () => {
 		const socket = io("http://localhost:5001/chat" );
 		socket?.emit('joinRoom', chatId);
 

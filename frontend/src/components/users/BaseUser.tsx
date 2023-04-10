@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BaseInterface, UserTest } from "../BaseInterface";
+import { User } from "../BaseInterface";
 
 
 interface BaseUserProps {
-    currentUser : UserTest;
+    currentUser : User;
 }
 
 const BaseUser: React.FC<BaseUserProps> = (props : BaseUserProps) => {

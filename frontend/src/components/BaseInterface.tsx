@@ -5,7 +5,7 @@ export enum UserStatus {
     OFFLINE = "offline"
 };
 
-export interface UserTest {
+export interface User {
 	id: string;
     email: string;
     displayName: string;
@@ -23,8 +23,4 @@ export interface UserTest {
 	isTwoFactorAuthenticationEnabled: boolean;
 	TwoFactorAuthenticationSecret: string;
 	first: boolean;
-}
-
-export interface BaseInterface {
-	currentUser : UserTest;
 }
