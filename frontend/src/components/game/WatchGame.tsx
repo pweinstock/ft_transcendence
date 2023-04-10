@@ -50,7 +50,7 @@ export default function WatchGame(props : WatchGameProps) {
             <div style={{color: "white"}}>
                 {gamestoWatch && gamestoWatch.map((item) => (
                     <button className='navbutton' onClick={() => joinServer(item.gameId)}>
-                        {"Play Against " + item.firstPlayer}
+                        {item.firstPlayer + "  vs  " + item.secondPlayer}
                     </button>
                 ))}
             </div>

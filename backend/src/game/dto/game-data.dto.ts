@@ -31,4 +31,5 @@ export interface GameDataDto {
     readonly players : Players;
     readonly timer : number;
     readonly paddleSpeed :number;
+    readonly ballSpeed : number;
 }

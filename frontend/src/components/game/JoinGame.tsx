@@ -14,7 +14,7 @@ interface JoinGameProps {
 
 export default function JoinGame(props : JoinGameProps) {
     const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
-    const [gameOption, setGameData] = useState<GameOption>();
+    const [gameOption, setGameOption] = useState<GameOption>();
 
     const socket = useContext(GameSocketContext);
     const joinServer = (id : string) => {
@@ -33,7 +33,7 @@ export default function JoinGame(props : JoinGameProps) {
     },[joinServer])
 
     socket.on("started", (data : GameOption) => {
-        setGameData(data);
+        setGameOption(data);
     });
 
     socket.on("notStarted", () => {

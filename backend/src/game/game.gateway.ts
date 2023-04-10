@@ -52,8 +52,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() gameOptions : GameOptionDto
     ) : Promise<void> {
         const gameId = await this.gameService.newGame(client.id, gameOptions);
-        if (gameId)
+        if (gameId) {
             client.join(gameId);
+            client.emit('created');
+        }
         else
             client.emit('notCreated');
     }
@@ -87,7 +89,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             client.emit("viewerNotJoined")
     }
 
-    @SubscribeMessage('update')
+    @SubscribeMessage('init')
     initialData(
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : GameDataDto
@@ -124,6 +126,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 dto.leftPaddle.dy = - dto.paddleSpeed;
             else
                 dto.rightPaddle.dy = - dto.paddleSpeed;
+            console.log(dto.ballSpeed);
             this.server.to(clientRoom.gameId).emit("update", dto);
         }
     }

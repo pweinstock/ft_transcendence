@@ -30,8 +30,8 @@ export default function CreateGame(props : CreateGameProps) {
         setGameOption({
             firstPlayer : props.user.displayName,
             secondPlayer : "",
-            paddleHeight : 75,
-            ballSpeed : 5,
+            paddleHeight : 100,
+            ballSpeed : 3,
             paddleSpeed : 6,
             isStarted : false
         })
@@ -52,9 +52,9 @@ export default function CreateGame(props : CreateGameProps) {
         setGameOption({
             firstPlayer : props.user.displayName,
             secondPlayer : "",
-            paddleHeight : 75,
-            ballSpeed : 5,
-            paddleSpeed : 6,
+            paddleHeight : 50,
+            ballSpeed : 7,
+            paddleSpeed : 5,
             isStarted : false
         })
     }
@@ -63,8 +63,11 @@ export default function CreateGame(props : CreateGameProps) {
 
     const createGame = () => socket.emit('create', gameOption);
 
-    socket.on('started', () => setGameStatus(GameState.START));
-    socket.on('notCreated', () => setGameStatus(GameState.WAITING));
+    socket.on('started', (gameData : GameOption) => {
+        setGameOption(gameData);
+        setGameStatus(GameState.START)
+    });
+    socket.on('created', () => setGameStatus(GameState.WAITING));
     socket.on('notCreated', handleError);
 
 
@@ -78,7 +81,7 @@ export default function CreateGame(props : CreateGameProps) {
                     <button onClick={createGame}>Create Game</button>
                 </div>}
             {gameStatus === GameState.WAITING &&
-                <p>WAITING SECOND PLAYER!</p>            }
+                <div>WAITING SECOND PLAYER!</div>}
             {gameStatus === GameState.START &&
                 <GameSocketProvider>
                     <PingPong gameOption={gameOption}/>

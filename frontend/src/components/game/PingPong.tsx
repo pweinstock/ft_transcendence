@@ -13,9 +13,10 @@ export default function PingPong(props : PingPongProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
+    console.log(props.gameOption.ballSpeed);
 
-    const dataUpdate = (data : GameData) => {
-        socket.emit("update", data);
+    const initGame = (data : GameData) => {
+        socket.emit("init", data);
     }
 
     const keyUp = (data : GameData) => {
@@ -105,9 +106,9 @@ export default function PingPong(props : PingPongProps) {
             const x2 = 780;
             const y= 30;
             context.textAlign = "left";
-            context.fillText( String(players.firstScore), x1, y);
+            context.fillText( players.firstPlayer + " " + players.firstScore, x1, y);
             context.textAlign = "right";
-            context.fillText(String(players.secondScore), x2, y);
+            context.fillText(players.secondPlayer + " " + players.secondScore, x2, y);
         };
 
         const moveBall = () => {
@@ -206,21 +207,11 @@ export default function PingPong(props : PingPongProps) {
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
                 case 'w':
-                    // gameData.leftPaddle.dy = -paddleSpeed;
                     wKeyDown(gameData);
                     break;
                 case 's':
-                    // gameData.leftPaddle.dy = paddleSpeed;
                     sKeyDown(gameData);
                     break;
-                // case 'ArrowUp':
-                //     gameData.rightPaddle.dy = -paddleSpeed;
-                //     gameUpdate(gameData);
-                //     break;
-                // case 'ArrowDown':
-                //     gameData.rightPaddle.dy = paddleSpeed;
-                //     gameUpdate(gameData);
-                //     break;
             }
         };
 
@@ -228,18 +219,12 @@ export default function PingPong(props : PingPongProps) {
             switch (event.key) {
                 case 'w':
                 case 's':
-                    //gameData.leftPaddle.dy = 0;
                     keyUp(gameData);
                     break;
-                // case 'ArrowUp':
-                // case 'ArrowDown':
-                //     gameData.rightPaddle.dy = 0;
-                //     gameUpdate(gameData);
-                //     break;
             }
     };
 
-        dataUpdate(gameData);
+        initGame(gameData);
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
