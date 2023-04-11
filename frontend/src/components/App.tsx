@@ -9,8 +9,8 @@ import {
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import './App.css';
 import Basic from './basic';
-import NewChat from './NewChat';
-import ChatRooms from './ChatRooms';
+import NewChat from './chatrooms/NewChat';
+import ChatRooms from './chatrooms/ChatRooms';
 import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
@@ -64,10 +64,6 @@ export default function App() {
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<Game user={currentUsersData}/>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
-                    <Route path="/settings" element={<Settings2/>}/>
-                         {currentUsersData && currentUsersData.chats.map((item) => (
-                            <Route key = {item} path={"/chat/id/" + item} element={<NewChat user={currentUsersData} chatidp={item}/>}/>
-                        ))}
                     </>
                 }
             </Routes>
@@ -78,22 +74,22 @@ export default function App() {
           </main>
           <footer>
             <nav>
-              <Link className="newpostlink" to="/">
+              <Link key={"home"} className="newpostlink" to="/">
                     <button className='navbutton'>Home</button>
                 </Link>
-              <Link className="newpostlink" to="/chatrooms">
+              <Link key={"chatroom"} className="newpostlink" to="/chatrooms">
                     <button className='navbutton'>ChatRooms</button>
               </Link>
-              <Link className="newpostlink" to="/game">
+              <Link key={"game"}  className="newpostlink" to="/game">
                     <button className='navbutton'>Game</button>
               </Link>
-              <Link className="newpostlink" to="/users">
+              <Link key={"users"}  className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
                 </Link>
-                {/*<Link className="newpostlink" to="/friends">*/}
+                {/*<Link key={"friends"}  className="newpostlink" to="/friends">*/}
                     {/*<button className='navbutton'>Friends</button>*/}
                 {/*</Link>*/}
-                <Link className="newpostlink" to="/settings">
+                <Link key={"settings"}  className="newpostlink" to="/settings">
                     <button className='navbutton'>Settings</button>
                 </Link>
             </nav>
