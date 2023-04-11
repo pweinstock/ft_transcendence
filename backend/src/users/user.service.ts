@@ -18,11 +18,6 @@ export class UserService {
         if (existingUser)
             return existingUser;
         const user = this.userRepository.create(dto);
-        user.pendingFriends = [];
-        user.bannedUsers = [];
-        user.friends = [];
-        user.chats = [];
-        user.matchHistory = [];
         return this.userRepository.save(user);
     }
 
