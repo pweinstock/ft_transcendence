@@ -76,12 +76,13 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
     setchatPassValue(event.target.value);
   };
 
-function handOnClickSend() {
-	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
-		.then().catch(reason => {
-			console.log("failed to post chat!")
-        	console.log(reason.message);
-	});
+const handOnClickSend = (e : any) => {
+	e.preventDefault();
+    axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
+        .then().catch(reason => {
+        console.log("failed to post chat!")
+        console.log(reason.message);
+    });
 }
 
 function deleteChatNutton(id : string) {
