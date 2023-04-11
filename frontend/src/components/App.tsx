@@ -74,22 +74,22 @@ export default function App() {
           </main>
           <footer>
             <nav>
-              <Link className="newpostlink" to="/">
+              <Link key={"home"} className="newpostlink" to="/">
                     <button className='navbutton'>Home</button>
                 </Link>
-              <Link className="newpostlink" to="/chatrooms">
+              <Link key={"chatroom"} className="newpostlink" to="/chatrooms">
                     <button className='navbutton'>ChatRooms</button>
               </Link>
-              <Link className="newpostlink" to="/game">
+              <Link key={"game"}  className="newpostlink" to="/game">
                     <button className='navbutton'>Game</button>
               </Link>
-              <Link className="newpostlink" to="/users">
+              <Link key={"users"}  className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
                 </Link>
-                {/*<Link className="newpostlink" to="/friends">*/}
+                {/*<Link key={"friends"}  className="newpostlink" to="/friends">*/}
                     {/*<button className='navbutton'>Friends</button>*/}
                 {/*</Link>*/}
-                <Link className="newpostlink" to="/settings">
+                <Link key={"settings"}  className="newpostlink" to="/settings">
                     <button className='navbutton'>Settings</button>
                 </Link>
             </nav>

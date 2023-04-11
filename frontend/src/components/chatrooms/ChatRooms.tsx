@@ -119,7 +119,7 @@ return (
 					<div className='mychatlist'>
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
-							<div className='buttonholder' style={{color: "white"}}>
+							<div key={item.id} className='buttonholder' style={{color: "white"}}>
 									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
 									}} >{item.name}</button>
@@ -159,7 +159,7 @@ return (
 					<div className='publicchatlist'>
 						<p>List of public chats</p>
 						{allChat && allChat.map((item, index) => (
-								<div  style={{color: "white"}}>
+								<div key={item.id} style={{color: "white"}}>
 									{item.owner !== props.user.displayName && 
 										<button className='navbutton' onClick={() => {
 											joinbuttonHandler(item.id);
