@@ -23,13 +23,13 @@ export interface Players {
     secondScore : number
 }
 
-export interface GameDataDto {
-    readonly leftPaddle : Paddle;
-    readonly rightPaddle : Paddle;
-    readonly maxPaddleY : number;
-    readonly ball : Ball;
-    readonly players : Players;
-    readonly timer : number;
-    readonly paddleSpeed :number;
-    readonly ballSpeed : number;
+export interface GameData {
+    leftPaddle : Paddle;
+    rightPaddle : Paddle;
+    maxPaddleY : number;
+    ball : Ball;
+    players : Players;
+    timer : number;
+    paddleSpeed :number;
+    ballSpeed : number;
 }

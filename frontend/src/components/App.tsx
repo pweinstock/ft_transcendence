@@ -19,7 +19,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { User } from "./BaseInterface";
 import Game from "./game/Game";
-import Users from './users/users';
+import Users from "./users/users";
 
 
 
@@ -63,7 +63,6 @@ export default function App() {
                     <>
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<Game user={currentUsersData}/>}/>
-
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                     <Route path="/settings" element={<Settings2/>}/>
                          {currentUsersData && currentUsersData.chats.map((item) => (
@@ -74,7 +73,7 @@ export default function App() {
             </Routes>
             <aside>
               {!currentUsersData && <Login />}
-              {/* {currentUsersData && <User />} */}
+              {currentUsersData && <Users />}
             </aside>
           </main>
           <footer>
