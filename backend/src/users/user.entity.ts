@@ -23,19 +23,19 @@ export class User {
     @Column({type: 'enum', enum: UserStatus, default: [UserStatus.ONLINE]})
     status: UserStatus;
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     bannedUsers: string[];
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     pendingFriends: string[];
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     friends: string[];
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     chats: string[];
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     matchHistory : string[];
 
     @Column('integer', {default: 0})

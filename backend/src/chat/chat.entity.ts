@@ -26,10 +26,10 @@ export class Chat {
     @Column({type: 'enum', enum: ChatType, default: [ChatType.PUBLIC]})
     type: ChatType;
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     admins: string[];
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     bannedUsers: string[];
 
     @Column({type: 'jsonb', array: false, default: () => "'[]'", nullable: false})
@@ -38,9 +38,9 @@ export class Chat {
     @Column("text", {nullable: true})
     owner: string;
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     users: string[];
 
-    @Column("text", {array: true, default: [], nullable: false})
+    @Column("text", {array: true, default: null, nullable: true})
     messages: string[];
 }
