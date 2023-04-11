@@ -32,8 +32,8 @@ export class Chat {
     @Column("text", {array: true, default: null, nullable: true})
     bannedUsers: string[];
 
-    @Column('simple-json', {array: true, default: null, nullable: true})
-    mutedUsers: MutedUser[];
+    @Column({type: 'jsonb', array: false, default: () => "'[]'", nullable: false})
+    mutedUsers: Array<MutedUser>;
 
     @Column("text", {nullable: true})
     owner: string;

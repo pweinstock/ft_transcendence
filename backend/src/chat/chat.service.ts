@@ -38,7 +38,6 @@ export class ChatService {
         chat.owner = owner.id;
         chat.admins = [];
         chat.bannedUsers = [];
-        // chat.mutedUsers = new Array<MutedUser>(); //todo find solution for thi
         chat.users = [];
         chat.messages = [];
         chat.users.push(owner.id);
@@ -259,8 +258,8 @@ export class ChatService {
         const chat = await this.findChatById(dto.chatId);
         if (chat.bannedUsers.includes(user.id))
             throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
-        // if (this.isMuted(chat, user.id))
-        //     throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
+        if (this.isMuted(chat, user.id))
+            throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
         const message = await this.messageServices.createMessage ({displayName : user.displayName, chatId : dto.chatId, userId : user.id, content: dto.content});
         console.log(message.id);
         chat.messages.push(message.id);
