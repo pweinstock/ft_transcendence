@@ -83,13 +83,6 @@ function handOnClickSend() {
 			console.log("failed to post chat!")
         	console.log(reason.message);
 	});
-
-//   useEffect(() => {
-// 	async function getAllPubliChat() {}
-
-// },[]);
-function handOnClickSend() {
-	axios.post("http://" + window.location.hostname + ":5000/chat",  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true});
 }
 
 function deleteChatNutton(id : string) {
@@ -103,9 +96,9 @@ function deleteChatNutton(id : string) {
 		});
 }
 
-function sclickAndSetActual(id : string) {
+// function sclickAndSetActual(id : string) {
 
-}
+// }
 
 function joinbuttonHandler(id :string) {
 	axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : props.user.id,  chatId : id, password : null }, {withCredentials: true}).then( () => {
@@ -160,7 +153,7 @@ return (
 								<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 							</label>
 							<br/>
-                            <button className='chatbutton' type="submit">Create Chat</button>
+							<button className='chatbutton' type="submit">Create Chat</button>
 						</form>
 						</div>
 
