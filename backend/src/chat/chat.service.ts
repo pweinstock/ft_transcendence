@@ -14,6 +14,7 @@ import {Socket} from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
 import { NewMessageDto } from './dto/new-message.dto';
+import * as bcrypt from 'bcrypt';
 
 interface Room {
     userId : string,
@@ -32,6 +33,7 @@ export class ChatService {
     async createChat(owner : User, dto: CreateChatDTO) : Promise<Chat> {
         if (dto.type == ChatType.PROTECTED && !dto.password)
             throw new HttpException('Wrong data provided!', HttpStatus.BAD_REQUEST);
+        dto.password = await this.hashPassword(dto.password);
         const chat = this.chatRepository.create(dto);
         chat.owner = owner.id;
         chat.admins = [];
@@ -138,7 +140,7 @@ export class ChatService {
                     chat.users.push(user.id);
                     break;
                 case ChatType.PROTECTED:
-                    if (chat.password === dto.password)
+                    if (await bcrypt.compare(chat.password, dto.password))
                         chat.users.push(user.id);
                     else
                         throw new HttpException('Wrong Password!', HttpStatus.FORBIDDEN);
@@ -328,6 +330,13 @@ export class ChatService {
             this.chatRepository.save(chat);
         }
         return false;
+    }
+
+    async hashPassword(password : string) : Promise<string> {
+        const saltOrRounds = 10;
+        const hash = await bcrypt.hash(password, saltOrRounds);
+        const salt = await bcrypt.genSalt();
+        return hash;
     }
 }
 
