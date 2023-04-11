@@ -62,6 +62,8 @@ export class ChatService {
         return chat;
     }
 
+
+
     //todo remove later(only debugging function)
     async findAll(): Promise<Chat[]> {
         const chats = await this.chatRepository.find();
