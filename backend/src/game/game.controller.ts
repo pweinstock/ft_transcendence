@@ -10,7 +10,6 @@ export class GameController {
 
     constructor(private gameService: GameService) {}
 
-
     @Get()
     @UseGuards(AuthGuard('2FA'))
     async getFinishedGames() : Promise<Game[]> {
@@ -36,18 +35,4 @@ export class GameController {
     gamesToJoin() : GameInfoDto[] {
         return this.gameService.getGamesToJoin();
     }
-
-    // @Get('/:id')
-    // @UseGuards(AuthGuard('2FA'))
-    // async getGame(@Req() request: any, @Param() gameId : string) : Promise<Game> {
-    //     const game = await this.gameService.findGamebyId(gameId);
-    //     return game;
-    // }
-    //
-    // @Post()
-    // @UseGuards(AuthGuard('2FA'))
-    // async createGame(@Req() request: any, @Body() dto : createGameDto) : Promise<Game> {
-    //     const game = await this.gameService.createGame(dto);
-    //     return game;
-    // }
 }

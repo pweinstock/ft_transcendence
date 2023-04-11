@@ -5,4 +5,5 @@ export interface GameOption {
     ballSpeed : number;
     paddleSpeed : number;
     isStarted : boolean;
+    maxScore : number;
 }

@@ -33,7 +33,8 @@ export class ChatService {
     async createChat(owner : User, dto: CreateChatDTO) : Promise<Chat> {
         if (dto.type == ChatType.PROTECTED && !dto.password)
             throw new HttpException('Wrong data provided!', HttpStatus.BAD_REQUEST);
-        dto.password = await this.hashPassword(dto.password);
+        if (dto.password)
+            dto.password = await this.hashPassword(dto.password);
         const chat = this.chatRepository.create(dto);
         chat.owner = owner.id;
         chat.admins = [];

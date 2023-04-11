@@ -30,7 +30,7 @@ export default function JoinGame(props : JoinGameProps) {
             .catch(e => {
                 //todo : handle error
             })
-    },[joinServer])
+    },[])
 
     socket.on("started", (data : GameOption) => {
         setGameOption(data);

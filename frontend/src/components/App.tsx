@@ -20,6 +20,7 @@ import axios from "axios";
 import { User } from "./BaseInterface";
 import Game from "./game/Game";
 import Users from "./users/users";
+import {GameSocketProvider} from "./context/game-socket";
 
 
 
@@ -62,7 +63,7 @@ export default function App() {
                 {currentUsersData &&
                     <>
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
-                    <Route path="/game" element={<Game user={currentUsersData}/>}/>
+                        <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                     </>
                 }
