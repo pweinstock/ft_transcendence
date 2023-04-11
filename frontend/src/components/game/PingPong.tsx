@@ -15,10 +15,10 @@ export default function PingPong(props : PingPongProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
+    let isEnded : boolean = false;
 
     useEffect(() => {
         let isPaused : boolean = false;
-        let isEnded : boolean = false;
 
         const initGame = (data : GameData) => socket.emit("init", data);
 
@@ -263,7 +263,6 @@ export default function PingPong(props : PingPongProps) {
 
         initGame(gameData);
         draw();
-        document.
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("update", (data : GameData) => gameData = data);
@@ -277,7 +276,7 @@ export default function PingPong(props : PingPongProps) {
             document.removeEventListener("keydown", onKeyDown);
             document.removeEventListener("keyup", onKeyUp);
         };
-    }, []);
+    }, [isEnded]);
 
     return (
         <canvas ref={canvasRef} width={800} height={530} />
