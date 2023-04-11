@@ -30,8 +30,8 @@ interface CreateChatForm {
 const ChatRooms: React.FC<ChatProps> = (props) => {
 const [value, setValue] = useState<{id: string, name: string }[]>([]);
 const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
-const [chaTypeValue, setchaTypeValue] = useState<ChatType>();
-const [chatNameValue, setchatNameValue] = useState<string>();
+const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
+const [chatNameValue, setchatNameValue] = useState<string>("");
 const [chatPassValue, setchatPassValue] = useState<string | undefined>(undefined);
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 
@@ -80,7 +80,11 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
   };
 
 function handOnClickSend() {
-	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true});
+	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
+		.then().catch(reason => {
+			console.log("failed to post chat!")
+        	console.log(reason.message);
+	});
 
 }
 
@@ -126,7 +130,7 @@ return (
 					<div className='mychatlist'>
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
-							<div className='buttonholder' style={{color: "white"}}>
+							<div className='buttonholder' key={index} style={{color: "white"}}>
 								{/* <Link key = {item.id} className="newpostlink" to={"/chat/id/" + item.id}> */}
 									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
@@ -161,7 +165,7 @@ return (
 								<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 							</label>
 							<br/>
-							<input className='chatbutton' type="submit" value="Create Chat" />
+                            <button className='chatbutton' type="submit">Create Chat</button>
 						</form>
 						</div>
 
