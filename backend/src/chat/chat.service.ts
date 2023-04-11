@@ -245,8 +245,6 @@ export class ChatService {
 
     getClientRoom(clientId : string) : Room {
         const room = this.clienttoUser.get(clientId);
-        if (!room)
-            throw new HttpException('You are not registered in this room!', HttpStatus.FORBIDDEN)
         return room;
     }
 
