@@ -22,7 +22,8 @@ const [user, setUser] = useState(null);
 return (
 <div className="App">
 		<>
-		<InputMessage/>
+		{/* <InputMessage/> */}
+		<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 		<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 		</>
 </div>

@@ -112,7 +112,6 @@ function joinbuttonHandler(id :string) {
 		console.log(reason.message);
 		});
 }
-
 return (
 	<>
 		<section>

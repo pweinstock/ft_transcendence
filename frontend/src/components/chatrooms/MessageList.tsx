@@ -24,10 +24,19 @@ chatidp: string;
 chatName : string;
 }
 
+interface MassageStyle {
+	content: string;
+	chat: string;
+	date: string;
+	id: string;
+	displayName: string;
+	user: string;
+}
+
 const MessageList: React.FC<ChatProps> = (props : ChatProps) => {
 
 // export default function MessageList() {
-const [messages, setMessages] = useState<{content: string, chat: string, date: string, id: string, displayName: string, user: string, type :string }[]>([]);;
+const [messages, setMessages] = useState<{content: string, chat: string, date: string, id: string, displayName: string, user: string}[]>([]);;
 const [msg, setmsg] = useState([]);
 
 
@@ -71,8 +80,7 @@ return (
 	<div id="message-list">
 	{messages.map((message) => {
 		return (
-			<div className={ `message ${props.user.displayName !== message.displayName ? 'message-reverse' : ''}` }>
-				{/* <div className='aligningbox'> */}
+			<div key={message.id} className={ `message ${props.user.displayName !== message.displayName ? 'message-reverse' : ''}` }>
 
 					<div className="datetime">
 						<div className="datetime-date">{message.date}</div>
@@ -84,7 +92,6 @@ return (
 						<div className="sender-name d-none">{message.displayName}</div>
 					</div>
 						<div className="chattext">{message.content}</div>
-				{/* </div> */}
 			 </div>
 			// <Message key={message.id} message={message} user={props.user} />
 		);
