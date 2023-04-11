@@ -2,7 +2,7 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import {io} from "socket.io-client";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { User } from "./BaseInterface";
+import { User } from "../BaseInterface";
 import './chatstyle.css';
 import NewChat from './NewChat';
 
@@ -41,8 +41,6 @@ useEffect(() => {
 		try{
 			const response = await axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true});
 			if (response)
-				// console.log("fetchchatrooms");
-				// console.log(response.data);
 				setValue(response.data);
 			}
 			catch(e) {
@@ -58,8 +56,6 @@ useEffect(() => {
 			const response = await axios.get(`http://${window.location.hostname}:5000/chat/all`, {withCredentials: true});
 			if (response)
 				setallChat(response.data);
-				console.log("chat All");
-				console.log(response.data);
 			}
 			catch(e) {
 				console.log("getAllPubliChat chat error");
@@ -79,13 +75,13 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
     setchatPassValue(event.target.value);
   };
 
-function handOnClickSend() {
-	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
-		.then().catch(reason => {
-			console.log("failed to post chat!")
-        	console.log(reason.message);
-	});
-
+const handOnClickSend = (e : any) => {
+	e.preventDefault();
+    axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
+        .then().catch(reason => {
+        console.log("failed to post chat!")
+        console.log(reason.message);
+    });
 }
 
 function deleteChatNutton(id : string) {
@@ -99,17 +95,14 @@ function deleteChatNutton(id : string) {
 		});
 }
 
-function sclickAndSetActual(id : string) {
+// function sclickAndSetActual(id : string) {
 
-}
+// }
 
 function joinbuttonHandler(id :string) {
-	// console.log('joinButton pressed');
-	// const chatId = "4bbd1c9f-e6a4-4e79-b428-6740ba42eeb5";
 	axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : props.user.id,  chatId : id, password : null }, {withCredentials: true}).then( () => {
 		const socket = io("http://localhost:5001/chat" );
 		socket?.emit('joinRoom', id);
-
 	}).catch((reason) => {
 		if (reason.response!.status !== 200) {
 			console.log("Error while joing chat, in chatid:");
@@ -117,9 +110,6 @@ function joinbuttonHandler(id :string) {
 		}
 		console.log(reason.message);
 		});
-	// const socket = io("http://localhost:5001/chat" );
-	// const chatId = 1;
-	// socket?.emit('joinRoom', chatId);
 }
 
 return (
@@ -130,13 +120,10 @@ return (
 					<div className='mychatlist'>
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
-							<div className='buttonholder' key={index} style={{color: "white"}}>
-								{/* <Link key = {item.id} className="newpostlink" to={"/chat/id/" + item.id}> */}
+							<div key={item.id} className='buttonholder' style={{color: "white"}}>
 									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
 									}} >{item.name}</button>
-								{/* </Link> */}
-								{/* <button onClick={deleteChatNutton(item.id)} >delete</button> */}
 								<button className='chatbuttondel' onClick={() => {
 									deleteChatNutton(item.id);
 									}} >X</button>
@@ -165,7 +152,7 @@ return (
 								<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 							</label>
 							<br/>
-                            <button className='chatbutton' type="submit">Create Chat</button>
+							<button className='chatbutton' type="submit">Create Chat</button>
 						</form>
 						</div>
 
@@ -173,7 +160,7 @@ return (
 					<div className='publicchatlist'>
 						<p>List of public chats</p>
 						{allChat && allChat.map((item, index) => (
-								<div  style={{color: "white"}}>
+								<div key={item.id} style={{color: "white"}}>
 									{item.owner !== props.user.displayName && 
 										<button className='navbutton' onClick={() => {
 											joinbuttonHandler(item.id);
@@ -181,9 +168,6 @@ return (
 									}
 								</div>
 						))}
-						{/* <div className="changingtext"> */}
-							{/* <button onClick={joinbuttonHandler}>join</button> */}
-						{/* </div>   */}
 
 					</div>
 				</div>

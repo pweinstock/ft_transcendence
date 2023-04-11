@@ -64,6 +64,8 @@ export class ChatService {
         return chat;
     }
 
+
+
     //todo remove later(only debugging function)
     async findAll(): Promise<Chat[]> {
         const chats = await this.chatRepository.find();
@@ -247,8 +249,6 @@ export class ChatService {
 
     getClientRoom(clientId : string) : Room {
         const room = this.clienttoUser.get(clientId);
-        if (!room)
-            throw new HttpException('You are not registered in this room!', HttpStatus.FORBIDDEN)
         return room;
     }
 

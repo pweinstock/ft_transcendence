@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
-import astroman from './img/littleman.png';
+import astroman from '../img/littleman.png';
 import axios from "axios";
-import Chat from "./chat/Chat"
-import {User} from "./BaseInterface";
-// const user = ;
+import Chat from "../chat/Chat"
+import {User} from "../BaseInterface";
 
 interface ChatProps {
     user : User;
@@ -12,16 +10,12 @@ interface ChatProps {
     // chatName : string;
   }
 
-//   export default function NewChat({chatidp}) {
   const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
-
-    const [msg, setmsg] = useState([]); //set with basic value 0
+    const [msg, setmsg] = useState([]);
     // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
-    // const chatId = chatidp;
-    //   console.log(props.user);
 
     useEffect(() => {
         console.log("massage log");
@@ -39,13 +33,10 @@ interface ChatProps {
     function handOnClickSend() {
         let temp = "Anonymus";
         let anopic = astroman;
-    
     }
 
     return (
         <>
-        {/* <section> */}
-
             <div className='formholder'>
                 <h1>Room  Content goes here</h1>
                 <p>{props.chatidp}</p>
@@ -64,9 +55,7 @@ interface ChatProps {
                 </form> */}
                 <Chat  user={props.user} chatidp={props.chatidp} />
             </div>
-        {/* </section> */}
         </>
-
     );
 }
 
