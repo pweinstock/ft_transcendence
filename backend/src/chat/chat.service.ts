@@ -258,17 +258,15 @@ export class ChatService {
             throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
         if (this.isMuted(chat, user.id))
             throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
-        const message = await this.messageServices.createMessage ({displayName : user.displayName, chatId : dto.chatId, userId : user.id, content: dto.content});
-        console.log(message.id);
+        const message = await this.messageServices.createMessage ({content : dto.content, chatId : chat.id, userId : user.id, displayName : user.displayName});
         chat.messages.push(message.id);
-        console.log(chat.messages);
         await this.chatRepository.save(chat);
         return message;
     }
 
     async deleteMessage(user : User, dto : DeleteMessageDto) : Promise<void> {
         const message = await this.messageServices.findMessageById(dto.messageId);
-        if (message.user != user.id)
+        if (message.userId != user.id)
             throw new HttpException('Message not belongs to user!', HttpStatus.FORBIDDEN);
         const chat = await this.findChatById(dto.chatId);
         chat.messages = chat.messages.filter((messageId) => messageId != dto.messageId);

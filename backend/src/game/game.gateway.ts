@@ -126,7 +126,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 dto.leftPaddle.dy = - dto.paddleSpeed;
             else
                 dto.rightPaddle.dy = - dto.paddleSpeed;
-            console.log(dto.ballSpeed);
             this.server.to(clientRoom.gameId).emit("update", dto);
         }
     }

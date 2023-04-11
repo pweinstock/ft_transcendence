@@ -14,27 +14,29 @@ export default function PingPong(props : PingPongProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
-    console.log(props.gameOption.ballSpeed);
 
-    const initGame = (data : GameData) => {
-        socket.emit("init", data);
-    }
-
-    const keyUp = (data : GameData) => {
-        socket.emit("KeyUp", data);
-    }
-
-    const wKeyDown = (data : GameData) => {
-        socket.emit("wKey", data);
-    }
-
-    const sKeyDown = (data : GameData) => {
-        socket.emit("sKey", data);
-    }
 
     const [isPaused, setIsPaused] = useState(false);
 
     useEffect(() => {
+        const initGame = (data : GameData) => {
+            socket.emit("init", data);
+        }
+
+        const keyUp = (data : GameData) => {
+            socket.emit("KeyUp", data);
+        }
+
+        const wKeyDown = (data : GameData) => {
+            socket.emit("wKey", data);
+        }
+
+        const sKeyDown = (data : GameData) => {
+            socket.emit("sKey", data);
+        }
+
+        const finishGame = () => {}
+
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
         let gameData = {
