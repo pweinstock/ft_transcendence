@@ -7,7 +7,7 @@ import {User} from "../BaseInterface";
 interface ChatProps {
     user : User;
     chatidp: string;
-    // chatName : string;
+    chatName : string;
   }
 
   const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
@@ -20,11 +20,9 @@ interface ChatProps {
     useEffect(() => {
         console.log("massage log");
         async function printmessages() {
-            console.log(props.chatidp);
             const response = await axios.get("http://localhost:5000/chat/id/" + props.chatidp, {withCredentials: true});
             setmsg(response.data);
-            
-            // const messages = response.data;
+            console.log("printmassage");
             console.log(response.data);
         }
         printmessages();
@@ -38,21 +36,7 @@ interface ChatProps {
     return (
         <>
             <div className='formholder'>
-                <h1>Room  Content goes here</h1>
-                <p>{props.chatidp}</p>
-                {/* <form>
-                    <div className="postlabel">
-                        <label htmlFor="subject">Massage</label>
-                    </div>
-                    <div className="bigtext">
-                        <textarea id="subject" name="subject" key="112" placeholder="Write something.." value={bigtext} required></textarea>
-                    </div>
-                    <Link to="/">
-                        <div className="newpostlink">
-                        <button type='button' className='submitbut' onClick={handOnClickSend}>send</button>
-                        </div>
-                    </Link>
-                </form> */}
+                <p>{props.chatName}</p>
                 <Chat  user={props.user} chatidp={props.chatidp} />
             </div>
         </>

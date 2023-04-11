@@ -34,6 +34,7 @@ const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
 const [chatNameValue, setchatNameValue] = useState<string>("");
 const [chatPassValue, setchatPassValue] = useState<string | undefined>(undefined);
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
+const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 
 
 useEffect(() => {
@@ -48,7 +49,7 @@ useEffect(() => {
 			}
 	}
 	fetchChatrooms();
-},[]);
+},[actualChatid]);
 
 useEffect(() => {
 	async function getAllPubliChat() {
@@ -116,12 +117,14 @@ return (
 		<section>
 			<div className='chatbox'>
 				<div className='chatside'>
+				<div className='toborderside'>
 					<div className='mychatlist'>
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
 							<div key={item.id} className='buttonholder' style={{color: "white"}}>
 									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
+									setactualChatName(item.name);
 									}} >{item.name}</button>
 								<button className='chatbuttondel' onClick={() => {
 									deleteChatNutton(item.id);
@@ -170,8 +173,9 @@ return (
 
 					</div>
 				</div>
+				</div>
 				<div className='chatcontent'>
-					{actualChatid && <NewChat user={props.user} chatidp={actualChatid}/>}
+					{actualChatid && actualChatName && <NewChat user={props.user} chatidp={actualChatid} chatName={actualChatName}/>}
 					{!actualChatid && <h1>No Chat</h1> }
 
 				</div>

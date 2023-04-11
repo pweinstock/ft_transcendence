@@ -4,8 +4,10 @@
 
 .chatside {
 	flex: 20%;
-	/* position: ; */
 	margin: 2px;
+}
+
+.toborderside {
 	border-style: solid;
 }
 
@@ -26,7 +28,6 @@
 .chatcontent {
 	margin: 2px;
 	flex: 80%;
-	border-style: dotted;
 
 }
 
@@ -35,6 +36,8 @@
 	flex-direction: column;
 	background-color: #dfdfdf46;
 	padding: 1%;
+	border-style: dotted;
+
 	/* width: 100%; */
 }
 .buttonholder {
