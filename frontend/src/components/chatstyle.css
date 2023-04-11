@@ -19,9 +19,64 @@
 	margin: 1px;
 }
 
+.createchat label {
+	font-size: small;
+}
+
 .chatcontent {
 	margin: 2px;
 	flex: 80%;
 	border-style: dotted;
 
 }
+
+.formholder {
+	display: flex;
+	flex-direction: column;
+	background-color: #dfdfdf46;
+	padding: 1%;
+	/* width: 100%; */
+}
+.buttonholder {
+	display: flex;
+	flex-direction: row;
+}
+
+.chatbutton {
+		width: 80%;
+		background-color: #837ca36b;
+		border: none;
+		border-radius: 2px;
+		color: white;
+		padding: 5% 2% 5% 2%;
+		margin: 0.5%;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 1vw;
+		cursor: pointer;
+}
+.chatbuttondel {
+		width: 20%;
+		background-color: #837ca36b;
+		border: none;
+		border-radius: 2px;
+		color: white;
+		padding: 5% 2% 5% 2%;
+		margin: 0.5%;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 1vw;
+		cursor: pointer;
+}
+
+.chatbutton:hover {
+	background-color: #837ca39b;
+  }
+
+.chatbuttondel:hover {
+	background-color: #b300007c;
+  }
+
+  

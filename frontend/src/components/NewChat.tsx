@@ -9,6 +9,7 @@ import {User} from "./BaseInterface";
 interface ChatProps {
     user : User;
     chatidp: string;
+    // chatName : string;
   }
 
 //   export default function NewChat({chatidp}) {
@@ -43,10 +44,11 @@ interface ChatProps {
 
     return (
         <>
-        <section>
+        {/* <section> */}
 
             <div className='formholder'>
                 <h1>Room  Content goes here</h1>
+                <p>{props.chatidp}</p>
                 {/* <form>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
@@ -62,7 +64,7 @@ interface ChatProps {
                 </form> */}
                 <Chat  user={props.user} chatidp={props.chatidp} />
             </div>
-        </section>
+        {/* </section> */}
         </>
 
     );

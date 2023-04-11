@@ -220,17 +220,10 @@ aside {
 
 /* foooooooooooooooooooorm */
 
-.formholder {
-  display: flex;
-  flex-direction: column;
-  background-color: #dfdfdf;
-  padding: 2%;
-  width: 60%;
-}
 
- form {
+ /* form {
   width: 100%;
-} 
+}  */
 
 input[type="text"] {
   width: 96%;
