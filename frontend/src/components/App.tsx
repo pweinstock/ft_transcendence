@@ -9,8 +9,8 @@ import {
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import './App.css';
 import Basic from './basic';
-import NewChat from './NewChat';
-import ChatRooms from './ChatRooms';
+import NewChat from './chatrooms/NewChat';
+import ChatRooms from './chatrooms/ChatRooms';
 import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";

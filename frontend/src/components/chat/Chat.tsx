@@ -14,12 +14,8 @@ const Chat: React.FC<ChatProps> = (props : ChatProps) => {
 
 
 // const Chat: React.FC<BaseInterface> = ({currentUser}, pchatId : string) => {
-// export default function Chat() {
 const [socket, setSocket] = useState<Socket>();
 const [messages, setMessages] = useState<string[]>([]);
-
-// console.log("from Caht component");
-// console.log(props.chatidp);
 
 function sendMassagetoBackend() {
 	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : "Hello test massage" ,  chatId : props.chatidp }, {withCredentials: true})

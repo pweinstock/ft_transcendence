@@ -2,7 +2,7 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import {io} from "socket.io-client";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { User } from "./BaseInterface";
+import { User } from "../BaseInterface";
 import './chatstyle.css';
 import NewChat from './NewChat';
 
