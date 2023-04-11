@@ -77,9 +77,13 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
     setchatPassValue(event.target.value);
   };
 
-function handOnClickSend() {
-	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true});
 
+//   useEffect(() => {
+// 	async function getAllPubliChat() {}
+
+// },[]);
+function handOnClickSend() {
+	axios.post("http://" + window.location.hostname + ":5000/chat",  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true});
 }
 
 function deleteChatNutton(id : string) {
@@ -150,7 +154,8 @@ return (
 								<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 							</label>
 							<br/>
-							<input className='chatbutton' type="submit" value="Create Chat" />
+							<input type="submit" value="Create Chat" />
+							{/* <input className='chatbutton' type="submit" value="Create Chat" /> */}
 						</form>
 						</div>
 

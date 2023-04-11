@@ -42,6 +42,7 @@ export class ChatController {
     @Post()
     @UseGuards(AuthGuard('2FA'))
     async create(@Req() request, @Body() dto: CreateChatDTO) : Promise<Chat> {
+        console.log(dto);
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         const chat = await this.chatService.createChat(request.user, dto);
