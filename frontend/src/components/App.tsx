@@ -64,10 +64,6 @@ export default function App() {
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<Game user={currentUsersData}/>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
-                    <Route path="/settings" element={<Settings2/>}/>
-                         {currentUsersData && currentUsersData.chats.map((item) => (
-                            <Route key = {item} path={"/chat/id/" + item} element={<NewChat user={currentUsersData} chatidp={item}/>}/>
-                        ))}
                     </>
                 }
             </Routes>

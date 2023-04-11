@@ -41,8 +41,6 @@ useEffect(() => {
 		try{
 			const response = await axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true});
 			if (response)
-				// console.log("fetchchatrooms");
-				// console.log(response.data);
 				setValue(response.data);
 			}
 			catch(e) {
@@ -100,12 +98,9 @@ function sclickAndSetActual(id : string) {
 }
 
 function joinbuttonHandler(id :string) {
-	// console.log('joinButton pressed');
-	// const chatId = "4bbd1c9f-e6a4-4e79-b428-6740ba42eeb5";
 	axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : props.user.id,  chatId : id, password : null }, {withCredentials: true}).then( () => {
 		const socket = io("http://localhost:5001/chat" );
 		socket?.emit('joinRoom', id);
-
 	}).catch((reason) => {
 		if (reason.response!.status !== 200) {
 			console.log("Error while joing chat, in chatid:");
@@ -113,9 +108,6 @@ function joinbuttonHandler(id :string) {
 		}
 		console.log(reason.message);
 		});
-	// const socket = io("http://localhost:5001/chat" );
-	// const chatId = 1;
-	// socket?.emit('joinRoom', chatId);
 }
 
 return (
@@ -127,12 +119,9 @@ return (
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
 							<div className='buttonholder' style={{color: "white"}}>
-								{/* <Link key = {item.id} className="newpostlink" to={"/chat/id/" + item.id}> */}
 									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
 									}} >{item.name}</button>
-								{/* </Link> */}
-								{/* <button onClick={deleteChatNutton(item.id)} >delete</button> */}
 								<button className='chatbuttondel' onClick={() => {
 									deleteChatNutton(item.id);
 									}} >X</button>
@@ -177,9 +166,6 @@ return (
 									}
 								</div>
 						))}
-						{/* <div className="changingtext"> */}
-							{/* <button onClick={joinbuttonHandler}>join</button> */}
-						{/* </div>   */}
 
 					</div>
 				</div>
