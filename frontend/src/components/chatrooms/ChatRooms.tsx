@@ -30,8 +30,8 @@ interface CreateChatForm {
 const ChatRooms: React.FC<ChatProps> = (props) => {
 const [value, setValue] = useState<{id: string, name: string }[]>([]);
 const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
-const [chaTypeValue, setchaTypeValue] = useState<ChatType>();
-const [chatNameValue, setchatNameValue] = useState<string>();
+const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
+const [chatNameValue, setchatNameValue] = useState<string>("");
 const [chatPassValue, setchatPassValue] = useState<string | undefined>(undefined);
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 
@@ -77,6 +77,12 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
     setchatPassValue(event.target.value);
   };
 
+function handOnClickSend() {
+	axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
+		.then().catch(reason => {
+			console.log("failed to post chat!")
+        	console.log(reason.message);
+	});
 
 //   useEffect(() => {
 // 	async function getAllPubliChat() {}
@@ -154,8 +160,7 @@ return (
 								<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 							</label>
 							<br/>
-							<input type="submit" value="Create Chat" />
-							{/* <input className='chatbutton' type="submit" value="Create Chat" /> */}
+                            <button className='chatbutton' type="submit">Create Chat</button>
 						</form>
 						</div>
 
