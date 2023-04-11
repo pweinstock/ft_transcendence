@@ -1,4 +1,3 @@
-import {io} from "socket.io-client";
 import axios from "axios";
 import React, {useContext, useEffect, useState} from "react";
 import {User} from "../BaseInterface";

@@ -81,9 +81,12 @@ export default function PingPong(props : PingPongProps) {
             context.fillStyle = "black";
             context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         };
+        let oldx = gameData.ball.x;
         const drawBall = (ball: Ball) => {
             context.fillStyle = "black";
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
+            console.log(Math.abs(ball.x - oldx));
+            oldx = ball.x;
         };
 
         const drawTimer = () => {
@@ -260,6 +263,7 @@ export default function PingPong(props : PingPongProps) {
 
         initGame(gameData);
         draw();
+        document.
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("update", (data : GameData) => gameData = data);
