@@ -33,11 +33,6 @@ export class ChatService {
             throw new HttpException('Wrong data provided!', HttpStatus.BAD_REQUEST);
         const chat = this.chatRepository.create(dto);
         chat.owner = owner.id;
-        chat.admins = [];
-        chat.bannedUsers = [];
-        // chat.mutedUsers = new Array<MutedUser>(); //todo find solution for this
-        chat.users = [];
-        chat.messages = [];
         chat.users.push(owner.id);
         await this.chatRepository.save(chat);
         await this.userServices.addChat(owner, chat.id);
