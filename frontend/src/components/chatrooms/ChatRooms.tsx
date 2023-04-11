@@ -56,8 +56,6 @@ useEffect(() => {
 			const response = await axios.get(`http://${window.location.hostname}:5000/chat/all`, {withCredentials: true});
 			if (response)
 				setallChat(response.data);
-				console.log("chat All");
-				console.log(response.data);
 			}
 			catch(e) {
 				console.log("getAllPubliChat chat error");
