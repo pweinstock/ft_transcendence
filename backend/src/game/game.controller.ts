@@ -10,6 +10,14 @@ export class GameController {
 
     constructor(private gameService: GameService) {}
 
+
+    @Get()
+    @UseGuards(AuthGuard('2FA'))
+    async getFinishedGames() : Promise<Game[]> {
+        const games = await this.gameService.getFinishedGames();
+        return games;
+    }
+
     @Get('all')
 	@UseGuards(AuthGuard('2FA'))
     async getAll() : Promise<Game[]> {

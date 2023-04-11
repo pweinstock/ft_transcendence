@@ -74,6 +74,16 @@ export class GameService {
         return false;
     }
 
+    async getFinishedGames() : Promise<Game[] | null> {
+        const games : Game[] = [];
+        const allGames = await this.gameRepository.find();
+        allGames.forEach((game) => {
+            if (game.finished)
+                games.push(game);
+        })
+        return games;
+    }
+
     getGamesToWatch() : GameInfoDto[] {
         const gameIds: GameInfoDto[] = [];
         for (const [gameId, matchData] of this.gameIdToGameOption.entries()) {
