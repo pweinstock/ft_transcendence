@@ -3,6 +3,7 @@ import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
 import {GameOption} from "./interfaces/game-option";
 import {GameSocketContext} from "../context/game-socket";
 import {Socket} from "socket.io-client";
+import {GameScore} from "./interfaces/game-score";
 
 
 interface PingPongProps {
@@ -14,27 +15,21 @@ export default function PingPong(props : PingPongProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
     const startTime = new Date().getTime();
-    console.log(props.gameOption.ballSpeed);
-
-    const initGame = (data : GameData) => {
-        socket.emit("init", data);
-    }
-
-    const keyUp = (data : GameData) => {
-        socket.emit("KeyUp", data);
-    }
-
-    const wKeyDown = (data : GameData) => {
-        socket.emit("wKey", data);
-    }
-
-    const sKeyDown = (data : GameData) => {
-        socket.emit("sKey", data);
-    }
-
-    const [isPaused, setIsPaused] = useState(false);
+    let isEnded : boolean = false;
 
     useEffect(() => {
+        let isPaused : boolean = false;
+
+        const initGame = (data : GameData) => socket.emit("init", data);
+
+        const keyUp = (data : GameData) => socket.emit("KeyUp", data);
+
+        const wKeyDown = (data : GameData) => socket.emit("wKey", data);
+
+        const sKeyDown = (data : GameData) => socket.emit("sKey", data);
+
+        const endGame = (data : GameScore) => socket.emit("end", data);
+
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
         let gameData = {
@@ -86,9 +81,12 @@ export default function PingPong(props : PingPongProps) {
             context.fillStyle = "black";
             context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         };
+        let oldx = gameData.ball.x;
         const drawBall = (ball: Ball) => {
             context.fillStyle = "black";
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
+            console.log(Math.abs(ball.x - oldx));
+            oldx = ball.x;
         };
 
         const drawTimer = () => {
@@ -98,6 +96,27 @@ export default function PingPong(props : PingPongProps) {
             const x = 400;
             const y= 15;
             context.fillText(String(gameData.timer), x, y);
+        };
+
+        const drawPause = () => {
+            context.font = "40px Roboto bold";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        };
+
+        const drawEndGame = () => {
+            context.font = "40px Roboto bold";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            if (gameData.players.firstScore > gameData.players.secondScore)
+                context.fillText(gameData.players.firstPlayer + "WON", canvas.width / 2, canvas.height / 2);
+            else if (gameData.players.firstScore < gameData.players.secondScore)
+                context.fillText(gameData.players.secondPlayer + " WON!", canvas.width / 2, canvas.height / 2);
+            else
+                context.fillText("DRAW!", canvas.width / 2, canvas.height / 2);
         };
 
         const drawScore = (players: Players) => {
@@ -137,6 +156,16 @@ export default function PingPong(props : PingPongProps) {
                 gameData.players.firstScore += 1;
             }
         };
+
+        const checkScore = () => {
+            if (gameData.players.secondScore >= props.gameOption.maxScore ||
+                gameData.players.firstScore >= props.gameOption.maxScore) {
+                endGame({
+                    firstPlayerScore: String(gameData.players.firstScore),
+                    secondPlayerScore: String(gameData.players.secondScore)
+                });
+            }
+        }
 
         const resetBall = (paddle: Paddle) => {
             gameData.ball.resetting = true;
@@ -197,14 +226,21 @@ export default function PingPong(props : PingPongProps) {
             const currentTime = new Date().getTime();
             gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
             moveBall();
+            checkScore();
             checkWallCollision();
             checkPaddleCollision(gameData.leftPaddle, true);
             checkPaddleCollision(gameData.rightPaddle, false);
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
-            requestAnimationFrame(update);
+            if (isPaused)
+                drawPause()
+            else if (isEnded)
+                drawEndGame();
+            else
+                requestAnimationFrame(update);
         };
+
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
                 case 'w':
@@ -223,30 +259,24 @@ export default function PingPong(props : PingPongProps) {
                     keyUp(gameData);
                     break;
             }
-    };
+        };
 
         initGame(gameData);
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("update", (data : GameData) => gameData = data);
-        socket.on("playerDisconnected", () => setIsPaused(true));
-        socket.on("reconnect", () => setIsPaused(false));
+        socket.on("playerDisconnected", () => isPaused = true);
+        socket.on("reconnect", () => isPaused = false);
+        socket.on("finished", () => isEnded = true);
 
-        if (isPaused) {
-            context.font = "40px Roboto bold";
-            context.fillStyle = "red";
-            context.textAlign = "center";
-            context.textBaseline = "middle";
-            context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
-        }
-        else
-            update();
+
+        update();
         return () => {
             document.removeEventListener("keydown", onKeyDown);
             document.removeEventListener("keyup", onKeyUp);
         };
-    }, []);
+    }, [isEnded]);
 
     return (
         <canvas ref={canvasRef} width={800} height={530} />

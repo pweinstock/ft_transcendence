@@ -24,7 +24,8 @@ export default function CreateGame(props : CreateGameProps) {
         paddleHeight : 75,
         ballSpeed : 5,
         paddleSpeed : 6,
-        isStarted : false
+        isStarted : false,
+        maxScore : 11
     });
     const [gameStatus, setGameStatus] = useState<GameState>(GameState.NOTCREATED);
     const easyMode = () => {
@@ -34,7 +35,8 @@ export default function CreateGame(props : CreateGameProps) {
             paddleHeight : 100,
             ballSpeed : 3,
             paddleSpeed : 6,
-            isStarted : false
+            isStarted : false,
+            maxScore : 3
         })
     }
 
@@ -45,7 +47,8 @@ export default function CreateGame(props : CreateGameProps) {
             paddleHeight : 75,
             ballSpeed : 5,
             paddleSpeed : 6,
-            isStarted : false
+            isStarted : false,
+            maxScore : 11
         })
     }
 
@@ -56,7 +59,8 @@ export default function CreateGame(props : CreateGameProps) {
             paddleHeight : 50,
             ballSpeed : 7,
             paddleSpeed : 5,
-            isStarted : false
+            isStarted : false,
+            maxScore : 11
         })
     }
 
@@ -70,7 +74,6 @@ export default function CreateGame(props : CreateGameProps) {
     });
     socket.on('created', () => setGameStatus(GameState.WAITING));
     socket.on('notCreated', handleError);
-
 
     return (
         <>

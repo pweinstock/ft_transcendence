@@ -1,4 +1,3 @@
-import {io} from "socket.io-client";
 import axios from "axios";
 import React, {useContext, useEffect, useState} from "react";
 import {User} from "../BaseInterface";
@@ -30,7 +29,7 @@ export default function JoinGame(props : JoinGameProps) {
             .catch(e => {
                 //todo : handle error
             })
-    },[joinServer])
+    },[])
 
     socket.on("started", (data : GameOption) => {
         setGameOption(data);

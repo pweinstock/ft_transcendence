@@ -5,4 +5,5 @@ export class GameOptionDto {
     ballSpeed : number;
     paddleSpeed : number;
     isStarted : boolean;
+    maxScore : number;
 }
