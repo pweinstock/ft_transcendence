@@ -19,11 +19,16 @@ const InputMessage: React.FC<ChatProps> = (props : ChatProps) => {
 const socket = useContext(ChatSocketContext);
 
 const [message, setMessage] = useState<string | "">("");
-const [messages, setMessages] = useState<string[]>([]);
+const [messages, setMessages] = useState<{content: string, date: string, id: string}[]>([]);
 
 
 socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
+
+useEffect(() => {
+	setMessages([]);
+	}, [props.chatidp]); 
+	//when we call it with a different chat id its triggers the clearing fo the variable handleled by the usstate
 
 const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 	setMessage(event.target.value);
@@ -34,12 +39,12 @@ async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
 	socket?.emit("message", {content : message, userId: props.user.id, chatId : props.chatidp});
+	setMessage("");
 }
 
 function sendMassagetoBackend() {
 	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp }, {withCredentials: true})
 		.then(
-			() => setMessage("")
 		)
 		.catch((reason) => {
 			console.log("Error while postint chat message, in chatid:");
@@ -49,8 +54,7 @@ function sendMassagetoBackend() {
 }
 
 const messageListener = (message: any) => {
-	console.log(message);
-	setMessages([...messages, message.content])
+	setMessages([...messages, message])
 }
 useEffect(() => {
 	socket?.on('message', messageListener)
@@ -63,13 +67,17 @@ return (
 	<>
 		<div className="message-list">
 			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
-			{ messages &&  <Message 
-					content={message}
+			{messages.map((message) => {
+			return (
+				<Message key={message.id + "bob"}
+					content={message.content}
 					date={"2023-04-12T17:29:19.591Z"}
-					id={"1234"}
+					id={message.id}
 					displayName={props.user.displayName}
 					user={props.user.displayName}
-				/>}
+				/>
+			);
+		})}
 		</div>
 
 		<div className="inputgroup">

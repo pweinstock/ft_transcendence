@@ -37,7 +37,7 @@ interface MassageStyle {
 const MessageList: React.FC<ChatProps> = (props : ChatProps) => {
 
 // export default function MessageList() {
-const [messages, setMessages] = useState<{content: string, chat: string, date: string, id: string, displayName: string, user: string}[]>([]);;
+const [messages, setMessages] = useState<{content: string, chat: string, date: string, id: string, displayName: string, user: string}[]>([]);
 const [msg, setmsg] = useState([]);
 
 
@@ -47,8 +47,8 @@ async function printmessages() {
 	await axios.get("http://localhost:5000/chat/messages/" + props.chatidp, {withCredentials: true})
 	.then( response => {
 		setMessages(response.data);
-		console.log("printmassage");
-		console.log(response.data);
+		// console.log("printmassage");
+		// console.log(response.data);
 	})
 	.catch((reason) => {
 		if (reason.response!.status !== 200) {
@@ -62,19 +62,19 @@ printmessages();
 }, [props.chatidp]);
 
 return (
-<>
-		{messages.map((message) => {
-			return (
-				<Message 
-					content={message.content}
-					date={message.date}
-					id={message.id}
-					displayName={message.displayName}
-					user={props.user.displayName}
-				/>
-			);
-		})}
-</>
+	<>
+			{messages.map((message) => {
+				return (
+					<Message key={message.id}
+						content={message.content}
+						date={message.date}
+						id={message.id}
+						displayName={message.displayName}
+						user={props.user.displayName}
+					/>
+				);
+			})}
+	</>
 
 );
 }
