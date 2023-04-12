@@ -23,12 +23,11 @@ interface ChatProps {
 	user : User;
 	chatidp: string;
 	chatName : string;
-	chatContent : string;
+	// chatContent : string;
 }
 
 interface MassageStyle {
 	content: string;
-	chat: string;
 	date: string;
 	id: string;
 	displayName: string;
@@ -60,33 +59,21 @@ async function printmessages() {
 	});
 }
 printmessages();
-}, [props.chatidp, props.chatContent]);
-
+}, [props.chatidp]);
 
 return (
 <>
-	<div className="message-list">
 		{messages.map((message) => {
 			return (
-				<Message />
-				// <div key={message.id} className={ `message ${props.user.displayName !== message.displayName ? 'message-reverse' : ''}` }>
-
-				// 		<div className="datetime">
-				// 			<div className="datetime-date">{message.date}</div>
-				// 		</div>
-				// 		<div className="sender">
-				// 			{/* <div className="sender-image">
-				// 				<img src={message.photoURL} alt={message.displayName} title={message.displayName} />
-				// 			</div> */}
-				// 			<div className="sender-name d-none">{message.displayName}</div>
-				// 		</div>
-				// 			<div className="chattext">{message.content}</div>
-				// </div>
-				// <Message key={message.id} message={message} user={props.user} />
+				<Message 
+					content={message.content}
+					date={message.date}
+					id={message.id}
+					displayName={message.displayName}
+					user={props.user.displayName}
+				/>
 			);
 		})}
-	</div>
-
 </>
 
 );

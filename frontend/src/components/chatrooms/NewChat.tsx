@@ -44,15 +44,13 @@ function handOnClickSend() {
 return (
 	<>
 		<div className='formholder'>
-			<div className='chatoverflow'>
 
 				<div className='chatheader'>
 					<span>
 						{props.chatName} chat:
 					</span>
 				</div>
-					<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName} chatContent={parentState} />
-			</div>
+					{/* <MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName} chatContent={parentState} /> */}
 			<ChatSocketProvider>	
 				<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName} onUpdate={handleParentStateUpdate}/>
 				{/* <Chat  user={props.user} chatidp={props.chatidp} /> */}

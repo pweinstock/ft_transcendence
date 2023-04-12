@@ -93,16 +93,11 @@
 
 /* Massage LIST */
 
-.chatoverflow {
+.message-list {
 	display: flex;
-	/* height: 85%; */
 	flex-direction: column;
 	overflow-y: scroll ;
 }
-
-/* .message-list {
-	display: flex;
-} */
 
 .message {
 	display: flex;

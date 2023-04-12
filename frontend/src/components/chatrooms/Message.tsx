@@ -1,7 +1,7 @@
 
 interface MassageStyle {
 	content: string;
-	chat: string;
+	// chat: string;
 	date: string;
 	id: string;
 	displayName: string;
