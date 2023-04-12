@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Avatar, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from "@mui/material";
 import { User } from "../BaseInterface";
+import { useNavigate } from "react-router-dom";
 
 export default function HighScore() {
   const [data, setData] = useState([]);
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc" | undefined>("asc");
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -38,6 +40,11 @@ export default function HighScore() {
     setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
   };
 
+  const handleAvatarClick = (displayName: string) => {
+    window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
+    //navigate('/users/${displayName}');
+  }
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table" stickyHeader>
@@ -58,7 +65,7 @@ export default function HighScore() {
           {data.map((user : User) => (
             <TableRow key={user.id}>
               <TableCell>
-                <Avatar alt={user.displayName} src={`http://${window.location.hostname}:5000/users/image/${user.photo}`} />
+                <Avatar alt={user.displayName} src={`http://${window.location.hostname}:5000/users/image/${user.photo}`} onClick={() => handleAvatarClick(user.displayName)}/>
                 {user.displayName}
               </TableCell>
               <TableCell align="right">{user.wins}</TableCell>

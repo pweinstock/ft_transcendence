@@ -17,7 +17,7 @@ export class User {
     @Column({ unique: true })
     displayName: string;    
 
-    @Column({ nullable: true , default: "littleman.png"})
+    @Column({ nullable: true })
     photo: string;
 
     @Column({type: 'enum', enum: UserStatus, default: [UserStatus.ONLINE]})
