@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import './chatstart.css';
 import axios from "axios";
 import {User} from "../BaseInterface";
+import Message from './Message';
 
 
 
@@ -19,9 +20,10 @@ import {User} from "../BaseInterface";
 // }
 
 interface ChatProps {
-user : User;
-chatidp: string;
-chatName : string;
+	user : User;
+	chatidp: string;
+	chatName : string;
+	chatContent : string;
 }
 
 interface MassageStyle {
@@ -46,8 +48,8 @@ async function printmessages() {
 	await axios.get("http://localhost:5000/chat/messages/" + props.chatidp, {withCredentials: true})
 	.then( response => {
 		setMessages(response.data);
-		// console.log("printmassage");
-		// console.log(response.data);
+		console.log("printmassage");
+		console.log(response.data);
 	})
 	.catch((reason) => {
 		if (reason.response!.status !== 200) {
@@ -58,45 +60,32 @@ async function printmessages() {
 	});
 }
 printmessages();
-}, [messages.length]);
+}, [props.chatidp, props.chatContent]);
 
-//   useEffect(() => {
-//   getmassagedata() => {
-//           const data = doc.data();
-//           list.push({
-//             id: doc.id,
-//             datetime: new Date(data.datetime.seconds * 1000),
-//             sender: data.sender,
-//             photoURL: data.photoURL,
-//             text: data.text
-//           });
-//         });
-//         setMessages(list);
-//       });
-//   }, [ messages.length ]);
 
 return (
 <>
-	<div id="message-list">
-	{messages.map((message) => {
-		return (
-			<div key={message.id} className={ `message ${props.user.displayName !== message.displayName ? 'message-reverse' : ''}` }>
+	<div className="message-list">
+		{messages.map((message) => {
+			return (
+				<Message />
+				// <div key={message.id} className={ `message ${props.user.displayName !== message.displayName ? 'message-reverse' : ''}` }>
 
-					<div className="datetime">
-						<div className="datetime-date">{message.date}</div>
-					</div>
-					<div className="sender">
-						{/* <div className="sender-image">
-							<img src={message.photoURL} alt={message.displayName} title={message.displayName} />
-						</div> */}
-						<div className="sender-name d-none">{message.displayName}</div>
-					</div>
-						<div className="chattext">{message.content}</div>
-			 </div>
-			// <Message key={message.id} message={message} user={props.user} />
-		);
-	})}
-</div>
+				// 		<div className="datetime">
+				// 			<div className="datetime-date">{message.date}</div>
+				// 		</div>
+				// 		<div className="sender">
+				// 			{/* <div className="sender-image">
+				// 				<img src={message.photoURL} alt={message.displayName} title={message.displayName} />
+				// 			</div> */}
+				// 			<div className="sender-name d-none">{message.displayName}</div>
+				// 		</div>
+				// 			<div className="chattext">{message.content}</div>
+				// </div>
+				// <Message key={message.id} message={message} user={props.user} />
+			);
+		})}
+	</div>
 
 </>
 

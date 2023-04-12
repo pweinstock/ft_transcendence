@@ -1,5 +1,6 @@
 .chatbox {
 	display: flex;
+	height: 60%;
 }
 
 .chatside {
@@ -28,16 +29,17 @@
 .chatcontent {
 	margin: 2px;
 	flex: 80%;
-
+	/* max-height: 50%; */
 }
 
 .formholder {
+	
 	display: flex;
 	flex-direction: column;
 	background-color: #dfdfdf46;
 	padding: 1px 5px 5px 5px;
 	border-style: dotted;
-
+	height: 75%;
 	/* width: 100%; */
 }
 .buttonholder {
@@ -88,12 +90,19 @@
 	padding: 2px;
 	margin-bottom: 5px;
 }
+
 /* Massage LIST */
-.message-list {
+
+.chatoverflow {
 	display: flex;
-	width: 100%;
-	justify-content: space-between;
+	/* height: 85%; */
+	flex-direction: column;
+	overflow-y: scroll ;
 }
+
+/* .message-list {
+	display: flex;
+} */
 
 .message {
 	display: flex;

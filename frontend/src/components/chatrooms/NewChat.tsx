@@ -30,6 +30,11 @@ const [msg, setmsg] = useState([]);
 //     }
 //     printmessages();
 // }, []);
+const [parentState, setParentState] = useState("Initial parent state");
+
+const handleParentStateUpdate = (newState: string) => {
+  setParentState(newState);
+};
 
 function handOnClickSend() {
 	let temp = "Anonymus";
@@ -39,14 +44,17 @@ function handOnClickSend() {
 return (
 	<>
 		<div className='formholder'>
-			<div className='chatheader'>
-				<span>
-					{props.chatName} chat:
-				</span>
+			<div className='chatoverflow'>
+
+				<div className='chatheader'>
+					<span>
+						{props.chatName} chat:
+					</span>
+				</div>
+					<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName} chatContent={parentState} />
 			</div>
-				<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 			<ChatSocketProvider>	
-				<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
+				<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName} onUpdate={handleParentStateUpdate}/>
 				{/* <Chat  user={props.user} chatidp={props.chatidp} /> */}
 			</ChatSocketProvider>
 		</div>

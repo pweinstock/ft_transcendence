@@ -23,8 +23,8 @@ return (
 <div className="App">
 		<>
 		{/* <InputMessage/> */}
-		<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
-		<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
+		{/* <InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName}/> */}
+		{/* <MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/> */}
 		</>
 </div>
 );

@@ -6,9 +6,10 @@ import { ChatSocketContext } from '../context/chat-socket';
 
 
 interface ChatProps {
-user : User;
-chatidp: string;
-chatName : string;
+	user : User;
+	chatidp: string;
+	chatName : string;
+	onUpdate: (newState: string) => void;
 }
 
 const InputMessage: React.FC<ChatProps> = (props : ChatProps) => {
@@ -21,6 +22,7 @@ socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
 const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 	setMessage(event.target.value);
+	props.onUpdate(event.target.value);
 };
 
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
@@ -28,6 +30,7 @@ async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	sendMassagetoBackend();
 	socket?.emit("message", {content : message, userId: props.user.id, chatId : props.chatidp});
 }
+
 function sendMassagetoBackend() {
 	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp }, {withCredentials: true})
 		.then(
@@ -40,9 +43,6 @@ function sendMassagetoBackend() {
 			});
 
 }
-
-
-
 
 return (
 <div className="inputgroup">

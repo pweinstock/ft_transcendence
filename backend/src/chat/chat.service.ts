@@ -259,9 +259,9 @@ export class ChatService {
         if (this.isMuted(chat, user.id))
             throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
         const message = await this.messageServices.createMessage ({displayName : user.displayName, chatId : dto.chatId, userId : user.id, content: dto.content});
-        console.log(message.id);
+        // console.log(message.id);
         chat.messages.push(message.id);
-        console.log(chat.messages);
+        // console.log(chat.messages);
         await this.chatRepository.save(chat);
         return message;
     }
