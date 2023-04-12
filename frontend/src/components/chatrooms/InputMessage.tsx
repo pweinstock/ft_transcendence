@@ -28,8 +28,9 @@ socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 useEffect(() => {
 	setMessages([]);
 	}, [props.chatidp]); 
-	//when we call it with a different chat id its triggers the clearing fo the variable handleled by the usstate
-
+//when we call it with a different chat id its triggers the clearing fo the variable handleled by the usstate
+// important revelation how the states can be handleed. how they update and how to prevent default behaviour of forms
+// usstate variables constalty watched and the usefect runs when the setted aruables are changed. 
 const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 	setMessage(event.target.value);
 	props.onUpdate(event.target.value);

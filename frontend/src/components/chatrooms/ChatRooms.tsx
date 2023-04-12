@@ -28,6 +28,7 @@ interface CreateChatForm {
 }
 
 const ChatRooms: React.FC<ChatProps> = (props) => {
+
 const [value, setValue] = useState<{id: string, name: string }[]>([]);
 const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
 const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
@@ -49,7 +50,7 @@ useEffect(() => {
 			}
 	}
 	fetchChatrooms();
-},[actualChatid]);
+},[chatNameValue, value]);
 
 useEffect(() => {
 	async function getAllPubliChat() {
@@ -63,7 +64,7 @@ useEffect(() => {
 			}
 	}
 	getAllPubliChat();
-},[]);
+},[chatNameValue]);
 
 const handleChatTypeChange = (event : ChangeEvent<HTMLSelectElement>) => {
     setchaTypeValue(event.target.value as ChatType);
@@ -76,16 +77,18 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
     setchatPassValue(event.target.value);
   };
 
-const handOnClickSend = (e : any) => {
-	e.preventDefault();
+async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
+	event.preventDefault();
+	// e.preventDefault();
     axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
         .then().catch(reason => {
         console.log("failed to post chat!")
         console.log(reason.message);
     });
+	setchatNameValue("");
 }
 
-function deleteChatNutton(id : string) {
+async function deleteChatNutton(id : string) {
 	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
 		.catch((reason) => {
 		if (reason.response!.status !== 200) {
@@ -94,6 +97,7 @@ function deleteChatNutton(id : string) {
 		}
 		console.log(reason.message);
 		});
+		setchatNameValue("");
 }
 
 // function sclickAndSetActual(id : string) {
