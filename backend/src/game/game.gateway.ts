@@ -53,7 +53,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const gameId = await this.gameService.newGame(client.id, gameOptions);
         if (gameId) {
             client.join(gameId);
-            client.emit('created');
+            this.server.emit('created');
         }
         else
             client.emit('notCreated');
