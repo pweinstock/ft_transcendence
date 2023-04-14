@@ -55,6 +55,8 @@ export class GameService {
         gameOption.secondPlayer = dto.displayName;
         gameOption.isStarted = true;
         this.gameIdToGameOption.set(dto.gameId, gameOption);
+        this.userService.changeStatus(gameOption.firstPlayer, dto.gameId);
+        this.userService.changeStatus(dto.displayName, dto.gameId);
         this.playerToGameId.set(clientId, {gameId : dto.gameId, isFirst : false});
         return gameOption;
     }
@@ -130,6 +132,8 @@ export class GameService {
         if (game) {
             game.firstPlayerScore = dto.firstPlayerScore;
             game.secondPlayerScore = dto.secondPlayerScore;
+            this.userService.changeStatus(game.firstPlayer, "online");
+            this.userService.changeStatus(game.secondPlayer, "online");
             game.finished = true;
             await this.gameRepository.save(game);
         }
