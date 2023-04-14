@@ -156,8 +156,8 @@ export class UserService {
     }
 
     //GAME
-    async wonGame(userId : string, matchId : string) : Promise<void> {
-        const user = await this.userRepository.findOneBy({id: userId});
+    async wonGame(displayname : string, matchId : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName: displayname});
         if (user) {
             user.matchHistory.push(matchId);
             user.wins += 1;
@@ -166,8 +166,8 @@ export class UserService {
         }
     }
 
-    async draw(userId : string, matchId : string) : Promise<void> {
-        const user = await this.userRepository.findOneBy({id: userId});
+    async draw(displayname : string, matchId : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName : displayname});
         if (user) {
             user.matchHistory.push(matchId);
             user.draws += 1;
@@ -176,8 +176,8 @@ export class UserService {
         }
     }
 
-    async lostGame(userId : string, matchId : string) : Promise<void> {
-        const user = await this.userRepository.findOneBy({id: userId});
+    async lostGame(displayname : string, matchId : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName: displayname});
         if (user) {
             user.matchHistory.push(matchId);
             user.losses += 1;

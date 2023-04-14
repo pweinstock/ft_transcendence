@@ -103,14 +103,14 @@ export class GameService {
         return games;
     }
 
-    endOfGame(clientId : string, dto : GameScoreDto, gameId : string) : boolean {
+    async endOfGame(clientId : string, dto : GameScoreDto, gameId : string) : Promise<boolean> {
         this.deletePlayer(clientId);
         if (!this.gameIdToGameOption.has(gameId))
             return false;
+        await this.finalScore(dto, gameId);
+        this.sendScoreToUser(dto, gameId);
         this.deleteGameOption(gameId);
         this.deleteGameData(gameId);
-        this.finalScore(dto, gameId);
-        this.sendScoreToUser(dto, gameId);
         return true;
     }
 
@@ -127,10 +127,12 @@ export class GameService {
 
     async finalScore(dto : GameScoreDto, gameId : string) {
         const game : Game = await this.findGamebyId(gameId);
-        game.firstPlayerScore = dto.firstPlayerScore;
-        game.secondPlayerScore = dto.secondPlayerScore;
-        game.finished = true;
-        this.gameRepository.save(game);
+        if (game) {
+            game.firstPlayerScore = dto.firstPlayerScore;
+            game.secondPlayerScore = dto.secondPlayerScore;
+            game.finished = true;
+            await this.gameRepository.save(game);
+        }
     }
 
     deleteGameOption(gameId : string) : void {

@@ -129,6 +129,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+
     @SubscribeMessage('sKey')
     sKeyPressed(
         @ConnectedSocket() client: Socket,
@@ -145,15 +146,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('end')
-    gameEnd(
+    async gameEnd(
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : GameScoreDto
-    ) : void {
-        if(!dto)
-            return
+    ) : Promise<void> {
         const gameId = this.gameService.getPlayerGameId(client.id);
         if (gameId) {
-            const isEnded = this.gameService.endOfGame(client.id, dto, gameId);
+            const isEnded = await this.gameService.endOfGame(client.id, dto, gameId);
             if (isEnded) {
                 this.server.to(gameId).emit('finished');
             }
@@ -161,6 +160,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         this.gameService.deleteViewer(client.id);
     }
+
 
     @SubscribeMessage('leave')
     leaveGame(@ConnectedSocket() client: Socket) : void {
