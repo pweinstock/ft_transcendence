@@ -41,7 +41,13 @@ export class UserController {
         return request.user;
     }
 
-    @Get('/:name')
+    @Get('/id/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async getUserById(@Param('id') UserId : string) : Promise<User> {
+        return this.usersService.findById(UserId);
+    }
+    
+    @Get('/name/:name')
     @UseGuards(AuthGuard('2FA'))
     async getPublicUser(@Param('name') displayName : string) : Promise<User> {
         return this.usersService.findByName(displayName);
@@ -101,6 +107,13 @@ export class UserController {
     async sendFriendRequest(@Req() request: any, @Param('id') friendId : string) : Promise<void> {
         const friend = await this.usersService.findById(friendId);
         this.usersService.sendFriendRequest(request.user, friend);
+    }
+
+    @Get('/deleteFriend/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async deleteFriendRequest(@Req() request: any, @Param('id') friendId : string) : Promise<void> {
+        const friend = await this.usersService.findById(friendId);
+        this.usersService.deleteFriend(request.user, friend);
     }
 
     @Get('/ban/:id')

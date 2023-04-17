@@ -22,6 +22,7 @@ import Game from "./game/Game";
 import Users from "./users/users";
 import {GameSocketProvider} from "./context/game-socket";
 import PublicProfile from './users/PublicProfile';
+import Friends from './users/Friends';
 
 
 
@@ -66,6 +67,7 @@ export default function App() {
                     <>
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                         <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
+                    <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                     <Route path="/users/:user" element={<PublicProfile currentUser={currentUsersData}/>}/>
                     </>
@@ -90,6 +92,9 @@ export default function App() {
               <Link key={"users"}  className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
                 </Link>
+              <Link key={"friends"}  className="newpostlink" to="/friends">
+                  <button className='navbutton'>Friends</button>
+              </Link>
                 {/*<Link key={"friends"}  className="newpostlink" to="/friends">*/}
                     {/*<button className='navbutton'>Friends</button>*/}
                 {/*</Link>*/}
