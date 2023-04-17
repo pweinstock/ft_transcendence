@@ -55,6 +55,8 @@ export class GameService {
         gameOption.secondPlayer = dto.displayName;
         gameOption.isStarted = true;
         this.gameIdToGameOption.set(dto.gameId, gameOption);
+        this.userService.changeStatus(gameOption.firstPlayer, dto.gameId);
+        this.userService.changeStatus(dto.displayName, dto.gameId);
         this.playerToGameId.set(clientId, {gameId : dto.gameId, isFirst : false});
         return gameOption;
     }
@@ -103,14 +105,14 @@ export class GameService {
         return games;
     }
 
-    endOfGame(clientId : string, dto : GameScoreDto, gameId : string) : boolean {
+    async endOfGame(clientId : string, dto : GameScoreDto, gameId : string) : Promise<boolean> {
         this.deletePlayer(clientId);
         if (!this.gameIdToGameOption.has(gameId))
             return false;
+        await this.finalScore(dto, gameId);
+        this.sendScoreToUser(dto, gameId);
         this.deleteGameOption(gameId);
         this.deleteGameData(gameId);
-        this.finalScore(dto, gameId);
-        this.sendScoreToUser(dto, gameId);
         return true;
     }
 
@@ -127,10 +129,14 @@ export class GameService {
 
     async finalScore(dto : GameScoreDto, gameId : string) {
         const game : Game = await this.findGamebyId(gameId);
-        game.firstPlayerScore = dto.firstPlayerScore;
-        game.secondPlayerScore = dto.secondPlayerScore;
-        game.finished = true;
-        this.gameRepository.save(game);
+        if (game) {
+            game.firstPlayerScore = dto.firstPlayerScore;
+            game.secondPlayerScore = dto.secondPlayerScore;
+            this.userService.changeStatus(game.firstPlayer, "online");
+            this.userService.changeStatus(game.secondPlayer, "online");
+            game.finished = true;
+            await this.gameRepository.save(game);
+        }
     }
 
     deleteGameOption(gameId : string) : void {

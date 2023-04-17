@@ -1,10 +1,5 @@
 import {Column, PrimaryGeneratedColumn, Entity} from "typeorm";
 
-export enum UserStatus {
-    ONLINE = "online",
-    INGAME = "ingame",
-    OFFLINE = "offline"
-};
 
 @Entity({name: 'user'})
 export class User {
@@ -12,16 +7,15 @@ export class User {
     id: string;
 
     @Column({ unique: true })
-    email: string;
-
+    email: string
     @Column({ unique: true })
     displayName: string;    
 
     @Column({ nullable: true })
     photo: string;
 
-    @Column({type: 'enum', enum: UserStatus, default: [UserStatus.ONLINE]})
-    status: UserStatus;
+    @Column({default: 'online', nullable: false})
+    status: string;
 
     @Column("text", {array: true, default: null, nullable: true})
     bannedUsers: string[];

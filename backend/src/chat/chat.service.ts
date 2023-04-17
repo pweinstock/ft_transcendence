@@ -9,7 +9,7 @@ import {JoinChatDto} from "./dto/join-chat.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {Message} from "./message/message.entity";
-import {User, UserStatus} from "../users/user.entity";
+import {User} from "../users/user.entity";
 import {Socket} from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
@@ -129,7 +129,6 @@ export class ChatService {
 
     async joinChat(user : User, dto : JoinChatDto) : Promise<Chat> {
         const chat = await this.findChatById(dto.chatId);
-        this.userServices.changeStatus(user, UserStatus.ONLINE);
         if (chat.users.length != 0 && chat.users.includes(user.id))
             return chat;
         if (chat.admins.includes(user.id))

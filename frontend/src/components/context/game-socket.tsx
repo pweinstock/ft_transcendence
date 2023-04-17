@@ -6,8 +6,6 @@ import { io, Socket } from 'socket.io-client';
 const socket = io(window.location.hostname + ":5002" + "/game", {transports: ["websocket"]}),
     GameSocketContext = createContext<Socket>(socket);
 
-socket.on('connect', () => console.log('connected to socket'));
-
 const GameSocketProvider = ({ children }: any) => {
     return (
         <GameSocketContext.Provider value={socket}>{children}</GameSocketContext.Provider>
