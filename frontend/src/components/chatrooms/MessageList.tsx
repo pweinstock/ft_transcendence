@@ -63,7 +63,7 @@ printmessages();
 
 return (
 	<>
-			{messages.slice(0).reverse().map((message) => {
+			{messages.map((message) => {
 				return (
 					<Message key={message.id}
 						content={message.content}

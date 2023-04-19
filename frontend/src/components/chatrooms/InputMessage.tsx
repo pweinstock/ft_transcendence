@@ -1,4 +1,4 @@
-import { FormEventHandler, useEffect, useState, ChangeEvent, useContext } from 'react';
+import { FormEventHandler, useEffect,useRef , useState, ChangeEvent, useContext } from 'react';
 import axios from "axios";
 import {User} from "../BaseInterface";
 import {Socket, io} from "socket.io-client";
@@ -39,6 +39,7 @@ const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
+	Scroll();
 	// const bobi = new Date().toLocaleString("en-de");
 	// console.log(bobi);
 	socket?.emit("message", {date: new Date().toLocaleString("en-de"), content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
@@ -67,10 +68,22 @@ useEffect(() => {
 	}
 }, [messageListener])
 
+const container = useRef<HTMLDivElement>(null);
+
+const Scroll = () => {
+	const { offsetHeight, scrollHeight, scrollTop } = container.current as HTMLDivElement
+	container.current?.scrollTo(0, scrollHeight)
+}
+
+useEffect(() => {
+  Scroll()
+}, [messages])
+
 return (
 	<>
-		<div className="message-list">
-			{messages.slice(0).reverse().map((message) => {
+		<div ref={container} className="message-list">
+			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
+			{messages.map((message) => {
 			return (
 				<Message key={message.date}
 					content={message.content}
@@ -80,7 +93,6 @@ return (
 				/>
 			);
 		})}
-		<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 		</div>
 
 		<div className="inputgroup">
