@@ -19,7 +19,7 @@ const InputMessage: React.FC<ChatProps> = (props : ChatProps) => {
 const socket = useContext(ChatSocketContext);
 
 const [message, setMessage] = useState<string | "">("");
-const [messages, setMessages] = useState<{content: string, date: string, id: string}[]>([]);
+const [messages, setMessages] = useState<{content: string, date: string, id: string, displayName : string}[]>([]);
 
 
 socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
@@ -39,7 +39,9 @@ const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
-	socket?.emit("message", {content : message, userId: props.user.id, chatId : props.chatidp});
+	const bobi = new Date().toLocaleString("en-de") + "";
+	console.log(bobi);
+	socket?.emit("message", {date: bobi, content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
 	setMessage("");
 }
 
@@ -55,6 +57,7 @@ function sendMassagetoBackend() {
 }
 
 const messageListener = (message: any) => {
+	console.log(message);
 	setMessages([...messages, message])
 }
 useEffect(() => {
@@ -70,11 +73,10 @@ return (
 			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 			{messages.map((message) => {
 			return (
-				<Message key={message.id + "bob"}
+				<Message key={message.date}
 					content={message.content}
-					date={"2023-04-12T17:29:19.591Z"}
-					id={message.id}
-					displayName={props.user.displayName}
+					date={message.date}
+					displayName={message.displayName}
 					user={props.user.displayName}
 				/>
 			);

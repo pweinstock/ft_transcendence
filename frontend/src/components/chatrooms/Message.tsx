@@ -3,7 +3,7 @@ interface MassageStyle {
 	content: string;
 	// chat: string;
 	date: string;
-	id: string;
+	// id: string;
 	displayName: string;
 	user: string;
 }
@@ -12,7 +12,7 @@ const Message: React.FC<MassageStyle> = (props : MassageStyle) => {
 
 return (
 	<>
-		<div key={props.id} className={ `message ${props.user !== props.displayName ? 'message-reverse' : ''}` }>
+		<div className={ `message ${props.user !== props.displayName ? 'message-reverse' : ''}` }>
 			<div className="datetime">
 				<div className="datetime-date">{props.date}</div>
 			</div>
