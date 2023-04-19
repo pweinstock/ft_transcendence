@@ -1,4 +1,4 @@
-import { PersonAdd, PersonRemove } from '@mui/icons-material';
+import { Check, DoNotDisturb, DoNotDisturbOff, DoNotDisturbOffOutlined, PersonAdd, PersonRemove } from '@mui/icons-material';
 import { Avatar, Button, IconButton, Tooltip } from '@mui/material';
 import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
@@ -13,6 +13,7 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
 	
     const [publicUser, setPublicUser] = useState<User>();
     const [isFriend, setIsFriend] = useState<boolean>(false)
+    const [isBlocked, setIsBlocked] = useState<boolean>(false)
     const param = useParams();
 
     useEffect(() => {  
@@ -20,6 +21,7 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           .then((response) => {
             setPublicUser(response.data);
             setIsFriend(props.currentUser.friends.includes(response.data.id));
+            setIsBlocked(props.currentUser.bannedUsers.includes(response.data.id));
           })
           .catch((error) => {
             alert("User " + param.user + " does not exist!");
@@ -46,6 +48,27 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
       });
       };
 
+
+    const handleBlockUser = (id : string | undefined) => {
+      axios.get(`http://${window.location.hostname}:5000/users/ban/${id}`, { withCredentials: true })
+      .then(() => {
+        setIsBlocked(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    };
+
+    const handleUnBlockUser = (id : string | undefined) => {
+      axios.get(`http://${window.location.hostname}:5000/users/unban/${id}`, { withCredentials: true })
+      .then(() => {
+        setIsBlocked(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    };
+
 	return (
     <>
       <Avatar  sx={{ width: 112, height: 112 }} src={`http://${window.location.hostname}:5000/users/image/${publicUser?.photo}`}/>
@@ -62,6 +85,16 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
         </Button>
       </Tooltip>
       }
+      {isBlocked ? (
+        <Button color="warning" variant="contained" startIcon={<DoNotDisturbOff/>} onClick={() => handleUnBlockUser(publicUser?.id)}>
+          Unblock
+        </Button>
+      ) : (
+        <Button color="error" variant="outlined" startIcon={<DoNotDisturb/>} onClick={() => handleBlockUser(publicUser?.id)}>
+          Block
+        </Button>
+      )
+    }
     </>
 	)
 }

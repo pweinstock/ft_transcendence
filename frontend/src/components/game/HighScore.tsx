@@ -6,15 +6,14 @@ import { useNavigate } from "react-router-dom";
 
 export default function HighScore() {
   const [data, setData] = useState([]);
-  const [orderDirection, setOrderDirection] = useState<"asc" | "desc" | undefined>("asc");
+  const [orderDirection, setOrderDirection] = useState<"asc" | "desc" | undefined>("desc");
   const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
       .then((res) => {
-        setData(res.data);
-        console.log("Result:", data);
+        setData(sortArray(res.data, orderDirection));
       })
       .catch((error) => {
         console.log(error);
@@ -36,9 +35,13 @@ export default function HighScore() {
   };
 
   const handleSortRequest = () => {
-    setData(sortArray(data, orderDirection));
-    setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+    setOrderDirection((orderDirection === "asc" ? "desc" : "asc"));
   };
+
+  useEffect(() => {
+    setData(sortArray(data, orderDirection));;
+  }, [orderDirection]);
+  
 
   const handleAvatarClick = (displayName: string) => {
     window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
