@@ -10,9 +10,10 @@ export class Message {
 
   @Column()
   displayName: string;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  date: Date;
+  
+  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column()
+  date: string;
 
   @Column()
   userId: string;
