@@ -46,7 +46,8 @@ async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 }
 
 function sendMassagetoBackend() {
-	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp }, {withCredentials: true})
+	const bobi = new Date().toLocaleString("en-de") + "";
+	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp, date : bobi}, {withCredentials: true})
 		.then(
 		)
 		.catch((reason) => {
