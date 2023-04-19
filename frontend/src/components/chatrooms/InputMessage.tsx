@@ -39,15 +39,15 @@ const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
-	const bobi = new Date().toLocaleString("en-de") + "";
-	console.log(bobi);
-	socket?.emit("message", {date: bobi, content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
+	// const bobi = new Date().toLocaleString("en-de");
+	// console.log(bobi);
+	socket?.emit("message", {date: new Date().toLocaleString("en-de"), content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
 	setMessage("");
 }
 
 function sendMassagetoBackend() {
-	const bobi = new Date().toLocaleString("en-de") + "";
-	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp, date : bobi}, {withCredentials: true})
+	// const bobi = new Date().toLocaleString("en-de");
+	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp, date : new Date().toLocaleString("en-de")}, {withCredentials: true})
 		.then(
 		)
 		.catch((reason) => {
@@ -58,7 +58,6 @@ function sendMassagetoBackend() {
 }
 
 const messageListener = (message: any) => {
-	console.log(message);
 	setMessages([...messages, message])
 }
 useEffect(() => {
@@ -71,8 +70,7 @@ useEffect(() => {
 return (
 	<>
 		<div className="message-list">
-			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
-			{messages.map((message) => {
+			{messages.slice(0).reverse().map((message) => {
 			return (
 				<Message key={message.date}
 					content={message.content}
@@ -82,6 +80,7 @@ return (
 				/>
 			);
 		})}
+		<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 		</div>
 
 		<div className="inputgroup">

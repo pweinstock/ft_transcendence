@@ -47,8 +47,8 @@ async function printmessages() {
 	await axios.get("http://localhost:5000/chat/messages/" + props.chatidp, {withCredentials: true})
 	.then( response => {
 		setMessages(response.data);
-		console.log("printmassage");
-		console.log(response.data);
+		// console.log("printmassage");
+		// console.log(response.data);
 	})
 	.catch((reason) => {
 		if (reason.response!.status !== 200) {
@@ -63,7 +63,7 @@ printmessages();
 
 return (
 	<>
-			{messages.map((message) => {
+			{messages.slice(0).reverse().map((message) => {
 				return (
 					<Message key={message.id}
 						content={message.content}
