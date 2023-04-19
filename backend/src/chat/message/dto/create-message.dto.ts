@@ -3,5 +3,5 @@ export class CreateMessageDto {
     readonly chatId : string;
     readonly userId : string;
     readonly displayName : string;
-    readonly date : Date;
+    readonly date : string;
 }

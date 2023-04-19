@@ -260,7 +260,7 @@ export class ChatService {
             throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
         if (this.isMuted(chat, user.id))
             throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
-        const message = await this.messageServices.createMessage ({content : dto.content, chatId : chat.id, userId : user.id, displayName : user.displayName, date : new Date()});
+        const message = await this.messageServices.createMessage ({content : dto.content, chatId : chat.id, userId : user.id, displayName : user.displayName, date : dto.date});
         chat.messages.push(message.id);
         await this.chatRepository.save(chat);
         return message;

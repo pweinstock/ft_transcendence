@@ -1,11 +1,14 @@
 .chatbox {
 	display: flex;
+	/* height: 60%; */
 }
 
 .chatside {
 	flex: 20%;
-	/* position: ; */
 	margin: 2px;
+}
+
+.toborderside {
 	border-style: solid;
 }
 
@@ -26,15 +29,19 @@
 .chatcontent {
 	margin: 2px;
 	flex: 80%;
-	border-style: dotted;
-
+	/* height: 900px; */
+	/* max-height: 50%; */
 }
 
 .formholder {
+	
 	display: flex;
 	flex-direction: column;
 	background-color: #dfdfdf46;
-	padding: 1%;
+	padding: 1px 5px 5px 5px;
+	border-style: dotted;
+	height: 700px;
+	/* height: 75%; */
 	/* width: 100%; */
 }
 .buttonholder {
@@ -79,4 +86,84 @@
 	background-color: #b300007c;
   }
 
-  
+.chatheader {
+	border-style: dotted;
+	border-radius: 10px;
+	padding: 2px;
+	margin-bottom: 5px;
+}
+
+/* Massage LIST */
+
+.message-list {
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll ;
+	/* justify-content: flex-end; */
+
+}
+
+.message {
+	display: flex;
+	flex-direction: column;
+	background-color: rgba(3, 169, 3, 0.208);
+	width: fit-content;
+	border: 1px;
+	border-style: solid;
+	border-radius: 10px;
+	margin-bottom: 5px;
+	padding: 0 10px 5px 10px;
+}
+
+.datetime {
+	color: rgb(36, 21, 21);
+	font-size: xx-small;
+	padding-top: 2px;
+}
+
+.sender {
+	font-size: small;
+	color: black;
+}
+
+.chattext {
+	font-size: medium;
+	margin-left: 6px;
+}
+
+.message-reverse {
+	background-color: rgba(49, 110, 215, 0.232);
+	align-items: end;
+	margin-left: auto;
+}
+/* chat input */
+
+.inputgroup {
+	display: flex;
+	width: 100%;
+}
+.inputgroup form {
+	display: flex;
+	width: 100%;
+}
+.inputgroup input[type=text] {
+	width: 100%;
+	background-color: rgba(255, 255, 255, 0.596);
+	border: none;
+	border-radius: 10px;
+}
+
+.chatsendbutton {
+	font-size: large;
+	border: none;
+	border-radius: 40px;
+	background-color: rgba(26, 104, 126, 0.46);
+	display: flex;
+	flex: 10%;
+	/* height: 100%; */
+	padding: 5px;
+	justify-content: center;
+	align-items: center;
+	margin-left: 5px;
+	cursor:pointer;
+}

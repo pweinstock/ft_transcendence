@@ -28,12 +28,14 @@ interface CreateChatForm {
 }
 
 const ChatRooms: React.FC<ChatProps> = (props) => {
+
 const [value, setValue] = useState<{id: string, name: string }[]>([]);
 const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
 const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
 const [chatNameValue, setchatNameValue] = useState<string>("");
 const [chatPassValue, setchatPassValue] = useState<string | undefined>(undefined);
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
+const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 
 
 useEffect(() => {
@@ -48,7 +50,7 @@ useEffect(() => {
 			}
 	}
 	fetchChatrooms();
-},[]);
+},[chatNameValue, value]);
 
 useEffect(() => {
 	async function getAllPubliChat() {
@@ -62,7 +64,7 @@ useEffect(() => {
 			}
 	}
 	getAllPubliChat();
-},[]);
+},[chatNameValue]);
 
 const handleChatTypeChange = (event : ChangeEvent<HTMLSelectElement>) => {
     setchaTypeValue(event.target.value as ChatType);
@@ -75,16 +77,18 @@ const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
     setchatPassValue(event.target.value);
   };
 
-const handOnClickSend = (e : any) => {
-	e.preventDefault();
+async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
+	event.preventDefault();
+	// e.preventDefault();
     axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : chatNameValue, password: chatPassValue}, {withCredentials: true})
         .then().catch(reason => {
         console.log("failed to post chat!")
         console.log(reason.message);
     });
+	setchatNameValue("");
 }
 
-function deleteChatNutton(id : string) {
+async function deleteChatNutton(id : string) {
 	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
 		.catch((reason) => {
 		if (reason.response!.status !== 200) {
@@ -93,6 +97,7 @@ function deleteChatNutton(id : string) {
 		}
 		console.log(reason.message);
 		});
+		setchatNameValue("");
 }
 
 // function sclickAndSetActual(id : string) {
@@ -111,18 +116,19 @@ function joinbuttonHandler(id :string) {
 		console.log(reason.message);
 		});
 }
-
 return (
 	<>
 		<section>
 			<div className='chatbox'>
 				<div className='chatside'>
+				<div className='toborderside'>
 					<div className='mychatlist'>
 						<p>My Chats:</p>
 						{value && value.map((item, index) => (
 							<div key={item.id} className='buttonholder' style={{color: "white"}}>
 									<button className='chatbutton' onClick={() => {
 									setactualChatid(item.id);
+									setactualChatName(item.name);
 									}} >{item.name}</button>
 								<button className='chatbuttondel' onClick={() => {
 									deleteChatNutton(item.id);
@@ -171,8 +177,9 @@ return (
 
 					</div>
 				</div>
+				</div>
 				<div className='chatcontent'>
-					{actualChatid && <NewChat user={props.user} chatidp={actualChatid}/>}
+					{actualChatid && actualChatName && <NewChat user={props.user} chatidp={actualChatid} chatName={actualChatName}/>}
 					{!actualChatid && <h1>No Chat</h1> }
 
 				</div>

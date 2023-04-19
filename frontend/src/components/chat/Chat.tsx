@@ -1,9 +1,10 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {Socket, io} from "socket.io-client";
 import MesageInput from "./messageInput";
 import Messages from "./messages";
 import { User } from "../BaseInterface";
 import axios from "axios";
+import { ChatSocketContext } from "../context/chat-socket";
 
 interface ChatProps {
 user : User;
@@ -14,7 +15,7 @@ const Chat: React.FC<ChatProps> = (props : ChatProps) => {
 
 
 // const Chat: React.FC<BaseInterface> = ({currentUser}, pchatId : string) => {
-const [socket, setSocket] = useState<Socket>();
+const socket = useContext(ChatSocketContext);
 const [messages, setMessages] = useState<string[]>([]);
 
 function sendMassagetoBackend() {
@@ -33,16 +34,10 @@ const send = (value: string) => {
 
 socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
-useEffect(() => {
-	const newSocket = io("http://localhost:5001/chat");
-	setSocket(newSocket);
-}, [setSocket]);
-
 const messageListener = (message: any) => {
 	setMessages([...messages, message.content])
 }
 useEffect(() => {
-
 	socket?.on('message', messageListener)
 	return () => {
 		socket?.off('message', messageListener)

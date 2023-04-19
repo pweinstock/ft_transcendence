@@ -1,37 +1,31 @@
-import './chatstart.css';
 
-// function zeroPadding(value) {
-//   return value.toString().padStart(2, '0');
-// }
-
-// function getDate(value) {
-//   return `${value.getFullYear()}.${zeroPadding(value.getMonth() + 1)}.${zeroPadding(value.getDate())}.`;
-// }
-
-// function getTime(value) {
-//   return `${zeroPadding(value.getHours())}:${zeroPadding(value.getMinutes())}`;
-// }
-
-export default function Message() {
-  // const { message, user } = props;
-  // const date = getDate(message.datetime);
-  // const time = getTime(message.datetime);
-
-  return (
-    <>
-    </>
-    // <div className={ `message ${user.displayName !== message.sender ? 'message-reverse' : ''}` }>
-    //   <div className="datetime">
-    //     <div className="datetime-date">{date}</div>
-    //     <div className="datetime-time">{time}</div>
-    //   </div>
-    //   <div className="sender">
-    //     <div className="sender-image">
-    //       <img src={message.photoURL} alt={message.sender} title={message.sender} />
-    //     </div>
-    //     <div className="sender-name d-none">{message.sender}</div>
-    //   </div>
-    //   <div className="text">{message.text}</div>
-    // </div>
-  );
+interface MassageStyle {
+	content: string;
+	// chat: string;
+	date: string;
+	// id: string;
+	displayName: string;
+	user: string;
 }
+
+const Message: React.FC<MassageStyle> = (props : MassageStyle) => {
+
+return (
+	<>
+		<div className={ `message ${props.user !== props.displayName ? 'message-reverse' : ''}` }>
+			<div className="datetime">
+				<div className="datetime-date">{props.date}</div>
+			</div>
+			<div className="sender">
+			{/* <div className="sender-image">
+				<img src={props.photoURL} alt={props.displayName} title={props.displayName} />
+			</div> */}
+			<div className="sender-name d-none">{props.displayName}</div>
+			</div>
+			<div className="chattext">{props.content}</div>
+		</div>
+	</>
+);
+}
+
+export default Message;

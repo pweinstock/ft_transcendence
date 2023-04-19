@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 // import Message from './Message';
 import './chatstart.css';
+import axios from "axios";
+import {User} from "../BaseInterface";
+import Message from './Message';
+
 
 
 // interfaces user {
@@ -15,46 +19,63 @@ import './chatstart.css';
 //   text: string;
 // }
 
-
-export default function MessageList() {
-  const [messages, setMessages] = useState([]);
-//   useEffect(() => {
-//   getmassagedata() => {
-//           const data = doc.data();
-//           list.push({
-//             id: doc.id,
-//             datetime: new Date(data.datetime.seconds * 1000),
-//             sender: data.sender,
-//             photoURL: data.photoURL,
-//             text: data.text
-//           });
-//         });
-//         setMessages(list);
-//       });
-//   }, [ messages.length ]);
-
-  return (
-    <>
-    </>
-    // <div id="message-list">
-    //   {messages.map((message) => {
-    //     return (
-    //       <div className={ `message ${user.displayName !== message.sender ? 'message-reverse' : ''}` }>
-    //       <div className="datetime">
-    //         <div className="datetime-date">{message.date}</div>
-    //         <div className="datetime-time">{message.time}</div>
-    //       </div>
-    //       <div className="sender">
-    //         <div className="sender-image">
-    //           <img src={message.photoURL} alt={message.sender} title={message.sender} />
-    //         </div>
-    //         <div className="sender-name d-none">{message.sender}</div>
-    //       </div>
-    //       <div className="text">{message.text}</div>
-    //     </div>
-    //         // <Message key={message.id} message={message} user={props.user} />
-    //     );
-    //   })}
-    // </div>
-  );
+interface ChatProps {
+	user : User;
+	chatidp: string;
+	chatName : string;
+	// chatContent : string;
 }
+
+interface MassageStyle {
+	content: string;
+	date: string;
+	id: string;
+	displayName: string;
+	user: string;
+}
+
+const MessageList: React.FC<ChatProps> = (props : ChatProps) => {
+
+// export default function MessageList() {
+const [messages, setMessages] = useState<{content: string, chat: string, date: Date, id: string, displayName: string, user: string}[]>([]);
+const [msg, setmsg] = useState([]);
+
+
+useEffect(() => {
+// console.log("massage log");
+async function printmessages() {
+	await axios.get("http://localhost:5000/chat/messages/" + props.chatidp, {withCredentials: true})
+	.then( response => {
+		setMessages(response.data);
+		// console.log("printmassage");
+		// console.log(response.data);
+	})
+	.catch((reason) => {
+		if (reason.response!.status !== 200) {
+		console.log("Error getting massages");
+		console.log(props.chatidp);
+	}
+	console.log(reason.message);
+	});
+}
+printmessages();
+}, [props.chatidp]);
+
+return (
+	<>
+			{messages.map((message) => {
+				return (
+					<Message key={message.id}
+						content={message.content}
+						date={message.date.toLocaleString("en-de") + " "}
+						displayName={message.displayName}
+						user={props.user.displayName}
+					/>
+				);
+			})}
+	</>
+
+);
+}
+
+export default MessageList;
