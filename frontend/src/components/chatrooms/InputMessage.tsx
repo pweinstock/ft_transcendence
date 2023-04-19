@@ -40,8 +40,6 @@ async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
 	Scroll();
-	// const bobi = new Date().toLocaleString("en-de");
-	// console.log(bobi);
 	socket?.emit("message", {date: new Date().toLocaleString("en-de"), content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
 	setMessage("");
 }
@@ -76,7 +74,7 @@ const Scroll = () => {
 }
 
 useEffect(() => {
-  Scroll()
+  Scroll();
 }, [messages])
 
 return (
