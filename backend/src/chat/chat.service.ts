@@ -9,11 +9,12 @@ import {JoinChatDto} from "./dto/join-chat.dto";
 import {MessageService} from "./message/message.service";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {Message} from "./message/message.entity";
-import {User, UserStatus} from "../users/user.entity";
+import {User} from "../users/user.entity";
 import {Socket} from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
 import { NewMessageDto } from './dto/new-message.dto';
+import * as bcrypt from 'bcrypt';
 
 interface Room {
     userId : string,
@@ -32,6 +33,8 @@ export class ChatService {
     async createChat(owner : User, dto: CreateChatDTO) : Promise<Chat> {
         if (dto.type == ChatType.PROTECTED && !dto.password)
             throw new HttpException('Wrong data provided!', HttpStatus.BAD_REQUEST);
+        if (dto.password)
+            dto.password = await this.hashPassword(dto.password);
         const chat = this.chatRepository.create(dto);
         chat.owner = owner.id;
         chat.admins = [];
@@ -126,7 +129,6 @@ export class ChatService {
 
     async joinChat(user : User, dto : JoinChatDto) : Promise<Chat> {
         const chat = await this.findChatById(dto.chatId);
-        this.userServices.changeStatus(user, UserStatus.ONLINE);
         if (chat.users.length != 0 && chat.users.includes(user.id))
             return chat;
         if (chat.admins.includes(user.id))
@@ -138,7 +140,7 @@ export class ChatService {
                     chat.users.push(user.id);
                     break;
                 case ChatType.PROTECTED:
-                    if (chat.password === dto.password)
+                    if (await bcrypt.compare(chat.password, dto.password))
                         chat.users.push(user.id);
                     else
                         throw new HttpException('Wrong Password!', HttpStatus.FORBIDDEN);
@@ -258,17 +260,15 @@ export class ChatService {
             throw new HttpException('You are banned in this chat!', HttpStatus.BAD_REQUEST);
         if (this.isMuted(chat, user.id))
             throw new HttpException('You are muted!', HttpStatus.BAD_REQUEST);
-        const message = await this.messageServices.createMessage ({displayName : user.displayName, chatId : dto.chatId, userId : user.id, content: dto.content});
-        // console.log(message.id);
+        const message = await this.messageServices.createMessage ({content : dto.content, chatId : chat.id, userId : user.id, displayName : user.displayName, date : new Date()});
         chat.messages.push(message.id);
-        // console.log(chat.messages);
         await this.chatRepository.save(chat);
         return message;
     }
 
     async deleteMessage(user : User, dto : DeleteMessageDto) : Promise<void> {
         const message = await this.messageServices.findMessageById(dto.messageId);
-        if (message.user != user.id)
+        if (message.userId != user.id)
             throw new HttpException('Message not belongs to user!', HttpStatus.FORBIDDEN);
         const chat = await this.findChatById(dto.chatId);
         chat.messages = chat.messages.filter((messageId) => messageId != dto.messageId);
@@ -330,6 +330,13 @@ export class ChatService {
             this.chatRepository.save(chat);
         }
         return false;
+    }
+
+    async hashPassword(password : string) : Promise<string> {
+        const saltOrRounds = 10;
+        const hash = await bcrypt.hash(password, saltOrRounds);
+        const salt = await bcrypt.genSalt();
+        return hash;
     }
 }
 

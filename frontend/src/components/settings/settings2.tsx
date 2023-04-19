@@ -1,6 +1,9 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import axios from "axios";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Switch, Typography } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Switch, Typography, Avatar, IconButton } from "@mui/material";
+import { PhotoCamera } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
 
 function Settings() {
   const [open, setOpen] = useState(false);
@@ -11,12 +14,15 @@ function Settings() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [code, setCode] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [avatar, setAvatar] = useState("");
 
   useEffect(() => {
     async function fetchUser() {
       const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
+      setNewName(response.data.displayName);
+      setAvatar(response.data.photo);
       if (response.data.first) {
-        setNewName(response.data.displayName);
         setOpen(true);
       }
       setToggle(response.data.isTwoFactorAuthenticationEnabled);
@@ -96,13 +102,15 @@ function Settings() {
   };
 
   const handleVerify = async () => {
-    const response = await axios.post(`http://${window.location.hostname}:5000/auth/validate`, { code }, { withCredentials: true });
-    if (response.data.valid) {
-      const response = await axios.get(`http://${window.location.hostname}:5000/auth/enable`, { withCredentials: true });
+    try {
+      await axios.post(`http://${window.location.hostname}:5000/auth/validate`, { code }, { withCredentials: true });
+    //if (response.data.valid) {
+      await axios.get(`http://${window.location.hostname}:5000/auth/enable`, { withCredentials: true });
       // Close the dialog and show a success message
+      //console.log('data: ', response.data);
       setDialogOpen(false);
       alert("Two-factor authentication has been enabled!");
-    } else {
+    } catch(e) {
       // Show an error message
       alert("Invalid code. Please try again.");
     }
@@ -125,8 +133,45 @@ function Settings() {
     }
   }
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    try {
+      const response = await axios.post("http://localhost:5000/users/upload", formData, {
+        withCredentials: true,
+      });
+      alert("Avatar upluaded successully!");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEdit = () => {
+    setEditing(true);
+    setNewName(newName);
+  };
+
+  const handleSave = async() => {
+    if (newName !== "") {
+      try {
+        await axios.post(`http://${window.location.hostname}:5000/users/changeName`, { newName }, { withCredentials: true });
+      } catch(e) {
+          alert("Username already exists!");
+      }
+    } else {
+      alert("Username cannot be empty!");
+    }
+    setEditing(false);
+  };
+
+  const avatarUrl = `http://${window.location.hostname}:5000/users/image/${avatar}`;
+
   return (
-    <div>
+    <div style={{ color: "white" }}>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add Username</DialogTitle>
         <DialogContent>
@@ -152,7 +197,38 @@ function Settings() {
           <Button onClick={handleUploadConfirm}>Confirm</Button>
         </DialogActions>
       </Dialog>
-      <Switch checked={toggle} onChange={handleToggleChange} name="Two Factor Authentication"/>
+      <div style={{ color: "white", display: "flex", alignItems: "center" }}>
+        <Avatar  sx={{ width: 112, height: 112 }} src={avatarUrl}/>
+        
+        <p style={{ fontSize: "16px", marginRight: "10px" }}>Upload an avatar</p>
+        <IconButton color="primary" aria-label="upload picture" component="label">
+          <input hidden accept="image/*" type="file" onChange={handleAvatarUpload}/>
+          <PhotoCamera />
+        </IconButton>
+      </div>
+      {editing ? (
+        <TextField
+          label="New Username"
+          value={newName}
+          onChange={(event) => setNewName(event.target.value)}
+          style={{ marginRight: 1, color: "white" }}
+        />
+      ) : (
+        <Typography variant="body1" style={{ color: "white" }}>
+          Username: {newName}
+        </Typography>
+      )}
+      {editing ? (
+        <IconButton onClick={handleSave}>
+          <SaveIcon style={{ color: "white" }} />
+        </IconButton>
+      ) : (
+        <IconButton onClick={handleEdit}>
+          <EditIcon style={{ color: "white" }} />
+        </IconButton>
+        
+      )}
+      <Switch checked={toggle} onChange={handleToggleChange} name="Two Factor Authentication"/>Two Factor Authentication
       <Dialog open={dialogOpen} onClose={handleDialogClose /*() => setDialogOpen(false)*/}>
         <DialogTitle>Enable Two-Factor Authentication</DialogTitle>
         <DialogContent>

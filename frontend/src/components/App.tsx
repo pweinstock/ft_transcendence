@@ -20,6 +20,9 @@ import axios from "axios";
 import { User } from "./BaseInterface";
 import Game from "./game/Game";
 import Users from "./users/users";
+import {GameSocketProvider} from "./context/game-socket";
+import PublicProfile from './users/PublicProfile';
+import Friends from './users/Friends';
 
 
 
@@ -55,6 +58,7 @@ export default function App() {
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/"  element={<Basic />}/>
+                <Route path="/settings"  element={<Settings2 />}/>
                 {/*<Route path="/chat" element={<Chat/>}/>*/}
                 {/*<Route path="/newchat" element={<NewChat/>}/> */}
                 {/*<Route path="/test" element={<Test/>}/>*/}
@@ -62,8 +66,10 @@ export default function App() {
                 {currentUsersData &&
                     <>
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
-                    <Route path="/game" element={<Game user={currentUsersData}/>}/>
+                        <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
+                    <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
+                    <Route path="/users/:user" element={<PublicProfile currentUser={currentUsersData}/>}/>
                     </>
                 }
             </Routes>
@@ -86,6 +92,9 @@ export default function App() {
               <Link key={"users"}  className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
                 </Link>
+              <Link key={"friends"}  className="newpostlink" to="/friends">
+                  <button className='navbutton'>Friends</button>
+              </Link>
                 {/*<Link key={"friends"}  className="newpostlink" to="/friends">*/}
                     {/*<button className='navbutton'>Friends</button>*/}
                 {/*</Link>*/}

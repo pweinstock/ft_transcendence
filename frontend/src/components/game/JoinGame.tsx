@@ -1,4 +1,3 @@
-import {io} from "socket.io-client";
 import axios from "axios";
 import React, {useContext, useEffect, useState} from "react";
 import {User} from "../BaseInterface";
@@ -15,6 +14,7 @@ interface JoinGameProps {
 export default function JoinGame(props : JoinGameProps) {
     const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
     const [gameOption, setGameOption] = useState<GameOption>();
+    const [gameAvailiable, setgameAvailiable ] = useState<boolean>(false);
 
     const socket = useContext(GameSocketContext);
     const joinServer = (id : string) => {
@@ -26,11 +26,16 @@ export default function JoinGame(props : JoinGameProps) {
             .then(response => {
                 if (response && response.status === 200)
                     setGamestoJoin(response.data);
+                setgameAvailiable(false);
+                console.log("1");
             })
             .catch(e => {
                 //todo : handle error
             })
-    },[joinServer])
+    },[gameAvailiable])
+
+    socket.on('created', () => setgameAvailiable(true));
+
 
     socket.on("started", (data : GameOption) => {
         setGameOption(data);
@@ -47,8 +52,8 @@ export default function JoinGame(props : JoinGameProps) {
             </GameSocketProvider>
             :
             <div style={{color: "white"}}>
-            {gamestoJoin && gamestoJoin.map((game) => (
-                <button className='navbutton' onClick={() => {
+            {gamestoJoin.map((game) => (
+                <button className='navbutton' key={game.gameId} onClick={() => {
                     joinServer(game.gameId)
                 }}>
                     {"Play Against " + game.firstPlayer}

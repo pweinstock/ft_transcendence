@@ -5,16 +5,15 @@ import PingPongView from "./PingPongView";
 import {GameData} from "./interfaces/game-data-props";
 import {GameSocketContext, GameSocketProvider} from "../context/game-socket";
 import {Socket} from "socket.io-client";
+import React from "react";
 
 
 export default function WatchGame() {
     const [gamestoWatch, setGamestoWatch] = useState<GameInfo[]>([]);
-    const [gameData, setGameData] = useState<GameData>()
+    const [gameData, setGameData] = useState<GameData>();
 
     const socket : Socket= useContext(GameSocketContext);
-    const joinServer = (gameId : string) => {
-        socket.emit("watch", gameId);
-    }
+    const joinServer = (gameId : string) => socket.emit("watch", gameId);
 
     useEffect(() => {
         axios.get(`http://${window.location.hostname}:5000/game/watch`, {withCredentials: true})

@@ -1,16 +1,10 @@
 
-export enum UserStatus {
-    ONLINE = "online",
-    INGAME = "ingame",
-    OFFLINE = "offline"
-};
-
 export interface User {
 	id: string;
     email: string;
     displayName: string;
     photo: string;
-    status: UserStatus;
+    status: string;
     bannedUsers: string[];
     pendingFriends: string[];
     friends: string[];

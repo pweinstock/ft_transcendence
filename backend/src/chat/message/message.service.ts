@@ -9,6 +9,8 @@ export class MessageService {
     constructor(@InjectRepository(Message) private messageRepository: Repository<Message>) {}
 
     async createMessage(dto: CreateMessageDto) : Promise<Message> {
+        if (!dto || !dto.userId || !dto.chatId || !dto.content)
+            throw new HttpException("invalid data was provided!", HttpStatus.BAD_REQUEST);
         const message = await this.messageRepository.create(dto);
         await this.messageRepository.save(message);
         return message;
