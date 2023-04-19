@@ -5,20 +5,30 @@ import {ChangeStatusDTO} from "./dto/change-status.dto";
 import {User} from "../users/user.entity";
 import {Message} from "./message/message.entity";
 import {AuthGuard} from '@nestjs/passport';
-import {Chat} from "./chat.entity";
+import {Chat, ChatType} from "./chat.entity";
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
+import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
+import { NewMessageDto } from './dto/new-message.dto';
 
 
 @Controller('chat')
 export class ChatController {
     constructor (private chatService: ChatService) {}
 
-    @Get('/all')
-    getAllchats() {
-        return this.chatService.findAllChats();
+    @Get('/allchats')
+    getAll() {
+        return this.chatService.findAll();
     }// todo for testing only delete later
+
+
+    @Get('/all')
+    @UseGuards(AuthGuard('2FA'))
+    async getAllchats() : Promise<ChatPublicDataDto[]> {
+        const chats = await this.chatService.findAllChats();
+        return chats;
+    }
 
     @Get()
     @UseGuards(AuthGuard('2FA'))
@@ -38,10 +48,10 @@ export class ChatController {
         return chat;
     }
 
-    @Post('/delete')
+    @Get('/delete/:id')
     @UseGuards(AuthGuard('2FA'))
-    delete(@Req() request, @Body() chatId : string) : void {
-        this.chatService.deleteChat(request.user, chatId);
+    async delete(@Req() request, @Param('id') chatId: string) : Promise<void> {
+        await this.chatService.deleteChat(request.user, chatId);
     }
 
     @Post('/join')
@@ -73,7 +83,7 @@ export class ChatController {
     async getChat(@Req() request, @Param('id') chatId : string) : Promise<Chat>{
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
-        if (!request.user.chats.includes(Number(chatId)))
+        if (!request.user.chats.includes(chatId))
             throw new HttpException('You are not in the Chat!', HttpStatus.BAD_REQUEST);
         const chat = await this.chatService.findChatById( chatId);
         return chat;
@@ -91,7 +101,7 @@ export class ChatController {
 
     @Post('/messages')
     @UseGuards(AuthGuard('2FA'))
-    async newMessage(@Req() request, @Body() dto : CreateMessageDto) : Promise<Message> {
+    async newMessage(@Req() request, @Body() dto : NewMessageDto) : Promise<Message> {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         const message = await this.chatService.createMessage(request.user, dto);

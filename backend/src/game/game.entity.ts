@@ -8,13 +8,13 @@ export class Game {
     @Column()
     firstPlayer: string;
 
-    @Column()
+    @Column({nullable : true})
     secondPlayer: string;
 
-    @Column()
+    @Column({default: "0"})
     firstPlayerScore: string;
 
-    @Column()
+    @Column({default: "0"})
     secondPlayerScore: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

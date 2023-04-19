@@ -1,128 +1,88 @@
-import React, { useEffect, useRef } from 'react';
-import {io} from "socket.io-client";
+import React, {useEffect, useRef, useContext} from 'react';
+import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
+import {GameSocketContext} from "../context/game-socket";
+import {Socket} from "socket.io-client";
 
 
-interface Paddle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    dy: number;
+interface PingPongProps {
+    gameData : GameData;
 }
 
-interface Ball {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    resetting: boolean;
-    dx: number;
-    dy: number;
-}
-
-interface Players {
-    firstPlayer : string
-    firstScore : number
-    secondPlayer : string
-    secondScore : number
-}
-
-interface GameData {
-    leftPaddle : Paddle;
-    rightPaddle : Paddle;
-    maxPaddleY : number;
-    ball : Ball;
-    players : Players;
-    timer : number;
-    paddleSpeed :number;
-}
-
-
-
-export default function PingPong() {
+export default function PingPongView(props : PingPongProps) {
+    const socket : Socket = useContext(GameSocketContext);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const grid = 15;
-    const paddleHeight = 75;
     const startTime = new Date().getTime();
-    let ballSpeed = 5;
-
-    const socket = io("localhost:5002/game", {
-        transports: ["websocket"],
-    });
+    let isEnded : boolean = false;
 
     useEffect(() => {
-        const canvas = canvasRef.current!;
-        const context = canvas.getContext('2d')!;
-        let gameData = {
-            leftPaddle : {
-                x: grid * 2,
-                y: canvas.height / 2 - paddleHeight / 2,
-                width: grid,
-                height: paddleHeight,
-                dy: 0,
-            },
-            rightPaddle : {
-                x: canvas.width - grid * 3,
-                y: canvas.height / 2 - paddleHeight / 2,
-                width: grid,
-                height: paddleHeight,
-                dy: 0,
-            },
-            maxPaddleY : canvas.height - grid - paddleHeight,
-            ball : {
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                width: grid,
-                height: grid,
-                resetting: false,
-                dx: ballSpeed,
-                dy: -ballSpeed,
-            },
-            players : {
-                firstPlayer : "",
-                firstScore : 0,
-                secondPlayer : "",
-                secondScore : 0
-            },
-            timer : 0,
-            paddleSpeed : 6
-        }
+        let isPaused : boolean = false;
 
+        const canvas = canvasRef.current!;
+        const context = canvas.getContext("2d")!;
+        let gameData = props.gameData;
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
-            context.moveTo(canvas.width / 2, 0);
+            context.moveTo(canvas.width / 2, 30);
             context.lineTo(canvas.width / 2, canvas.height);
-            context.strokeStyle = 'black';
+            context.strokeStyle = "grey";
             context.lineWidth = 2;
             context.stroke();
         };
 
         const drawPaddle = (paddle: Paddle) => {
-            context.fillStyle = 'black';
+            context.fillStyle = "black";
             context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         };
+        let oldx = gameData.ball.x;
         const drawBall = (ball: Ball) => {
-            context.fillStyle = 'black';
+            context.fillStyle = "black";
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
+            console.log(Math.abs(ball.x - oldx));
+            oldx = ball.x;
         };
 
         const drawTimer = () => {
-            context.font = "bold 24px Arial";
-            context.fillStyle = "black";
-            const x = 200;
-            const y= 30;
-            context.fillText("Time: " + gameData.timer, x, y);
+            context.font = "bold 18px Arial";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            const x = 400;
+            const y= 15;
+            context.fillText(String(gameData.timer), x, y);
+        };
+
+        const drawPause = () => {
+            context.font = "40px Roboto bold";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        };
+
+        const drawEndGame = () => {
+            context.font = "40px Roboto bold";
+            context.fillStyle = "red";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            if (gameData.players.firstScore > gameData.players.secondScore)
+                context.fillText(gameData.players.firstPlayer + "WON", canvas.width / 2, canvas.height / 2);
+            else if (gameData.players.firstScore < gameData.players.secondScore)
+                context.fillText(gameData.players.secondPlayer + " WON!", canvas.width / 2, canvas.height / 2);
+            else
+                context.fillText("DRAW!", canvas.width / 2, canvas.height / 2);
         };
 
         const drawScore = (players: Players) => {
-            context.font = "bold 24px Arial";
-            context.fillStyle = "black";
-            const x1 = 10;
-            const x2 = 390;
+            context.font = "bold 22px Arial";
+            context.fillStyle = "green";
+            const x1 = 20;
+            const x2 = 780;
             const y= 30;
-            context.fillText("Player 1: " + players.firstScore, x1, y);
-            context.fillText("Player 2: " + players.secondScore, x2, y);
+            context.textAlign = "left";
+            context.fillText( players.firstPlayer + " " + players.firstScore, x1, y);
+            context.textAlign = "right";
+            context.fillText(players.secondPlayer + " " + players.secondScore, x2, y);
         };
 
         const moveBall = () => {
@@ -130,7 +90,8 @@ export default function PingPong() {
                 gameData.ball.x = canvas.width / 2;
                 gameData.ball.y = canvas.height / 2;
                 gameData.ball.resetting = false;
-            } else {
+            }
+            else {
                 gameData.ball.x += gameData.ball.dx;
                 gameData.ball.y += gameData.ball.dy;
             }
@@ -189,8 +150,8 @@ export default function PingPong() {
                     bounceAngle = Math.PI - bounceAngle; // flip angle
                 }
 
-                gameData.ball.dx = ballSpeed * Math.cos(bounceAngle);
-                gameData.ball.dy = ballSpeed * -Math.sin(bounceAngle);
+                gameData.ball.dx = gameData.ballSpeed * Math.cos(bounceAngle);
+                gameData.ball.dy = gameData.ballSpeed * -Math.sin(bounceAngle);
                 gameData.ball.dx *= -1; // switch direction
             }
         };
@@ -215,20 +176,25 @@ export default function PingPong() {
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
-            requestAnimationFrame(update);
+            if (isPaused)
+                drawPause()
+            else if (isEnded)
+                drawEndGame();
+            else
+                requestAnimationFrame(update);
         };
 
-
         draw();
-        socket.on("gameUpdate", (data : GameData) => {
-                gameData = data
-            }
-        );
+        socket.on("update", (data : GameData) => gameData = data);
+        socket.on("playerDisconnected", () => isPaused = true);
+        socket.on("reconnect", () => isPaused = false);
+        socket.on("finished", () => isEnded = true);
+
 
         update();
-    }, [socket]);
+    }, [isEnded]);
 
     return (
-        <canvas ref={canvasRef} width={1200} height={800} />
+        <canvas ref={canvasRef} width={800} height={530} />
     )
 }

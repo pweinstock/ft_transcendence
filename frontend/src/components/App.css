@@ -1,9 +1,11 @@
 body {
-  background-color:  #02041b;
+  background-image: url("./img/snow-g489a55a12_1920.jpg");
+
+  /* background-color:  #02041b; */
 }
 #root {
   display: flex;    
-  background-color: #030625;
+  /* background-color: #030625; */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -28,7 +30,7 @@ header {
   background-color: #585252;
   text-align: center;
   color: wheat;
-  margin-bottom: 2%;
+  /* margin-bottom: 2%; */
   
 }
 header div {
@@ -92,14 +94,16 @@ nav a {
 
 main {
   display: flex;
+  height: 100%;
   flex-wrap: wrap;
-  width: 80%;
+  width: 100%;
   justify-content: center;
   /* align-items: center; */
 }
 
 
 section {
+  color: #d8cccc;
   display: flex;
   flex: 70%;
   flex-direction: column;
@@ -216,17 +220,10 @@ aside {
 
 /* foooooooooooooooooooorm */
 
-.formholder {
-  display: flex;
-  flex-direction: column;
-  background-color: #dfdfdf;
-  padding: 2%;
-  width: 60%;
-}
 
- form {
+ /* form {
   width: 100%;
-} 
+}  */
 
 input[type="text"] {
   width: 96%;

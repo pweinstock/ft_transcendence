@@ -1,51 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
-import astroman from './img/littleman.png';
+import astroman from '../img/littleman.png';
 import axios from "axios";
-import Chat from "./chat/Chat"
-// const user = ;
+import Chat from "../chat/Chat"
+import {User} from "../BaseInterface";
 
-interface Props {
-    chatidp: number;
+interface ChatProps {
+    user : User;
+    chatidp: string;
+    // chatName : string;
   }
 
-//   export default function NewChat({chatidp}) {
-  const NewChat: React.FC<Props> = ({chatidp}) => {
+  const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
     const [title, setTitle] = useState('');
     const [urlpost, setUrlpost] = useState('');
     const [bigtext, setBigtext] = useState('');
-
-    const [msg, setmsg] = useState([]); //set with basic value 0
+    const [msg, setmsg] = useState([]);
     // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
-    // const chatId = chatidp;
 
     useEffect(() => {
-        async function printassages() {
-            // const chatId = '1';
-            const response = await axios.get("http://localhost:5000/chat/id/" + chatidp, {withCredentials: true});
+        console.log("massage log");
+        async function printmessages() {
+            console.log(props.chatidp);
+            const response = await axios.get("http://localhost:5000/chat/id/" + props.chatidp, {withCredentials: true});
             setmsg(response.data);
             
             // const messages = response.data;
             console.log(response.data);
         }
-        printassages();
+        printmessages();
     }, []);
 
     function handOnClickSend() {
         let temp = "Anonymus";
         let anopic = astroman;
-        // if (user) {
-        //     temp = user.displayName;
-        //     anopic = user.photoURL;
-        // }
     }
 
     return (
         <>
-        <section>
-
             <div className='formholder'>
-                <h1>Room {chatidp} Content goes here</h1>
+                <h1>Room  Content goes here</h1>
+                <p>{props.chatidp}</p>
                 {/* <form>
                     <div className="postlabel">
                         <label htmlFor="subject">Massage</label>
@@ -59,11 +53,9 @@ interface Props {
                         </div>
                     </Link>
                 </form> */}
-                <Chat/>
+                <Chat  user={props.user} chatidp={props.chatidp} />
             </div>
-        </section>
         </>
-
     );
 }
 

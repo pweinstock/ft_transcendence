@@ -1,33 +1,38 @@
-import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res} from '@nestjs/common';
+import { Controller, Get, UseGuards} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {GameService} from "./game.service";
 import {Game} from "./game.entity";
-import {createGameDto} from "./dto/create-game.dto";
+import {GameInfoDto} from "./dto/game-info.dto";
 
 
 @Controller('game')
-export class UserController {
+export class GameController {
 
     constructor(private gameService: GameService) {}
 
     @Get()
+    @UseGuards(AuthGuard('2FA'))
+    async getFinishedGames() : Promise<Game[]> {
+        const games = await this.gameService.getFinishedGames();
+        return games;
+    }
+
+    @Get('all')
 	@UseGuards(AuthGuard('2FA'))
     async getAll() : Promise<Game[]> {
         const games = this.gameService.findAllGame();
         return games;
     }
 
-    @Get('/:id')
+    @Get('watch')
     @UseGuards(AuthGuard('2FA'))
-    async getGame(@Req() request: any, @Param() gameId : string) : Promise<Game> {
-        const game = await this.gameService.findGamebyId(gameId);
-        return game;
+    gamesToWatch() : GameInfoDto[] {
+        return this.gameService.getGamesToWatch();
     }
 
-    @Post()
+    @Get('join')
     @UseGuards(AuthGuard('2FA'))
-    async createGame(@Req() request: any, @Body() dto : createGameDto) : Promise<Game> {
-        const game = await this.gameService.createGame(dto);
-        return game;
+    gamesToJoin() : GameInfoDto[] {
+        return this.gameService.getGamesToJoin();
     }
 }

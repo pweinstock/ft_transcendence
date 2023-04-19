@@ -1,5 +1,4 @@
 // import PingPong from "./game/Game"
-import Chat from "./chat/Chat"
 import astroman from './img/littleman.png';
 import {
     BrowserRouter as Router,
@@ -8,43 +7,43 @@ import {
     Link
   } from "react-router-dom";
 // import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
-import GameView from "./game/GameView"
-import Test from "./Test"
 import './App.css';
 import Basic from './basic';
-import NewChat from './NewChat';
-import ChatRooms from './ChatRooms';
+import NewChat from './chatrooms/NewChat';
+import ChatRooms from './chatrooms/ChatRooms';
 import Login from "./auth/login/Login";
-import Users from "./users/users";
-import Settings from "./settings/settings1";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
-import User from './users/users';
-import React, { useState, useEffect, useRef } from 'react';
+import BaseUser from './users/BaseUser';
+import React, { useState, useEffect } from 'react';
 import axios from "axios";
+import { User } from "./BaseInterface";
+import Game from "./game/Game";
+import Users from "./users/users";
+import {GameSocketProvider} from "./context/game-socket";
+import PublicProfile from './users/PublicProfile';
+import Friends from './users/Friends';
+
+
 
 export default function App() {
 
   const [value, setValue] = useState<{id: number, name: string }[]>([]); 
+  const [currentUsersData, setcurrentUsersData] = useState<User>();
+
   useEffect(() => {
-    async function fetchChatrooms() {
-
-        try{
-        const response = await axios.get("http://localhost:5000/chat", {withCredentials: true});
-        if (response)
-          console.log(response.data);
-          setValue(response.data);
+    axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
+      .then((response) => {
+        setcurrentUsersData(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+        if (error.response && error.response.status !== 200) {
+          console.log("Error get current user....");
         }
-        catch(e) {
-          //error handling
-          console.log("fetchChatrooms error");
-        }
+      });
+  }, []);
 
-        
-        
-    }
-    fetchChatrooms();
-},[]);
     return (
         <>
         <Router>
@@ -56,47 +55,50 @@ export default function App() {
           </header>
           <main>
             <Routes>
-                <Route path="/"  element={<Basic />}/>
-                <Route path="/gameview" element={<GameView/>}/>
-                <Route path="/chatrooms" element={<ChatRooms/>}/>
-                <Route path="/chat" element={<Chat/>}/>
-                {/* <Route path="/newchat" element={<NewChat/>}/> */}
-                <Route path="/test" element={<Test/>}/>
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
-                <Route path="/users" element={<Users/>}/>
-                <Route path="/settings" element={<Settings2/>}/>
-                     {value && value.map((item, index) => (
-                        // <Route key = {item.id} path={"/chat/id/:id"} element={<NewChat chatidp={42}/>}/>
-                        // <Route key = {item.id} path={"/chat/id/:id"} element={<NewChat chatidp={item.id}/>}/>
-                        <Route key = {item.id} path={"/chat/id/" + item.id} element={<NewChat chatidp={item.id}/>}/>
-                    ))}
+                <Route path="/"  element={<Basic />}/>
+                <Route path="/settings"  element={<Settings2 />}/>
+                {/*<Route path="/chat" element={<Chat/>}/>*/}
+                {/*<Route path="/newchat" element={<NewChat/>}/> */}
+                {/*<Route path="/test" element={<Test/>}/>*/}
+                {/*<Route path="/gameview" element={<GameView/>}/>*/}
+                {currentUsersData &&
+                    <>
+                    <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
+                        <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
+                    <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
+                    <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
+                    <Route path="/users/:user" element={<PublicProfile currentUser={currentUsersData}/>}/>
+                    </>
+                }
             </Routes>
             <aside>
-                <Login />
-                <User />
-                <h3 style={{color:"white"}}>Here will put the loged in user and maybe even the active chats?</h3>
-                {/* <Groupabout /> */}
+              {!currentUsersData && <Login />}
+              {currentUsersData && <Users />}
             </aside>
           </main>
           <footer>
             <nav>
-              <Link className="newpostlink" to="/">
+              <Link key={"home"} className="newpostlink" to="/">
                     <button className='navbutton'>Home</button>
                 </Link>
-              <Link className="newpostlink" to="/chatrooms">
+              <Link key={"chatroom"} className="newpostlink" to="/chatrooms">
                     <button className='navbutton'>ChatRooms</button>
               </Link>
-              <Link className="newpostlink" to="/gameview">
-                    <button className='navbutton'>WatchGame</button>
+              <Link key={"game"}  className="newpostlink" to="/game">
+                    <button className='navbutton'>Game</button>
               </Link>
-              <Link className="newpostlink" to="/users">
+              <Link key={"users"}  className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
                 </Link>
-                <Link className="newpostlink" to="/test">
-                    <button className='navbutton'>Friends</button>
-                </Link>
-                <Link className="newpostlink" to="/settings">
+              <Link key={"friends"}  className="newpostlink" to="/friends">
+                  <button className='navbutton'>Friends</button>
+              </Link>
+                {/*<Link key={"friends"}  className="newpostlink" to="/friends">*/}
+                    {/*<button className='navbutton'>Friends</button>*/}
+                {/*</Link>*/}
+                <Link key={"settings"}  className="newpostlink" to="/settings">
                     <button className='navbutton'>Settings</button>
                 </Link>
             </nav>

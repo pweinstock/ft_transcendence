@@ -1,6 +1,4 @@
 export default function Messages({messages} : {messages : string[]}) {
-    console.log("hello!");
-    console.log(messages[0]);
     return (
         <div>
             <p>

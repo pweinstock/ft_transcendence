@@ -1,6 +1,6 @@
 import {HttpException, HttpStatus, Injectable, Res} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
-import {User, UserStatus} from "./user.entity";
+import {User} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import { join } from 'path';
@@ -18,8 +18,8 @@ export class UserService {
         if (existingUser)
             return existingUser;
         const user = this.userRepository.create(dto);
-        user.pendingFriends = [];
         user.bannedUsers = [];
+        user.pendingFriends = [];
         user.friends = [];
         user.chats = [];
         user.matchHistory = [];
@@ -89,9 +89,12 @@ export class UserService {
         return of(res.sendFile(join(process.cwd(), './uploads/image/' + imagename)));
     }
 
-    async changeStatus(user : User, status : UserStatus) : Promise<User> {
-        user.status = status;
-        return this.userRepository.save(user);
+    async changeStatus(name : string, status : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName: name});
+        if (user) {
+            user.status = status;
+            this.userRepository.save(user);
+        }
     }
 
     //FRIEND LIST
@@ -156,27 +159,33 @@ export class UserService {
     }
 
     //GAME
-    async wonGame(userId : string, matchId : string) : Promise<void> {
-        const user = await this.findById(userId);
-        user.matchHistory.push(matchId);
-        user.wins += 1;
-        user.score += 3;
-        this.userRepository.save(user);
+    async wonGame(displayname : string, matchId : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName: displayname});
+        if (user) {
+            user.matchHistory.push(matchId);
+            user.wins += 1;
+            user.score += 3;
+            this.userRepository.save(user);
+        }
     }
 
-    async draw(userId : string, matchId : string) : Promise<void> {
-        const user = await this.findById(userId);
-        user.matchHistory.push(matchId);
-        user.draws += 1;
-        user.score += 1;
-        this.userRepository.save(user);
+    async draw(displayname : string, matchId : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName : displayname});
+        if (user) {
+            user.matchHistory.push(matchId);
+            user.draws += 1;
+            user.score += 1;
+            this.userRepository.save(user);
+        }
     }
 
-    async lostGame(userId : string, matchId : string) : Promise<void> {
-        const user = await this.findById(userId);
-        user.matchHistory.push(matchId);
-        user.losses += 1;
-        this.userRepository.save(user);
+    async lostGame(displayname : string, matchId : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName: displayname});
+        if (user) {
+            user.matchHistory.push(matchId);
+            user.losses += 1;
+            this.userRepository.save(user);
+        }
     }
 
     //CHAT
