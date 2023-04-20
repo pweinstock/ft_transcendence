@@ -5,6 +5,7 @@ import { User } from "../BaseInterface";
 import './chatstyle.css';
 import NewChat from './NewChat';
 import CreateChat from './CreateChat';
+import PublicChatList from './PublicChatList';
 
 interface ChatProps {
     user: User;
@@ -13,10 +14,10 @@ interface ChatProps {
 const ChatRooms: React.FC<ChatProps> = (props) => {
 
 const [value, setValue] = useState<{id: string, name: string }[]>([]);
-const [allChat, setallChat] = useState<{id: string, name: string, owner: string, type :string }[]>([]);
 const [chatNameValue, setchatNameValue] = useState<string>("");
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
+const [addThisUserId, setaddThisUserId] = useState<string>("");
 
 
 useEffect(() => {
@@ -33,19 +34,17 @@ useEffect(() => {
 	fetchChatrooms();
 },[chatNameValue, value]);
 
-useEffect(() => {
-	async function getAllPubliChat() {
-		try{
-			const response = await axios.get(`http://${window.location.hostname}:5000/chat/all`, {withCredentials: true});
-			if (response)
-				setallChat(response.data);
-			}
-			catch(e) {
-				console.log("getAllPubliChat chat error");
-			}
-	}
-	getAllPubliChat();
-},[chatNameValue]);
+function addUserHandler(UserId :string) {
+	axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUserId,  chatId : actualChatid }, {withCredentials: true}).then( () => {
+	}).catch((reason) => {
+		if (reason.response!.status !== 200) {
+			console.log("Error while adding user in chatid:");
+			console.log(actualChatid);
+		}
+		console.log(reason.message);
+	});
+}
+
 
 async function deleteChatNutton(id : string) {
 	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
@@ -62,18 +61,6 @@ const handleParentStateUpdate = (newState: string) => {
 	setchatNameValue(newState);
 };
 
-function joinbuttonHandler(id :string) {
-	axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : props.user.id,  chatId : id, password : null }, {withCredentials: true}).then( () => {
-		const socket = io("http://localhost:5001/chat" );
-		socket?.emit('joinRoom', id);
-	}).catch((reason) => {
-		if (reason.response!.status !== 200) {
-			console.log("Error while joing chat, in chatid:");
-			console.log(id);
-		}
-		console.log(reason.message);
-		});
-}
 return (
 	<>
 		<section>
@@ -95,19 +82,7 @@ return (
 						))}
 					</div>
 					<CreateChat chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
-					<div className='publicchatlist'>
-						<p>List of public chats</p>
-						{allChat && allChat.map((item, index) => (
-								<div key={item.id} style={{color: "white"}}>
-									{item.owner !== props.user.displayName && 
-										<button className='navbutton' onClick={() => {
-											joinbuttonHandler(item.id);
-											}}>Join {item.name} chat! with: {item.owner} ({item.type})</button>
-									}
-								</div>
-						))}
-
-					</div>
+					<PublicChatList user={props.user} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 				</div>
 				</div>
 				<div className='chatcontent'>

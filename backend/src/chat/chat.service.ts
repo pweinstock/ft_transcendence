@@ -140,7 +140,7 @@ export class ChatService {
                     chat.users.push(user.id);
                     break;
                 case ChatType.PROTECTED:
-                    if (await bcrypt.compare(chat.password, dto.password))
+                    if (await bcrypt.compare( dto.password ,chat.password))
                         chat.users.push(user.id);
                     else
                         throw new HttpException('Wrong Password!', HttpStatus.FORBIDDEN);

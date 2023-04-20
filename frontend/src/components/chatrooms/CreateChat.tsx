@@ -19,8 +19,7 @@ interface ChatProps {
 const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 
 	const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
-	// const [chatNameValue, setchatNameValue] = useState<string>("");
-	const [chatPassValue, setchatPassValue] = useState<string | undefined>(undefined);
+	const [chatPassValue, setchatPassValue] = useState<string>("");
 
 	const handleChatTypeChange = (event : ChangeEvent<HTMLSelectElement>) => {
 		setchaTypeValue(event.target.value as ChatType);
@@ -42,6 +41,7 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 			console.log(reason.message);
 		});
 		props.onUpdate("");
+		setchatPassValue("");
 	}
 
 return (
@@ -71,7 +71,6 @@ return (
 					<button className='chatbutton' type="submit">Create Chat</button>
 				</form>
 			</div>
-
 		</div>
 	</>
 );
