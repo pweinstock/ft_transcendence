@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards} from '@nestjs/common';
+import { Controller, Get, Param, UseGuards} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {GameService} from "./game.service";
 import {Game} from "./game.entity";
@@ -22,6 +22,12 @@ export class GameController {
     async getAll() : Promise<Game[]> {
         const games = this.gameService.findAllGame();
         return games;
+    }
+
+    @Get('id/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async getById(@Param('id') id : string) : Promise<Game> {
+        return this.gameService.findGamebyId(id);
     }
 
     @Get('watch')
