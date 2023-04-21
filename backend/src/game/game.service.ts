@@ -29,10 +29,10 @@ export class GameService {
         const gameId = this.getPlayerGameId(clientId);
         if (gameId)
             return null;
-        const game = await this.gameRepository.save({firstPlayer : dto.firstPlayer, secondPlayer : null});
-        this.playerToGameId.set(clientId, {gameId : game.id, isFirst : true});
-        this.gameIdToGameOption.set(game.id, dto);
-        return game.id;
+        // const game = await this.gameRepository.save({firstPlayer : dto.firstPlayer, secondPlayer : null});
+        this.playerToGameId.set(clientId, {gameId : dto.firstPlayer, isFirst : true});
+        this.gameIdToGameOption.set(gameId, dto);
+        return gameId;
     }
 
     getGameData (gameId :string) : GameDataDto {

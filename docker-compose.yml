@@ -43,6 +43,7 @@ services:
         PORT: $PORT
         CHAT_PORT: $CHAT_PORT
         GAME_PORT: $GAME_PORT
+        USER_PORT: $USER_PORT
         FORTYTWO_APP_ID: $FORTYTWO_APP_ID
         FORTYTWO_APP_SECRET: $FORTYTWO_APP_SECRET
         HOST_IP: $HOST_IP
@@ -55,6 +56,7 @@ services:
       - ${PORT}:${PORT}
       - ${CHAT_PORT}:${CHAT_PORT}
       - ${GAME_PORT}:${GAME_PORT}
+      - ${USER_PORT}:${USER_PORT}
       networks:
       - transcendence
       depends_on:
