@@ -18,6 +18,7 @@ interface ChatProps {
 const InputMessage: React.FC<ChatProps> = (props : ChatProps) => {
 const socket = useContext(ChatSocketContext);
 
+// const [savescrollHeight, setsaveScrollHeight] = useState<number>(0);
 const [message, setMessage] = useState<string | "">("");
 const [messages, setMessages] = useState<{content: string, date: string, id: string, displayName : string}[]>([]);
 
@@ -27,6 +28,8 @@ socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
 useEffect(() => {
 	setMessages([]);
+	// const {scrollHeight} = container.current as HTMLDivElement;
+	// setsaveScrollHeight(scrollHeight);
 	}, [props.chatidp]); 
 //when we call it with a different chat id its triggers the clearing fo the variable handleled by the usstate
 // important revelation how the states can be handleed. how they update and how to prevent default behaviour of forms
@@ -39,9 +42,9 @@ const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
+	// const {scrollHeight} = container.current as HTMLDivElement;
+	// setsaveScrollHeight(scrollHeight);
 	Scroll();
-	// const bobi = new Date().toLocaleString("en-de");
-	// console.log(bobi);
 	socket?.emit("message", {date: new Date().toLocaleString("en-de"), content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
 	setMessage("");
 }
@@ -71,28 +74,33 @@ useEffect(() => {
 const container = useRef<HTMLDivElement>(null);
 
 const Scroll = () => {
-	const { offsetHeight, scrollHeight, scrollTop } = container.current as HTMLDivElement
-	container.current?.scrollTo(0, scrollHeight)
+	container.current?.scrollTo(0, 9999);
+	// container.current?.scrollTo(0, savescrollHeight)
+	console.log("RUN....");
+	// console.log(savescrollHeight);
 }
 
 useEffect(() => {
-  Scroll()
+	// const {scrollHeight } = container.current as HTMLDivElement;
+	// const {scrollHeight} = container.current as HTMLDivElement;
+	// setsaveScrollHeight(scrollHeight);
+  Scroll();
 }, [messages])
 
 return (
 	<>
 		<div ref={container} className="message-list">
 			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
-			{messages.map((message) => {
-			return (
-				<Message key={message.date}
-					content={message.content}
-					date={message.date}
-					displayName={message.displayName}
-					user={props.user.displayName}
-				/>
-			);
-		})}
+			{messages.map((message, index) => {
+				return (
+					<Message key={index + props.chatidp}
+						content={message.content}
+						date={message.date}
+						displayName={message.displayName}
+						user={props.user.displayName}
+					/>
+				);
+			})}
 		</div>
 
 		<div className="inputgroup">

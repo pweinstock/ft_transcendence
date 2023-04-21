@@ -14,10 +14,13 @@ chatName : string;
 }
 
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
+const [usersData, setUsersData] = useState<any[]>([]);
+
 const [title, setTitle] = useState('');
 const [urlpost, setUrlpost] = useState('');
 const [bigtext, setBigtext] = useState('');
 const [msg, setmsg] = useState([]);
+
 // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
 
 // useEffect(() => {
@@ -30,10 +33,37 @@ const [msg, setmsg] = useState([]);
 //     }
 //     printmessages();
 // }, []);
+
+useEffect(() => {
+	axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
+		.then((response) => {
+			setUsersData(response.data);
+		})
+		.catch((error) => {
+			console.error(error);
+			if (error.response && error.response.status !== 200) {
+				console.log("error in getting all user data");
+			}
+		});
+		console.log(usersData);
+}, []);
+
+function addUserHandler(UserId :string) {
+	axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : UserId,  chatId : props.chatidp }, {withCredentials: true}).then( () => {
+	}).catch((reason) => {
+		if (reason.response!.status !== 200) {
+			console.log("Error while adding user in chatid:");
+			console.log(props.chatidp);
+		}
+		console.log(reason.message);
+	});
+}
+
+
 const [parentState, setParentState] = useState("Initial parent state");
 
 const handleParentStateUpdate = (newState: string) => {
-  setParentState(newState);
+	setParentState(newState);
 };
 
 function handOnClickSend() {
