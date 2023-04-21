@@ -243,8 +243,6 @@ export class UserService {
             user.status = "online";
             await this.userRepository.save(user);
         }
-        else
-            this.clientToUser.delete(clientId);
     }
 
     async userDisconnect(clientId : string) : Promise<void> {
