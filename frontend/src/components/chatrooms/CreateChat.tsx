@@ -13,7 +13,7 @@ interface ChatProps {
 	// user : User;
 	// chatidp: string;
 	chatName : string;
-	onUpdate: (newState: string) => void;
+	onUpdate: (newState: string, deside: boolean) => void;
 }
 
 const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
@@ -26,7 +26,7 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 	  };
 	
 	const handleChatNameChange = (event : ChangeEvent<HTMLInputElement>) => {
-		props.onUpdate(event.target.value);
+		props.onUpdate(event.target.value, true);
 	  };
 	const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
 		setchatPassValue(event.target.value);
@@ -36,12 +36,15 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 		event.preventDefault();
 		// e.preventDefault();
 		axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : props.chatName, password: chatPassValue}, {withCredentials: true})
-			.then().catch(reason => {
+			.then(() => {
+				props.onUpdate("", true);
+				setchatPassValue("");
+				props.onUpdate("", false);
+			}
+			).catch(reason => {
 			console.log("failed to post chat!")
 			console.log(reason.message);
 		});
-		props.onUpdate("");
-		setchatPassValue("");
 	}
 
 return (

@@ -41,6 +41,7 @@
 	padding: 1px 5px 5px 5px;
 	border-style: dotted;
 	height: 700px;
+	justify-content: space-between;
 	/* height: 75%; */
 	/* width: 100%; */
 }
@@ -98,6 +99,7 @@
 .message-list {
 	display: flex;
 	flex-direction: column;
+	height: 100%;
 	overflow-y: scroll ;
 	/* justify-content: flex-end; */
 
@@ -168,3 +170,27 @@
 	margin-left: 5px;
 	cursor:pointer;
 }
+
+/* scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+	width: 5px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+	box-shadow: inset 0 0 5px grey; 
+	border-radius: 10px;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+	background: rgba(172, 160, 160, 0.12); 
+	border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+	background: rgba(172, 160, 160, 0.578); ; 
+  }

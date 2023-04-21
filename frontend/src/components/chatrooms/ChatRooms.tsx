@@ -19,8 +19,20 @@ const [chatNameValue, setchatNameValue] = useState<string>("");
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 const [addThisUserId, setaddThisUserId] = useState<string>("");
+const [updateStatesGlobal, setaupdateStatesGlobal] = useState<number>(0);
+
 const socket : Socket= useContext(UserSocketContext);
 
+const updateOtherUsers = () =>{
+	socket?.emit('userUpdate',  {});
+}
+
+// listening to any update in the server.
+// socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
+
+useEffect(() => {
+	socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
+}, [updateStatesGlobal, setaupdateStatesGlobal])
 
 
 
@@ -36,11 +48,15 @@ useEffect(() => {
 			}
 	}
 	fetchChatrooms();
-},[chatNameValue, value]);
+},[chatNameValue, value, updateStatesGlobal]);
 
 
 async function deleteChatNutton(id : string) {
 	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
+		.then(() => {
+			setchatNameValue("");
+			updateOtherUsers();
+		})
 		.catch((reason) => {
 		if (reason.response!.status !== 200) {
 			console.log("Error in deleteing chat, in chatid:");
@@ -48,10 +64,13 @@ async function deleteChatNutton(id : string) {
 		}
 		console.log(reason.message);
 		});
-		setchatNameValue("");
+
 }
-const handleParentStateUpdate = (newState: string) => {
-	setchatNameValue(newState);
+const handleParentStateUpdate = (newState: string, deside: boolean) => {
+	if (deside)
+		setchatNameValue(newState);
+	else
+		updateOtherUsers();
 };
 
 return (
@@ -75,7 +94,7 @@ return (
 						))}
 					</div>
 					<CreateChat chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
-					<PublicChatList user={props.user} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
+					<PublicChatList user={props.user} updatestate={updateStatesGlobal} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 				</div>
 				</div>
 				<div className='chatcontent'>

@@ -45,8 +45,11 @@ useEffect(() => {
 				console.log("error in getting all user data");
 			}
 		});
-		console.log(usersData);
-}, []);
+	}, [props.chatidp]);
+
+useEffect(() => {
+	console.log(usersData);
+}, [props.chatidp]);
 
 function addUserHandler(UserId :string) {
 	axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : UserId,  chatId : props.chatidp }, {withCredentials: true}).then( () => {

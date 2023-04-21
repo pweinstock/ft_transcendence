@@ -23,26 +23,35 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly userService: UserService) {}
 
-    afterInit(server: Server) {}
+    afterInit(server: Server) {
+    }
 
-    handleConnection() {}
+    handleConnection() {
+    }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
         await this.userService.userDisconnect(client.id);
     }
 
     @SubscribeMessage('userConnect')
-    async createGame(
+    async newUser(
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : UserInfoDto
     ): Promise<void> {
-        if (dto && dto.userId)
+        console.log("connect requested");
+
+        if (dto && dto.userId) {
+            console.log("connect accepted");
             await this.userService.userConnect(client.id, dto);
+        }
     }
 
-    @SubscribeMessage('update')
+    @SubscribeMessage('userUpdate')
     userUpdate(@ConnectedSocket() client: Socket) {
-        if (this.userService.isConnected(client.id))
+        console.log("update requested");
+        if (this.userService.isConnected(client.id)) {
+            console.log("update sended");
             this.server.emit('userUpdate');
+        }
     }
 }
