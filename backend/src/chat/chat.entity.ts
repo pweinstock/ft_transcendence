@@ -7,11 +7,6 @@ export enum ChatType {
     DIRECT = "direct",
 };
 
-export interface MutedUser {
-    userId: string;
-    unmuteDate: Date;
-}
-
 @Entity({name: 'chat'})
 export class Chat {
     @PrimaryGeneratedColumn("uuid")
@@ -32,8 +27,8 @@ export class Chat {
     @Column("text", {array: true, default: null, nullable: true})
     bannedUsers: string[];
 
-    @Column({type: 'jsonb', array: false, default: () => "'[]'", nullable: false})
-    mutedUsers: Array<MutedUser>;
+    @Column("text", {array: true, default: null, nullable: true})
+    mutedUsers: string[];
 
     @Column("text", {nullable: true})
     owner: string;
