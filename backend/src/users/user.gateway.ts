@@ -23,16 +23,18 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly userService: UserService) {}
 
-    afterInit(server: Server) {}
+    afterInit(server: Server) {
+    }
 
-    handleConnection() {}
+    handleConnection() {
+    }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
         await this.userService.userDisconnect(client.id);
     }
 
     @SubscribeMessage('userConnect')
-    async createGame(
+    async newUser(
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : UserInfoDto
     ): Promise<void> {
@@ -40,7 +42,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             await this.userService.userConnect(client.id, dto);
     }
 
-    @SubscribeMessage('update')
+    @SubscribeMessage('userUpdate')
     userUpdate(@ConnectedSocket() client: Socket) {
         if (this.userService.isConnected(client.id))
             this.server.emit('userUpdate');

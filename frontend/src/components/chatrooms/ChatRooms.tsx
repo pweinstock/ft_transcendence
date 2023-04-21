@@ -24,7 +24,7 @@ const [updateStatesGlobal, setaupdateStatesGlobal] = useState<number>(0);
 const socket : Socket= useContext(UserSocketContext);
 
 const updateOtherUsers = () =>{
-	socket?.emit('update',  {});
+	socket?.emit('userUpdate',  {});
 }
 
 // listening to any update in the server.
