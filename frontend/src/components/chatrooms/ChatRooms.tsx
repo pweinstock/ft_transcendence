@@ -34,17 +34,6 @@ useEffect(() => {
 	fetchChatrooms();
 },[chatNameValue, value]);
 
-function addUserHandler(UserId :string) {
-	axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUserId,  chatId : actualChatid }, {withCredentials: true}).then( () => {
-	}).catch((reason) => {
-		if (reason.response!.status !== 200) {
-			console.log("Error while adding user in chatid:");
-			console.log(actualChatid);
-		}
-		console.log(reason.message);
-	});
-}
-
 
 async function deleteChatNutton(id : string) {
 	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
