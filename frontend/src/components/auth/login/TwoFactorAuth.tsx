@@ -1,76 +1,41 @@
-import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
+import axios from "axios";
+import { ChangeEvent, useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 const TwoFactorAuth = () => {
-  const [code, setCode] = useState('');
-  const [validationResult, setValidationResult] = useState('');
 
-  const handleCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newCode = event.target.value;
-    if (newCode.length <= 6) {
-      setCode(newCode);
-    }
-  };
+    const [code, setCode] = useState("")
+    const navigate = useNavigate();
 
-  const handleValidation = () => {
-    fetch(`http://${window.location.hostname}:5000/auth/validate`, {
-      method: 'POST',
-      credentials: "include",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ code })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.valid) {
-          setValidationResult('Validation successful');
-        } else {
-          setValidationResult('Validation failed');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  };
+    const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setCode(event.target.value);
+      };
+    
+    const handleVerify = async () => {
+      try {
+        await axios.post(`http://${window.location.hostname}:5000/auth/validate`, { code }, { withCredentials: true });
+        await axios.get(`http://${window.location.hostname}:5000/auth/enable`, { withCredentials: true });
+        alert("Two-factor authentication has been enabled!");
+        window.location.href = `http://${window.location.hostname}:3000`;
+      } catch(e) {
+        alert("Invalid code. Please try again.");
+      }
+    };
 
-  const handleContinue = () => {
-    window.location.href = `http://${window.location.hostname}:3000`;
-  };
-
-  return (
-    <>
-      <TextField
-        label="Enter 2FA validation code"
-        value={code}
-        onChange={handleCodeChange}
-        inputProps={{
-          maxLength: 6,
-          style: {
-            color: 'white'
-          }
-        }}
-        InputLabelProps={{
-          style: {
-            color: 'white'
-          }
-        }}
-      />
-      <Button variant="contained" onClick={handleValidation}>Validate</Button>
-      {validationResult && (
-        <>
-          <Typography variant="body1" style={{ color: 'white' }}>
-            {validationResult}
-          </Typography>
-          {validationResult === 'Validation successful' && (
-            <Button variant="contained" onClick={handleContinue}>Continue</Button>
-          )}
-        </>
-      )}
-    </>
-  );
-};
-
-export default TwoFactorAuth;
+    
+    return (
+        <Dialog open={true}>
+            <DialogTitle>
+                Enter 2FA verification code
+            </DialogTitle>
+            <DialogContent>
+                <TextField label="Verification Code" value={code} onChange={handleCodeChange} inputProps={{ maxLength: 6 }}/>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleVerify}>Verify</Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+export default TwoFactorAuth

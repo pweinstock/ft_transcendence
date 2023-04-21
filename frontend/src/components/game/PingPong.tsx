@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
+import React, {useEffect, useRef, useContext} from 'react';
 import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
 import {GameOption} from "./interfaces/game-option";
 import {GameSocketContext} from "../context/game-socket";
