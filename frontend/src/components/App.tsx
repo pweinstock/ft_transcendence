@@ -1,4 +1,3 @@
-// import PingPong from "./game/Game"
 import astroman from './img/littleman.png';
 import {
     BrowserRouter as Router,
@@ -6,10 +5,8 @@ import {
     Routes,
     Link
   } from "react-router-dom";
-// import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 import './App.css';
 import Basic from './basic';
-import NewChat from './chatrooms/NewChat';
 import ChatRooms from './chatrooms/ChatRooms';
 import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
@@ -23,13 +20,12 @@ import Users from "./users/users";
 import {GameSocketProvider} from "./context/game-socket";
 import PublicProfile from './users/PublicProfile';
 import Friends from './users/Friends';
+import {UserSocketProvider} from "./context/user-socket";
 
 
 
 export default function App() {
-
-  const [value, setValue] = useState<{id: number, name: string }[]>([]); 
-  const [currentUsersData, setcurrentUsersData] = useState<User>();
+    const [currentUsersData, setcurrentUsersData] = useState<User>();
 
   useEffect(() => {
     axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
@@ -59,14 +55,10 @@ export default function App() {
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
                 <Route path="/"  element={<Basic />}/>
                 <Route path="/settings"  element={<Settings2 />}/>
-                {/*<Route path="/chat" element={<Chat/>}/>*/}
-                {/*<Route path="/newchat" element={<NewChat/>}/> */}
-                {/*<Route path="/test" element={<Test/>}/>*/}
-                {/*<Route path="/gameview" element={<GameView/>}/>*/}
                 {currentUsersData &&
                     <>
-                    <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
-                        <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
+                    <Route path="/chatrooms" element={<UserSocketProvider><ChatRooms user={currentUsersData}/></UserSocketProvider>}/>
+                    <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
                     <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
                     <Route path="/users/:user" element={<PublicProfile currentUser={currentUsersData}/>}/>
@@ -74,15 +66,14 @@ export default function App() {
                 }
             </Routes>
             <aside>
-              {!currentUsersData && <Login />}
-              {currentUsersData && <Users />}
+              currentUsersData ? <Users /> : <Login />
             </aside>
           </main>
           <footer>
             <nav>
               <Link key={"home"} className="newpostlink" to="/">
                     <button className='navbutton'>Home</button>
-                </Link>
+              </Link>
               <Link key={"chatroom"} className="newpostlink" to="/chatrooms">
                     <button className='navbutton'>ChatRooms</button>
               </Link>
@@ -91,16 +82,13 @@ export default function App() {
               </Link>
               <Link key={"users"}  className="newpostlink" to="/users">
                     <button className='navbutton'>Users</button>
-                </Link>
+              </Link>
               <Link key={"friends"}  className="newpostlink" to="/friends">
                   <button className='navbutton'>Friends</button>
               </Link>
-                {/*<Link key={"friends"}  className="newpostlink" to="/friends">*/}
-                    {/*<button className='navbutton'>Friends</button>*/}
-                {/*</Link>*/}
-                <Link key={"settings"}  className="newpostlink" to="/settings">
-                    <button className='navbutton'>Settings</button>
-                </Link>
+              <Link key={"settings"}  className="newpostlink" to="/settings">
+                  <button className='navbutton'>Settings</button>
+              </Link>
             </nav>
           </footer>
         </Router>
