@@ -5,11 +5,11 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import { join } from 'path';
 import { Observable, of } from 'rxjs';
+import {UserInfoDto} from "./dto/user-info.dto";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private userRepository : Repository<User>) {
-    }
+    constructor(@InjectRepository(User) private userRepository : Repository<User>) {}
 
     async createUser(dto: UserDTO): Promise<User> {
         if (!dto.email || !dto.displayName)
@@ -165,6 +165,8 @@ export class UserService {
             user.matchHistory.push(matchId);
             user.wins += 1;
             user.score += 3;
+            if (user.status != "offline")
+                user.status = "online";
             this.userRepository.save(user);
         }
     }
@@ -175,6 +177,8 @@ export class UserService {
             user.matchHistory.push(matchId);
             user.draws += 1;
             user.score += 1;
+            if (user.status != "offline")
+                user.status = "online";
             this.userRepository.save(user);
         }
     }
@@ -184,6 +188,8 @@ export class UserService {
         if (user) {
             user.matchHistory.push(matchId);
             user.losses += 1;
+            if (user.status != "offline")
+                user.status = "online";
             this.userRepository.save(user);
         }
     }
@@ -218,4 +224,34 @@ export class UserService {
 	async disableTwoFactorAuthentication(Id: string) {
 		return this.userRepository.update(Id, {isTwoFactorAuthenticationEnabled: false});
 	}
+
+	//USER SOCKET INTERRACTION!
+    private clientToUser = new Map<string, string>();
+
+    getUserFromClient(clientId :string) : string {
+        return this.clientToUser.get(clientId);
+    }
+
+    async userConnect(clientId : string, dto : UserInfoDto) : Promise<void> {
+        if (this.clientToUser.has(clientId))
+            return ;
+        const user = await this.userRepository.findOneBy({id: dto.userId});
+        if (user) {
+            this.clientToUser.set(clientId, user.id);
+            user.status = "online";
+            this.userRepository.save(user);
+        }
+    }
+
+    async userDisconnect(clientId : string) : Promise<void> {
+        const userId = this.getUserFromClient(clientId);
+        if (userId) {
+            const user = await this.userRepository.findOneBy({id: userId});
+            if (user) {
+                user.status = "offline";
+                this.userRepository.save(user);
+            }
+            this.clientToUser.delete(clientId);
+        }
+    }
 }
