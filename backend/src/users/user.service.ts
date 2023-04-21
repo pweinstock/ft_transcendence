@@ -91,7 +91,7 @@ export class UserService {
 
     async changeStatus(name : string, status : string) : Promise<void> {
         const user = await this.userRepository.findOneBy({displayName: name});
-        if (user) {
+        if (user && user.status != "offline") {
             user.status = status;
             this.userRepository.save(user);
         }
