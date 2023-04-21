@@ -104,17 +104,13 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
     <>
       <Avatar  sx={{ width: 112, height: 112 }} src={`http://${window.location.hostname}:5000/users/image/${publicUser?.photo}`}/>
       {isFriend ? 
-      <Tooltip title={"Remove " + publicUser?.displayName + " as a friend"}>
-        <Button variant="outlined" onClick={handleRemoveFriend} startIcon={<PersonRemove/>}>
-          Remove from friends
-        </Button>
-      </Tooltip>
+      <Button variant="outlined" onClick={handleRemoveFriend} startIcon={<PersonRemove/>}>
+        Remove from friends
+      </Button>
       :
-      <Tooltip title={"Add " + publicUser?.displayName + " as a friend"}>
-        <Button variant="contained" onClick={handleAddFriend} startIcon={<PersonAdd/>}>
-          Add as friend
-        </Button>
-      </Tooltip>
+      <Button variant="contained" onClick={handleAddFriend} startIcon={<PersonAdd/>}>
+        Add as friend
+      </Button>
       }
       {isBlocked ? (
         <Button color="warning" variant="contained" startIcon={<DoNotDisturbOff/>} onClick={() => handleUnBlockUser(publicUser?.id)}>
