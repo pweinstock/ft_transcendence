@@ -19,8 +19,18 @@ const [chatNameValue, setchatNameValue] = useState<string>("");
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 const [addThisUserId, setaddThisUserId] = useState<string>("");
+const [updateStatesGlobal, setaupdateStatesGlobal] = useState<number>(0);
+
 const socket : Socket= useContext(UserSocketContext);
 
+const updateOtherUsers = () =>{
+	socket?.emit('update',  {});
+}
+
+// listening to any update in the server.
+useEffect(() => {
+	socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
+}, [updateStatesGlobal])
 
 
 
@@ -36,7 +46,7 @@ useEffect(() => {
 			}
 	}
 	fetchChatrooms();
-},[chatNameValue, value]);
+},[chatNameValue, value, updateStatesGlobal]);
 
 
 async function deleteChatNutton(id : string) {
@@ -50,8 +60,11 @@ async function deleteChatNutton(id : string) {
 		});
 		setchatNameValue("");
 }
-const handleParentStateUpdate = (newState: string) => {
-	setchatNameValue(newState);
+const handleParentStateUpdate = (newState: string, deside: boolean) => {
+	if (deside)
+		setchatNameValue(newState);
+	else
+		updateOtherUsers();
 };
 
 return (

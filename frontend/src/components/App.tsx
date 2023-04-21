@@ -12,7 +12,7 @@ import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
 import Settings2 from "./settings/settings2";
 import BaseUser from './users/BaseUser';
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import axios from "axios";
 import { User } from "./BaseInterface";
 import Game from "./game/Game";
@@ -20,12 +20,15 @@ import Users from "./users/users";
 import {GameSocketProvider} from "./context/game-socket";
 import PublicProfile from './users/PublicProfile';
 import Friends from './users/Friends';
-import {UserSocketProvider} from "./context/user-socket";
+import {UserSocketContext, UserSocketProvider} from "./context/user-socket";
+import {Socket} from "socket.io-client";
+
 
 
 
 export default function App() {
     const [currentUsersData, setcurrentUsersData] = useState<User>();
+    const socket : Socket= useContext(UserSocketContext);
 
   useEffect(() => {
     axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
@@ -39,6 +42,11 @@ export default function App() {
         }
       });
   }, []);
+  
+  useEffect(() => {
+    if (currentUsersData)  
+      socket?.emit('userConnect',  {userId: currentUsersData.id});
+  }, [currentUsersData])
 
     return (
         <>
@@ -57,7 +65,7 @@ export default function App() {
                 <Route path="/settings"  element={<Settings2 />}/>
                 {currentUsersData &&
                     <>
-                    <Route path="/chatrooms" element={<UserSocketProvider><ChatRooms user={currentUsersData}/></UserSocketProvider>}/>
+                    <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
                     <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
                     <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>

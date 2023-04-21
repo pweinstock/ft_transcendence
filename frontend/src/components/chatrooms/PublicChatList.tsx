@@ -7,7 +7,7 @@ interface ChatProps {
 	user : User;
 	// chatidp: string;
 	chatName : string;
-	onUpdate: (newState: string) => void;
+	onUpdate: (newState: string, deside: boolean) => void;
 }
 
 
