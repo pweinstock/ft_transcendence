@@ -5,10 +5,13 @@ export class Game {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Column({nullable : true})
+    winner : string;
+
     @Column()
     firstPlayer: string;
 
-    @Column({nullable : true})
+    @Column({nullable : true, default: null})
     secondPlayer: string;
 
     @Column({default: "0"})

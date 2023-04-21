@@ -135,6 +135,10 @@ export class GameService {
             this.userService.changeStatus(game.firstPlayer, "online");
             this.userService.changeStatus(game.secondPlayer, "online");
             game.finished = true;
+            if (game.firstPlayerScore > game.secondPlayer)
+                game.winner = game.firstPlayer;
+            else if (game.firstPlayerScore < game.secondPlayer)
+                game.winner = game.secondPlayer;
             await this.gameRepository.save(game);
         }
     }
