@@ -228,8 +228,10 @@ export class UserService {
 	//USER SOCKET INTERRACTION!
     private clientToUser = new Map<string, string>();
 
-    getUserFromClient(clientId :string) : string {
-        return this.clientToUser.get(clientId);
+    isConnected(clientId : string) : boolean {
+        if (this.clientToUser.has(clientId))
+            return true;
+        return false;
     }
 
     async userConnect(clientId : string, dto : UserInfoDto) : Promise<void> {
@@ -239,17 +241,17 @@ export class UserService {
         if (user) {
             this.clientToUser.set(clientId, user.id);
             user.status = "online";
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
     async userDisconnect(clientId : string) : Promise<void> {
-        const userId = this.getUserFromClient(clientId);
+        const userId = this.clientToUser.get(clientId);
         if (userId) {
             const user = await this.userRepository.findOneBy({id: userId});
             if (user) {
                 user.status = "offline";
-                this.userRepository.save(user);
+                await this.userRepository.save(user);
             }
             this.clientToUser.delete(clientId);
         }

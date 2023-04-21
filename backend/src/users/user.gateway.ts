@@ -27,8 +27,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     handleConnection() {}
 
-    handleDisconnect(@ConnectedSocket() client: Socket) {
-        this.userService.userDisconnect(client.id);
+    async handleDisconnect(@ConnectedSocket() client: Socket) {
+        await this.userService.userDisconnect(client.id);
     }
 
     @SubscribeMessage('connect')
@@ -36,11 +36,12 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : UserInfoDto
     ): Promise<void> {
-        this.userService.userConnect(client.id, dto);
+        await this.userService.userConnect(client.id, dto);
     }
 
     @SubscribeMessage('update')
-    userUpdate() {
-        this.server.emit('userUpdate');
+    userUpdate(@ConnectedSocket() client: Socket) {
+        if (this.userService.isConnected(client.id))
+            this.server.emit('userUpdate');
     }
 }
