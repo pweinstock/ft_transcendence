@@ -6,6 +6,7 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 interface ChatProps {
 	user : User;
 	// chatidp: string;
+	updatestate :number;
 	chatName : string;
 	onUpdate: (newState: string, deside: boolean) => void;
 }
@@ -61,7 +62,7 @@ const PublicChatList: React.FC<ChatProps> = (props : ChatProps) => {
 
 	useEffect(() => {
 		getAllPubliChat();
-	},[props.chatName, publicChats]);
+	},[props.chatName, publicChats, props.updatestate]);
 
 return (
 	<>
@@ -72,7 +73,7 @@ return (
 							Password:
 							<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
 						</label>
-			{publicChats && allChat && allChat.map((item, index) => (
+			{allChat && allChat.map((item, index) => (
 					<div key={item.id} style={{color: "white"}}>
 						{item.owner !== props.user.displayName && 
 						<>

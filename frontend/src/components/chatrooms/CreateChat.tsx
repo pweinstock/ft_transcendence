@@ -36,13 +36,15 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 		event.preventDefault();
 		// e.preventDefault();
 		axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : chaTypeValue,  name : props.chatName, password: chatPassValue}, {withCredentials: true})
-			.then().catch(reason => {
+			.then(() => {
+				props.onUpdate("", true);
+				setchatPassValue("");
+				props.onUpdate("", false);
+			}
+			).catch(reason => {
 			console.log("failed to post chat!")
 			console.log(reason.message);
 		});
-		props.onUpdate("", true);
-		setchatPassValue("");
-		props.onUpdate("", false);
 	}
 
 return (

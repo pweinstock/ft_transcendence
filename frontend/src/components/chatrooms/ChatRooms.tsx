@@ -28,9 +28,11 @@ const updateOtherUsers = () =>{
 }
 
 // listening to any update in the server.
+// socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
+
 useEffect(() => {
 	socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
-}, [updateStatesGlobal])
+}, [updateStatesGlobal, setaupdateStatesGlobal])
 
 
 
@@ -51,6 +53,10 @@ useEffect(() => {
 
 async function deleteChatNutton(id : string) {
 	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
+		.then(() => {
+			setchatNameValue("");
+			updateOtherUsers();
+		})
 		.catch((reason) => {
 		if (reason.response!.status !== 200) {
 			console.log("Error in deleteing chat, in chatid:");
@@ -58,7 +64,7 @@ async function deleteChatNutton(id : string) {
 		}
 		console.log(reason.message);
 		});
-		setchatNameValue("");
+
 }
 const handleParentStateUpdate = (newState: string, deside: boolean) => {
 	if (deside)
@@ -88,7 +94,7 @@ return (
 						))}
 					</div>
 					<CreateChat chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
-					<PublicChatList user={props.user} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
+					<PublicChatList user={props.user} updatestate={updateStatesGlobal} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 				</div>
 				</div>
 				<div className='chatcontent'>
