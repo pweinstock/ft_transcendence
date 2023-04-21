@@ -2,7 +2,7 @@ import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserService} from 'src/users/user.service';
 import {Repository} from 'typeorm';
-import {Chat, ChatType, MutedUser} from './chat.entity';
+import {Chat, ChatType} from './chat.entity';
 import {ChangeStatusDTO} from './dto/change-status.dto';
 import {CreateChatDTO} from './dto/create-chat.dto';
 import {JoinChatDto} from "./dto/join-chat.dto";
@@ -41,6 +41,7 @@ export class ChatService {
         chat.bannedUsers = [];
         chat.users = [];
         chat.messages = [];
+        chat.mutedUsers = [];
         chat.users.push(owner.id);
         await this.chatRepository.save(chat);
         await this.userServices.addChat(owner, chat.id);
@@ -193,14 +194,12 @@ export class ChatService {
     }
 
     async muteUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
-        if (!dto.timeoutMinutes)
-            return;
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
             throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
         this.checkAdmin(chat, adminId);
         const user = await this.userServices.findById(dto.userId);
-        this.addMute(chat, user.id, dto.timeoutMinutes);
+        this.addMute(chat, user.id);
     }
 
     async unmuteUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
@@ -300,35 +299,23 @@ export class ChatService {
         }
     }
 
-    addMute(chat : Chat, userId: string, timeoutMinutes : string) : void {
-        const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
-        if (mutedUser) {
-            chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
-            const newMutedUser: MutedUser = {
-                userId: userId,
-                unmuteDate: new Date(Date.now() + Number(timeoutMinutes) * 60000),
-            };
-            chat.mutedUsers.push(newMutedUser);
+    addMute(chat : Chat, userId: string) : void {
+        if (this.isMuted(chat, userId)) {
+            chat.mutedUsers.push(userId);
         }
     }
 
     removeMute(chat : Chat, userId: string) : void {
-        const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
-        if (mutedUser) {
-            chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
+        if (this.isMuted(chat, userId)) {
+            const index = chat.mutedUsers.indexOf(userId);
+            chat.mutedUsers.splice(index, 1);
             this.chatRepository.save(chat);
         }
     }
 
     isMuted(chat : Chat, userId : string) : boolean {
-        const mutedUser = chat.mutedUsers.find((muted) => muted.userId === userId);
-        if (mutedUser) {
-            const currentDate = new Date();
-            if (mutedUser.unmuteDate > currentDate)
-                return true;
-            chat.mutedUsers = chat.mutedUsers.filter(muted => muted.userId !== userId);
-            this.chatRepository.save(chat);
-        }
+        if (chat.mutedUsers.includes(userId))
+            return true;
         return false;
     }
 
