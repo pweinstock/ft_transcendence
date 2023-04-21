@@ -36,7 +36,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : UserInfoDto
     ): Promise<void> {
-        await this.userService.userConnect(client.id, dto);
+        if (dto && dto.userId)
+            await this.userService.userConnect(client.id, dto);
     }
 
     @SubscribeMessage('update')
