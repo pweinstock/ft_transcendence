@@ -31,7 +31,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.userService.userDisconnect(client.id);
     }
 
-    @SubscribeMessage('connect')
+    @SubscribeMessage('userConnect')
     async createGame(
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : UserInfoDto
