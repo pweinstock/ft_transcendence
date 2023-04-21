@@ -235,14 +235,16 @@ export class UserService {
     }
 
     async userConnect(clientId : string, dto : UserInfoDto) : Promise<void> {
-        if (this.clientToUser.has(clientId))
-            return ;
+        if (this.isConnected(clientId))
+            return;
         const user = await this.userRepository.findOneBy({id: dto.userId});
         if (user) {
             this.clientToUser.set(clientId, user.id);
             user.status = "online";
             await this.userRepository.save(user);
         }
+        else
+            this.clientToUser.delete(clientId);
     }
 
     async userDisconnect(clientId : string) : Promise<void> {
