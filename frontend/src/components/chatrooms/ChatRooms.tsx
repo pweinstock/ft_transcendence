@@ -1,11 +1,12 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import {io} from "socket.io-client";
+import React, {useState, useEffect, useContext} from 'react';
+import {io, Socket} from "socket.io-client";
 import axios from "axios";
 import { User } from "../BaseInterface";
 import './chatstyle.css';
 import NewChat from './NewChat';
 import CreateChat from './CreateChat';
 import PublicChatList from './PublicChatList';
+import {UserSocketContext} from "../context/user-socket";
 
 interface ChatProps {
     user: User;
@@ -18,6 +19,9 @@ const [chatNameValue, setchatNameValue] = useState<string>("");
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 const [addThisUserId, setaddThisUserId] = useState<string>("");
+const socket : Socket= useContext(UserSocketContext);
+
+
 
 
 useEffect(() => {
