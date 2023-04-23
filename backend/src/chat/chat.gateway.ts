@@ -8,7 +8,7 @@ import { CreateMessageDto } from './message/dto/create-message.dto';
 import { Server, Socket } from 'socket.io';
 import {JoinChatDto} from "./dto/join-chat.dto";
 
-@WebSocketGateway(Number(process.env.CHAT_PORT), {
+@WebSocketGateway(Number(process.env.SOCKET_PORT), {
 	namespace: 'chat',
 	cors: {	origin: '*' },
 })

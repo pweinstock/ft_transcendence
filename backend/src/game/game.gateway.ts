@@ -16,7 +16,7 @@ import {GameScoreDto} from "./dto/game-score.dto";
 import {GameOptionDto} from "./dto/game-option.dto";
 
 
-@WebSocketGateway(Number(process.env.GAME_PORT), {
+@WebSocketGateway(Number(process.env.SOCKET_PORT), {
     namespace: "game",
     transports: ["websocket"],
     cors: {	origin: '*' },
