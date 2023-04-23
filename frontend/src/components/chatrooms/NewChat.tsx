@@ -6,6 +6,7 @@ import {User} from "../BaseInterface";
 import MessageList from './MessageList';
 import InputMessage from './InputMessage';
 import { ChatSocketProvider } from '../context/chat-socket';
+import { color } from '@mui/system';
 
 interface ChatProps {
 	user : User;
@@ -17,9 +18,11 @@ interface ChatProps {
 
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
 const [usersData, setUsersData] = useState<any[]>([]);
-const [chatData, setchatData] = useState<{users: any[]}>();
+const [chatData, setchatData] = useState<{users: any[], admins: any[], owner :string}>();
 
 const [addThisUser, setaddThisUser] = useState<string>("");
+const [errorPrint, setErrorPrint] = useState<string>("");
+
 const [title, setTitle] = useState('');
 const [urlpost, setUrlpost] = useState('');
 const [bigtext, setBigtext] = useState('');
@@ -34,8 +37,8 @@ useEffect(() => {
 		.then((response) => {
 			setchatData(response.data);
 			// setmsg(response.data);
-			// console.log("chat data");
-			// console.log(response.data);
+			console.log("chat data");
+			console.log(response.data);
 
 		});
     }
@@ -59,37 +62,52 @@ useEffect(() => {
 	console.log(usersData);
 }, [props.chatidp, props.updatestate]);
 
-useEffect(() => {
-	if (addThisUser !== "")
+// useEffect(() => {
+// 	if (addThisUser !== "" && chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+// 	{
+// 		axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
+// 		.then( () => {
+// 			props.onUpdate("", false);
+// 			// setaddThisUser(""); //do i need this?
+// 		}).catch((reason) => {
+// 			// if (reason.response!.status !== 200) {
+// 			// }
+// 			console.log(reason.message);
+// 			console.log("Error while adding user:");
+// 			console.log(addThisUser);
+// 			console.log("in chatid:");
+// 			console.log(props.chatidp);
+// 		});
+// 	}
+// 	else if (addThisUser !== "")
+// 	{
+// 		setErrorPrint("Wrong credentials!");
+// 	}
+// }, [addThisUser, props.updatestate]);
+
+
+
+function addUserHandler() {
+	if (addThisUser !== "" && chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
 	{
 		axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
 		.then( () => {
 			props.onUpdate("", false);
-
 			// setaddThisUser(""); //do i need this?
 		}).catch((reason) => {
-			if (reason.response!.status !== 200) {
-				console.log("Error while adding user:");
-				console.log(addThisUser);
-				console.log("in chatid:");
-				console.log(props.chatidp);
-			}
+			// if (reason.response!.status !== 200) {
+			// }
 			console.log(reason.message);
+			console.log("Error while adding user:");
+			console.log(addThisUser);
+			console.log("in chatid:");
+			console.log(props.chatidp);
 		});
 	}
-}, [addThisUser, props.updatestate]);
-
-
-
-function addUserHandler(UserId :string) {
-	axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : UserId,  chatId : props.chatidp }, {withCredentials: true}).then( () => {
-	}).catch((reason) => {
-		if (reason.response!.status !== 200) {
-			console.log("Error while adding user in chatid:");
-			console.log(props.chatidp);
-		}
-		console.log(reason.message);
-	});
+	else if (addThisUser !== "")
+	{
+		// setErrorPrint("Wrong credentials!");
+	}
 }
 
 
@@ -114,6 +132,7 @@ return (
 					</span>
 					<div className='adduserdivcontainer'>
 						<span>Add users: </span>
+						{errorPrint === "Wrong credentials!" && <span style={{color:"red"}}>{errorPrint}</span>}
 						{usersData && usersData.map((item, index) => (
 							<div key={index} className='adduserdiv' style={{color: "white"}}>
 									{item.id !== props.user.id 
@@ -125,6 +144,7 @@ return (
 												</p>
 												<button className='' onClick={() => {
 													setaddThisUser(item.id);
+													addUserHandler();
 												}} >add</button> 
 											</div>
 										}
