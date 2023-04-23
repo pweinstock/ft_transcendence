@@ -8,13 +8,16 @@ interface CreateGameProps {
     user : User;
     cancelGame : any;
     leaveGame : any;
-    isCreated : boolean;
 }
 
 export default function CreateGame(props : CreateGameProps) {
     const socket = useContext(GameSocketContext);
     const [gameOption, setGameOption] = useState<GameOption>();
+    const [isCreated, setCreated] = useState<boolean>(false);
 
+    useEffect(() => {
+        socket.emit('checkCreated')
+    }, [])
 
     const easyMode = () => {
         socket.emit('create', {
@@ -52,11 +55,9 @@ export default function CreateGame(props : CreateGameProps) {
         });
     }
 
-    socket.on('started', (gameData : GameOption) => {
-        setGameOption(gameData);
-    });
+    socket.on('started', (gameData : GameOption) => setGameOption(gameData));
 
-
+    socket.on('created', () => setCreated(true));
 
     socket.on('notCreated', () => {
         //todo handleError
@@ -69,7 +70,7 @@ export default function CreateGame(props : CreateGameProps) {
                 <button className='navbutton' onClick={props.leaveGame}>Leave</button>
             </>
         :
-            props.isCreated ?
+            isCreated ?
                 <>
                     <div>WAITING SECOND PLAYER!</div>
                     <button className='navbutton' onClick={props.cancelGame}>Cancel</button>

@@ -112,9 +112,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
     ) : void {
-        if (!dto || this.gameService.isPlayer(client.id))
+        if (!dto)
             client.emit('notStarted');
         else {
+            if (this.gameService.isPlayer(client.id)) {
+                const clientRoom = this.gameService.getClientRoom(client.id);
+                this.gameService.cancelGame(clientRoom.gameId);
+            }
             const gameOption : GameOptionDto = this.gameService.joinGame(client.id, dto);
             if (gameOption) {
                 client.join(dto.gameId);

@@ -24,7 +24,6 @@ interface GameProps {
 export default function Game(props : GameProps) {
     const socket : Socket = useContext(GameSocketContext);
     const [UIState, setGameUIState] = useState(GameUIState.NOTHING);
-    const [isCreated, setCreated] = useState<boolean>(false);
 
     useEffect(() => {
         socket.emit('checkCreated');
@@ -36,10 +35,6 @@ export default function Game(props : GameProps) {
     }, [])
 
     socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT))
-    socket.on('created', () => {
-        setGameUIState(GameUIState.NEW);
-        setCreated(true);
-    })
 
     const newGameClick = () => setGameUIState(GameUIState.NEW);
     const joinGameClick = () => setGameUIState(GameUIState.JOIN);
@@ -68,7 +63,7 @@ export default function Game(props : GameProps) {
         :
         <>
             {UIState === GameUIState.NEW &&
-                <CreateGame user={props.user} cancelGame={cancelGame} leaveGame={leaveGame} isCreated={isCreated}/>}
+                <CreateGame user={props.user} cancelGame={cancelGame} leaveGame={leaveGame}/>}
             {UIState === GameUIState.JOIN &&
                 <JoinGame user={props.user} leaveGame={leaveGame}/>}
             {UIState === GameUIState.WATCH &&
