@@ -274,7 +274,8 @@ export default function PingPong(props : PingPongProps) {
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;
-            playerLeft = player
+            playerLeft = player;
+            console.log('player left');
         });
 
 

@@ -99,7 +99,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const gameId = await this.gameService.newGame(client.id, gameOptions);
             if (gameId) {
                 client.join(gameId);
-                client.emit('created')
+                client.emit('created');
                 this.server.emit('newPong');
             }
             else
@@ -205,9 +205,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : GameScoreDto
     ) : Promise<void> {
-        this.gameService.deletePlayer(client.id);
         const gameId = this.gameService.getPlayerGameId(client.id);
         if (gameId) {
+            this.gameService.deletePlayer(client.id);
             const isEnded = await this.gameService.endOfGame(client.id, dto, gameId);
             if (isEnded) {
                 this.server.to(gameId).emit('finished');
@@ -226,9 +226,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() player : string
     ) : void {
-        this.gameService.deletePlayer(client.id);
         const gameId = this.gameService.getPlayerGameId(client.id);
         if (gameId) {
+            this.gameService.deletePlayer(client.id);
             this.server.to(gameId).emit('left', player);
             this.gameService.leaveGame(client.id, player, gameId);
             client.leave(gameId);
