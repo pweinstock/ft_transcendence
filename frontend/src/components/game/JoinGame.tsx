@@ -26,16 +26,15 @@ export default function JoinGame(props : JoinGameProps) {
             .then(response => {
                 if (response && response.status === 200)
                     setGamestoJoin(response.data);
-                setgameAvailiable(false);
-                console.log("1");
             })
             .catch(e => {
                 //todo : handle error
             })
     },[gameAvailiable])
 
-    socket.on('created', () => setgameAvailiable(true));
-
+    socket.on('created', () => {
+        gameAvailiable ? setgameAvailiable(true) : setgameAvailiable(false)
+    });
 
     socket.on("started", (data : GameOption) => {
         setGameOption(data);
@@ -47,18 +46,16 @@ export default function JoinGame(props : JoinGameProps) {
 
     return (
         gameOption ?
-            <GameSocketProvider>
-                <PingPong gameOption={gameOption}/>
-            </GameSocketProvider>
+            <PingPong gameOption={gameOption}/>
             :
             <div style={{color: "white"}}>
-            {gamestoJoin.map((game) => (
-                <button className='navbutton' key={game.gameId} onClick={() => {
-                    joinServer(game.gameId)
-                }}>
-                    {"Play Against " + game.firstPlayer}
-                </button>
-            ))}
+                {gamestoJoin.map((game) => (
+                    <button className='navbutton' key={game.gameId} onClick={() => {
+                        joinServer(game.gameId)
+                    }}>
+                        {"Play Against " + game.firstPlayer}
+                    </button>
+                ))}
             </div>
     )
 }

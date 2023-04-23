@@ -47,12 +47,17 @@ export default function Game(props : GameProps) {
                 <button className='navbutton' onClick={viewHighScore}>High Score</button>
             </>
             :
-            <GameSocketProvider>
-                {gameUIState === GameUIState.NEW && <CreateGame user={props.user}/>}
+            <>
+                {gameUIState === GameUIState.NEW &&
+                    <>
+                        <CreateGame user={props.user}/>
+                        <button className='navbutton' onClick={leaveGameClick}>Back</button>
+                    </>
+                }
                 {gameUIState === GameUIState.JOIN && <JoinGame user={props.user}/>}
                 {gameUIState === GameUIState.WATCH && <WatchGame/>}
                 {gameUIState === GameUIState.HIGHSCORE && <HighScore/>}
-                {<button className='navbutton' onClick={leaveGameClick}>Leave Game</button>}
-            </GameSocketProvider>
+
+            </>
     );
 }

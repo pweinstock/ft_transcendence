@@ -38,9 +38,7 @@ export default function WatchGame() {
 
     return (
         gameData ?
-            <GameSocketProvider>
-                <PingPongView gameData={gameData} />
-            </GameSocketProvider>
+            <PingPongView gameData={gameData} />
             :
             <div style={{color: "white"}}>
                 {gamestoWatch && gamestoWatch.map((item) => (

@@ -39,7 +39,6 @@ export default function PingPongView(props : PingPongProps) {
         const drawBall = (ball: Ball) => {
             context.fillStyle = "black";
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
-            console.log(Math.abs(ball.x - oldx));
             oldx = ball.x;
         };
 

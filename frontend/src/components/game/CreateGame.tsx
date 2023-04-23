@@ -36,7 +36,7 @@ export default function CreateGame(props : CreateGameProps) {
             ballSpeed : 3,
             paddleSpeed : 6,
             isStarted : false,
-            maxScore : 3
+            maxScore : 11
         })
     }
 
@@ -70,10 +70,10 @@ export default function CreateGame(props : CreateGameProps) {
 
     socket.on('started', (gameData : GameOption) => {
         setGameOption(gameData);
-        setGameStatus(GameState.START)
+        setGameStatus(GameState.START);
     });
     socket.on('created', () => setGameStatus(GameState.WAITING));
-    socket.on('notCreated', handleError);
+    socket.on('notCreated', () => handleError);
 
     return (
         <>
@@ -84,12 +84,8 @@ export default function CreateGame(props : CreateGameProps) {
                     <button onClick={hardMode}>Hard</button>
                     <button onClick={createGame}>Create Game</button>
                 </div>}
-            {gameStatus === GameState.WAITING &&
-                <div>WAITING SECOND PLAYER!</div>}
-            {gameStatus === GameState.START &&
-                <GameSocketProvider>
-                    <PingPong gameOption={gameOption}/>
-                </GameSocketProvider>}
+            {gameStatus === GameState.WAITING && <div>WAITING SECOND PLAYER!</div>}
+            {gameStatus === GameState.START && <PingPong gameOption={gameOption}/>}
         </>
     )
 };

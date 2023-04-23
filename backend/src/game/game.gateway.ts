@@ -129,7 +129,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-
     @SubscribeMessage('sKey')
     sKeyPressed(
         @ConnectedSocket() client: Socket,
@@ -160,7 +159,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         this.gameService.deleteViewer(client.id);
     }
-
 
     @SubscribeMessage('leave')
     leaveGame(@ConnectedSocket() client: Socket) : void {
