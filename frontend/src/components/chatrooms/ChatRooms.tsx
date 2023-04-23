@@ -58,11 +58,11 @@ async function deleteChatNutton(id : string) {
 			updateOtherUsers();
 		})
 		.catch((reason) => {
-		if (reason.response!.status !== 200) {
-			console.log("Error in deleteing chat, in chatid:");
-			console.log(id);
-		}
-		console.log(reason.message);
+			if (reason.response!.status !== 200) {
+				console.log("Error in deleteing chat, in chatid:");
+				console.log(id);
+			}
+			console.log(reason.message);
 		});
 
 }
@@ -98,7 +98,7 @@ return (
 				</div>
 				</div>
 				<div className='chatcontent'>
-					{actualChatid && actualChatName && <NewChat user={props.user} chatidp={actualChatid} chatName={actualChatName}/>}
+					{actualChatid && actualChatName && <NewChat updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
 					{!actualChatid && <h1>No Chat</h1> }
 
 				</div>

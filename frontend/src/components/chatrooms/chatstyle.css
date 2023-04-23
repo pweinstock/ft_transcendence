@@ -171,6 +171,41 @@
 	cursor:pointer;
 }
 
+.adduserdivcontainer {
+	font-size: x-small;
+	display: flex;
+	flex-direction: row;
+}
+
+.adduserdiv {
+	display: flex;
+	flex-direction: row;
+}
+
+.adduserbutandp {
+	font-size: small;
+	display: flex;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+.adduserbutandp p {
+	font-size: small;
+	margin-right: 2px;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+.adduserbutandp button {
+	background-color: rgba(130, 203, 40, 0.474);
+	border: none;
+	border-radius: 10px;
+	padding: 4px;
+}
+.adduserbutandp button:hover {
+	background-color: rgba(130, 203, 40, 0.61);
+}
+
+
 /* scrollbar */
 
 /* width */
