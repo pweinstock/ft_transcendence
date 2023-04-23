@@ -51,12 +51,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (clientRoom) {
             const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
             if (gameOptions && gameOptions.isStarted)
-                client.emit("inGame", true);
-            else
-                client.emit("inGame", false);
+                client.emit("inGame");
         }
-        else
-            client.emit("inGame", false);
+    }
+
+    @SubscribeMessage('checkCreated')
+    checkCreated (@ConnectedSocket() client: Socket) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
+            if (gameOptions && !gameOptions.isStarted)
+                client.emit("created");
+        }
     }
 
     @SubscribeMessage('reconnect')
@@ -82,19 +88,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-
     @SubscribeMessage('create')
     async createGame (
         @ConnectedSocket() client: Socket,
         @MessageBody() gameOptions : GameOptionDto
     ) : Promise<void> {
-        if (this.gameService.isPlayer(client.id))
+        if (!gameOptions || this.gameService.isPlayer(client.id))
             client.emit('notCreated');
         else {
             const gameId = await this.gameService.newGame(client.id, gameOptions);
             if (gameId) {
                 client.join(gameId);
-                this.server.emit('created');
+                client.emit('created')
+                this.server.emit('newPong');
             }
             else
                 client.emit('notCreated');
@@ -106,7 +112,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
     ) : void {
-        if (this.gameService.isPlayer(client.id))
+        if (!dto || this.gameService.isPlayer(client.id))
             client.emit('notStarted');
         else {
             const gameOption : GameOptionDto = this.gameService.joinGame(client.id, dto);
@@ -195,6 +201,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : GameScoreDto
     ) : Promise<void> {
+        this.gameService.deletePlayer(client.id);
         const gameId = this.gameService.getPlayerGameId(client.id);
         if (gameId) {
             const isEnded = await this.gameService.endOfGame(client.id, dto, gameId);
@@ -203,16 +210,24 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             }
             client.leave(gameId);
         }
-        this.gameService.deleteViewer(client.id);
+        const viewerGameId = this.gameService.getViewerGameId(client.id);
+        if (viewerGameId) {
+            this.gameService.deleteViewer(client.id);
+            client.leave(viewerGameId);
+        }
     }
 
     @SubscribeMessage('leave')
-    leaveGame(@ConnectedSocket() client: Socket) : void {
-        const playerGameId = this.gameService.getPlayerGameId(client.id)
-        if (playerGameId) {
-            this.server.to(playerGameId).emit('finished');
-            this.gameService.deletePlayer(client.id);
-            this.gameService.deleteGameOption(playerGameId);
+    leaveGame(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() player : string
+    ) : void {
+        this.gameService.deletePlayer(client.id);
+        const gameId = this.gameService.getPlayerGameId(client.id);
+        if (gameId) {
+            this.server.to(gameId).emit('left', player);
+            this.gameService.leaveGame(client.id, player, gameId);
+            client.leave(gameId);
         }
         const viewerGameId = this.gameService.getViewerGameId(client.id);
         if (viewerGameId) {

@@ -13,7 +13,8 @@ enum GameUIState {
     NEW,
     JOIN,
     WATCH,
-    HIGHSCORE
+    HIGHSCORE,
+    RECONNECT
 }
 
 interface GameProps {
@@ -23,18 +24,22 @@ interface GameProps {
 export default function Game(props : GameProps) {
     const socket : Socket = useContext(GameSocketContext);
     const [UIState, setGameUIState] = useState(GameUIState.NOTHING);
-    const [gameStarted, setStarted] = useState(false);
-    const [gameCreated, setCreated] = useState(false);
-    const [inGame, setInGame] = useState(false);
+    const [isCreated, setCreated] = useState<boolean>(false);
+
+    useEffect(() => {
+        socket.emit('checkCreated');
+    }, [])
 
 
     useEffect(() => {
         socket.emit('checkInGame');
-        if (gameCreated)
-            setGameUIState(GameUIState.NEW);
     }, [])
 
-    socket.on("inGame", (isPlayer : boolean) => setInGame(isPlayer))
+    socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT))
+    socket.on('created', () => {
+        setGameUIState(GameUIState.NEW);
+        setCreated(true);
+    })
 
     const newGameClick = () => setGameUIState(GameUIState.NEW);
     const joinGameClick = () => setGameUIState(GameUIState.JOIN);
@@ -42,24 +47,17 @@ export default function Game(props : GameProps) {
     const viewHighScore = () => setGameUIState(GameUIState.HIGHSCORE);
 
 
-    const leaveGameClick = () => {
-        socket.emit("leave");
-        setStarted(false);
+    const leaveGame = () => {
+        socket.emit("leave", props.user.displayName);
         setGameUIState(GameUIState.NOTHING);
     };
 
-    const backToOptions = () => {
-        if (gameCreated) {
-            socket.emit("cancel");
-            setCreated(false);
-        }
+    const cancelGame = () => {
+        socket.emit("cancel");
         setGameUIState(GameUIState.NOTHING);
     };
 
     return (
-        inGame ?
-            <ReconnectGame user={props.user} setStarted={setStarted} setInGame={setInGame}/>
-        :
         UIState === GameUIState.NOTHING ?
         <>
             <button className='navbutton' onClick={newGameClick}>New Game</button>
@@ -70,19 +68,15 @@ export default function Game(props : GameProps) {
         :
         <>
             {UIState === GameUIState.NEW &&
-                <CreateGame user={props.user} setStarted={setStarted} isStarted={gameStarted}
-                            isCreated={gameCreated} setCreated={setCreated} backToOptions={backToOptions}/>}
+                <CreateGame user={props.user} cancelGame={cancelGame} leaveGame={leaveGame} isCreated={isCreated}/>}
             {UIState === GameUIState.JOIN &&
-                <JoinGame user={props.user} setIsStarted={setStarted}/>}
+                <JoinGame user={props.user} leaveGame={leaveGame}/>}
             {UIState === GameUIState.WATCH &&
                 <WatchGame/>}
             {UIState === GameUIState.HIGHSCORE &&
                 <HighScore/>}
-            {gameStarted ?
-                <button className='navbutton' onClick={leaveGameClick}>Leave</button>
-                :
-                <button className='navbutton' onClick={backToOptions}>Back</button>
-            }
+            {UIState === GameUIState.RECONNECT &&
+                <ReconnectGame user={props.user} leaveGame={leaveGame}/>}
         </>
     );
 }

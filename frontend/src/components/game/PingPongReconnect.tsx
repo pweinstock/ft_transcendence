@@ -19,6 +19,7 @@ export default function PingPongReconnect(props : PingPongProps) {
 
     useEffect(() => {
         let isPaused : boolean = false;
+        let playerLeft : string = "";
 
         const keyUp = (data : GameData) => socket.emit("KeyUp", data);
 
@@ -74,8 +75,10 @@ export default function PingPongReconnect(props : PingPongProps) {
             context.fillStyle = "red";
             context.textAlign = "center";
             context.textBaseline = "middle";
-            if (props.gameData.players.firstScore > props.gameData.players.secondScore)
-                context.fillText(props.gameData.players.firstPlayer + "WON", canvas.width / 2, canvas.height / 2);
+            if (playerLeft !== "")
+                context.fillText(playerLeft + " LEFT!", canvas.width / 2, canvas.height / 2);
+            else if (props.gameData.players.firstScore > props.gameData.players.secondScore)
+                context.fillText(props.gameData.players.firstPlayer + " WON", canvas.width / 2, canvas.height / 2);
             else if (props.gameData.players.firstScore < props.gameData.players.secondScore)
                 context.fillText(props.gameData.players.secondPlayer + " WON!", canvas.width / 2, canvas.height / 2);
             else
@@ -231,6 +234,11 @@ export default function PingPongReconnect(props : PingPongProps) {
         socket.on("playerDisconnected", () => isPaused = true);
         socket.on("reconnect", () => isPaused = false);
         socket.on("finished", () => isEnded = true);
+        socket.on("left", (player : string) => {
+            isEnded = true;
+            playerLeft = player
+        });
+
 
 
         update();

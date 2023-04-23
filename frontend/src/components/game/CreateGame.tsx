@@ -1,26 +1,23 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {User} from "../BaseInterface";
 import PingPong from "./PingPong";
 import {GameOption} from "./interfaces/game-option";
 import {GameSocketContext} from "../context/game-socket";
 
-
 interface CreateGameProps {
     user : User;
-    backToOptions : any;
+    cancelGame : any;
+    leaveGame : any;
     isCreated : boolean;
-    isStarted : boolean;
-    setStarted : React.Dispatch<React.SetStateAction<any>>;
-    setCreated : React.Dispatch<React.SetStateAction<any>>;
 }
 
 export default function CreateGame(props : CreateGameProps) {
-
     const socket = useContext(GameSocketContext);
     const [gameOption, setGameOption] = useState<GameOption>();
 
+
     const easyMode = () => {
-        setGameOption({
+        socket.emit('create', {
             firstPlayer : props.user.displayName,
             secondPlayer : "",
             paddleHeight : 100,
@@ -28,12 +25,11 @@ export default function CreateGame(props : CreateGameProps) {
             paddleSpeed : 6,
             isStarted : false,
             maxScore : 11
-        })
-        socket.emit('create', gameOption);
+        });
     }
 
     const normalMode = () => {
-        setGameOption({
+        socket.emit('create', {
             firstPlayer : props.user.displayName,
             secondPlayer : "",
             paddleHeight : 75,
@@ -41,12 +37,11 @@ export default function CreateGame(props : CreateGameProps) {
             paddleSpeed : 6,
             isStarted : false,
             maxScore : 11
-        })
-        socket.emit('create', gameOption);
+        });
     }
 
     const hardMode = () => {
-        setGameOption({
+        socket.emit('create', {
             firstPlayer : props.user.displayName,
             secondPlayer : "",
             paddleHeight : 50,
@@ -54,31 +49,30 @@ export default function CreateGame(props : CreateGameProps) {
             paddleSpeed : 5,
             isStarted : false,
             maxScore : 11
-        })
-        socket.emit('create', gameOption);
+        });
     }
 
-    const handleError = () => {} //todo handle error
-
     socket.on('started', (gameData : GameOption) => {
-        props.setCreated(false);
-        props.setStarted(true);
         setGameOption(gameData);
     });
-    socket.on('created', () => {
-        props.setCreated(true);
+
+
+
+    socket.on('notCreated', () => {
+        //todo handleError
     });
 
-    socket.on('notCreated', () => handleError);
-
     return (
-        props.isStarted && gameOption ?
-            <PingPong gameOption={gameOption}/>
+        gameOption ?
+            <>
+                <PingPong gameOption={gameOption}/>
+                <button className='navbutton' onClick={props.leaveGame}>Leave</button>
+            </>
         :
             props.isCreated ?
                 <>
                     <div>WAITING SECOND PLAYER!</div>
-                    <button className='navbutton' onClick={props.backToOptions}>Cancel</button>
+                    <button className='navbutton' onClick={props.cancelGame}>Cancel</button>
                 </>
             :
                 <>

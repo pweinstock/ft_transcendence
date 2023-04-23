@@ -17,6 +17,7 @@ export default function PingPongView(props : PingPongProps) {
 
     useEffect(() => {
         let isPaused : boolean = false;
+        let playerLeft : string = "";
 
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
@@ -64,8 +65,10 @@ export default function PingPongView(props : PingPongProps) {
             context.fillStyle = "red";
             context.textAlign = "center";
             context.textBaseline = "middle";
-            if (gameData.players.firstScore > gameData.players.secondScore)
-                context.fillText(gameData.players.firstPlayer + "WON", canvas.width / 2, canvas.height / 2);
+            if (playerLeft !== "")
+                context.fillText(playerLeft + " LEFT!", canvas.width / 2, canvas.height / 2);
+            else if (gameData.players.firstScore > gameData.players.secondScore)
+                context.fillText(gameData.players.firstPlayer + " WON", canvas.width / 2, canvas.height / 2);
             else if (gameData.players.firstScore < gameData.players.secondScore)
                 context.fillText(gameData.players.secondPlayer + " WON!", canvas.width / 2, canvas.height / 2);
             else
@@ -185,9 +188,16 @@ export default function PingPongView(props : PingPongProps) {
 
         draw();
         socket.on("update", (data : GameData) => gameData = data);
-        socket.on("playerDisconnected", () => isPaused = true);
+        socket.on("playerDisconnected", () => {
+
+            isPaused = true;
+        });
         socket.on("reconnect", () => isPaused = false);
         socket.on("finished", () => isEnded = true);
+        socket.on("left", (player : string) => {
+            isEnded = true;
+            playerLeft = player;
+        });
 
 
         update();

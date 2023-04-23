@@ -106,7 +106,6 @@ export class GameService {
     }
 
     async endOfGame(clientId : string, dto : GameScoreDto, gameId : string) : Promise<boolean> {
-        this.deletePlayer(clientId);
         if (!this.gameIdToGameOption.has(gameId))
             return false;
         await this.finalScore(dto, gameId);
@@ -114,6 +113,12 @@ export class GameService {
         this.deleteGameOption(gameId);
         this.deleteGameData(gameId);
         return true;
+    }
+
+    async leaveGame (clientId : string, playerName : string, gameId : string) : Promise<void> {
+        await this.recordTechnicalLoose(gameId, playerName);
+        this.deleteGameOption(gameId);
+        this.deleteGameData(gameId);
     }
 
     //WORKING WITH DATABASE
@@ -148,6 +153,31 @@ export class GameService {
     }
 
     //Helpers
+    async recordTechnicalLoose (gameId : string, playerName : string) : Promise <boolean> {
+        const game : Game = await this.findGamebyId(gameId);
+        if (game && game.finished === false) {
+            const matchData = this.gameIdToGameOption.get(gameId);
+            this.userService.changeStatus(game.firstPlayer, "online");
+            this.userService.changeStatus(game.secondPlayer, "online");
+            game.finished = true;
+            if (game.firstPlayer === playerName) {
+                game.secondPlayerScore = "11";
+                game.winner = game.secondPlayer;
+                this.userService.lostGame(matchData.firstPlayer, gameId);
+                this.userService.wonGame(matchData.secondPlayer, gameId);
+            }
+            else {
+                game.firstPlayerScore = "11";
+                game.winner = game.firstPlayer;
+                this.userService.lostGame(matchData.secondPlayer, gameId);
+                this.userService.wonGame(matchData.firstPlayer, gameId);
+            }
+            await this.gameRepository.save(game);
+            return true;
+        }
+        return false;
+    }
+
     deletePlayer(clientId : string) : void {
         this.playerToGameId.delete(clientId);
     }
