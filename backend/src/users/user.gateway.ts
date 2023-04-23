@@ -38,19 +38,19 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : UserInfoDto
     ): Promise<void> {
-        console.log("connect requested");
+        // console.log("connect requested");
 
         if (dto && dto.userId) {
-            console.log("connect accepted");
+            // console.log("connect accepted");
             await this.userService.userConnect(client.id, dto);
         }
     }
 
     @SubscribeMessage('userUpdate')
     userUpdate(@ConnectedSocket() client: Socket) {
-        console.log("update requested");
+        // console.log("update requested");
         if (this.userService.isConnected(client.id)) {
-            console.log("update sended");
+            // console.log("update sended");
             this.server.emit('userUpdate');
         }
     }
