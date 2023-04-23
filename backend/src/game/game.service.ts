@@ -48,7 +48,7 @@ export class GameService {
     }
 
     joinGame (clientId : string, dto : JoinGameDto) : GameOptionDto {
-        const gameOption : GameOptionDto = this.gameIdToGameOption.get(dto.gameId);
+        const gameOption : GameOptionDto = this.getGameOptions(dto.gameId);
         if (!gameOption || gameOption.isStarted) {
             return null;
         }
@@ -177,6 +177,10 @@ export class GameService {
         return this.playerToGameId.get(clientId);
     }
 
+    getGameOptions(gameId : string) : GameOptionDto {
+        return this.gameIdToGameOption.get(gameId);
+    }
+
     sendScoreToUser(dto : GameScoreDto, gameId : string) : void {
         const matchData = this.gameIdToGameOption.get(gameId);
         if (matchData) {
@@ -194,5 +198,11 @@ export class GameService {
             }
             this.deleteGameData(gameId);
         }
+    }
+
+    async cancelGame(gameId : string) : Promise<void> {
+        this.deleteGameOption(gameId);
+        this.deletePlayer(gameId);
+        await this.gameRepository.delete(gameId);
     }
 }

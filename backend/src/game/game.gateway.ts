@@ -45,18 +45,60 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.gameService.deleteViewer(client.id);
     }
 
+    @SubscribeMessage('checkInGame')
+    checkInGame (@ConnectedSocket() client: Socket) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
+            if (gameOptions && gameOptions.isStarted)
+                client.emit("inGame", true);
+            else
+                client.emit("inGame", false);
+        }
+        else
+            client.emit("inGame", false);
+    }
+
+    @SubscribeMessage('reconnect')
+    reconnectGame (@ConnectedSocket() client: Socket) : void {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            const gameData : GameDataDto = this.gameService.getGameData(clientRoom.gameId);
+            this.server.to(clientRoom.gameId).emit("reconnected", gameData);
+        }
+        else
+            client.emit("notReconnected");
+    }
+
+    @SubscribeMessage('cancel')
+    async cancelGame (@ConnectedSocket() client: Socket) : Promise<void> {
+        const clientRoom = this.gameService.getClientRoom(client.id);
+        if (clientRoom) {
+            const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
+            if (gameOptions && gameOptions.isStarted === false) {
+                client.leave(clientRoom.gameId);
+                await this.gameService.cancelGame(clientRoom.gameId);
+            }
+        }
+    }
+
+
     @SubscribeMessage('create')
     async createGame (
         @ConnectedSocket() client: Socket,
         @MessageBody() gameOptions : GameOptionDto
     ) : Promise<void> {
-        const gameId = await this.gameService.newGame(client.id, gameOptions);
-        if (gameId) {
-            client.join(gameId);
-            this.server.emit('created');
-        }
-        else
+        if (this.gameService.isPlayer(client.id))
             client.emit('notCreated');
+        else {
+            const gameId = await this.gameService.newGame(client.id, gameOptions);
+            if (gameId) {
+                client.join(gameId);
+                this.server.emit('created');
+            }
+            else
+                client.emit('notCreated');
+        }
     }
 
     @SubscribeMessage('join')
@@ -64,13 +106,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
     ) : void {
-        const gameOption : GameOptionDto = this.gameService.joinGame(client.id, dto);
-        if (gameOption) {
-            client.join(dto.gameId);
-            this.server.to(dto.gameId).emit("started", gameOption);
+        if (this.gameService.isPlayer(client.id))
+            client.emit('notStarted');
+        else {
+            const gameOption : GameOptionDto = this.gameService.joinGame(client.id, dto);
+            if (gameOption) {
+                client.join(dto.gameId);
+                this.server.to(dto.gameId).emit("started", gameOption);
+            }
+            else
+                client.emit("notStarted");
         }
-        else
-            client.emit("notStarted");
     }
 
     @SubscribeMessage('watch')

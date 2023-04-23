@@ -4,10 +4,10 @@ import {User} from "../BaseInterface";
 import {GameInfo} from "./interfaces/game-info";
 import PingPong from "./PingPong";
 import {GameOption} from "./interfaces/game-option";
-import {GameSocketContext, GameSocketProvider} from "../context/game-socket"
-
+import {GameSocketContext} from "../context/game-socket"
 interface JoinGameProps {
     user : User;
+    setIsStarted : React.Dispatch<React.SetStateAction<any>>;
 }
 
 
@@ -37,6 +37,7 @@ export default function JoinGame(props : JoinGameProps) {
     });
 
     socket.on("started", (data : GameOption) => {
+        props.setIsStarted(true);
         setGameOption(data);
     });
 

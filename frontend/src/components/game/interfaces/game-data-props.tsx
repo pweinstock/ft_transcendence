@@ -32,4 +32,5 @@ export interface GameData {
     timer : number;
     paddleSpeed :number;
     ballSpeed : number;
+    maxScore : number;
 }
