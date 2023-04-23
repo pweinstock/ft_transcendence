@@ -12,6 +12,7 @@ interface ChatProps {
 	chatidp: string;
 	updatestate: number;
 	chatName : string;
+	onUpdate: (newState: string, deside: boolean) => void;
 }
 
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
@@ -39,7 +40,7 @@ useEffect(() => {
 		});
     }
     getChatData();
-}, [props.chatidp]);
+}, [props.chatidp, addThisUser, props.updatestate]);
 
 useEffect(() => {
 	axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
@@ -63,6 +64,8 @@ useEffect(() => {
 	{
 		axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
 		.then( () => {
+			props.onUpdate("", false);
+
 			// setaddThisUser(""); //do i need this?
 		}).catch((reason) => {
 			if (reason.response!.status !== 200) {
@@ -74,7 +77,7 @@ useEffect(() => {
 			console.log(reason.message);
 		});
 	}
-}, [addThisUser]);
+}, [addThisUser, props.updatestate]);
 
 
 
@@ -109,16 +112,25 @@ return (
 					<span>
 						{props.chatName} chat:
 					</span>
-					{usersData && usersData.map((item, index) => (
-							<div key={index} className='' style={{color: "white"}}>
-								{item.id !== props.user.id 
-									&& chatData 
-									&&	!(chatData.users.includes(item.id)) 
-									&& <button className='' onClick={() => {
-										setaddThisUser(item.id);
-									}} >add {item.displayName}</button>}
-							</div>
-						))}
+					<div className='adduserdivcontainer'>
+						<span>Add users: </span>
+						{usersData && usersData.map((item, index) => (
+							<div key={index} className='adduserdiv' style={{color: "white"}}>
+									{item.id !== props.user.id 
+										&& chatData 
+										&&	!(chatData.users.includes(item.id)) 
+										&& <div className='adduserbutandp'>
+												<p>
+													{item.displayName}
+												</p>
+												<button className='' onClick={() => {
+													setaddThisUser(item.id);
+												}} >add</button> 
+											</div>
+										}
+								</div>
+							))}
+					</div>
 				</div>
 			<ChatSocketProvider>	
 				<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName} onUpdate={handleParentStateUpdate}/>

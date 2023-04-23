@@ -28,8 +28,7 @@ socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
 useEffect(() => {
 	setMessages([]);
-	// const {scrollHeight} = container.current as HTMLDivElement;
-	// setsaveScrollHeight(scrollHeight);
+
 	}, [props.chatidp]); 
 //when we call it with a different chat id its triggers the clearing fo the variable handleled by the usstate
 // important revelation how the states can be handleed. how they update and how to prevent default behaviour of forms
@@ -42,15 +41,12 @@ const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	sendMassagetoBackend();
-	// const {scrollHeight} = container.current as HTMLDivElement;
-	// setsaveScrollHeight(scrollHeight);
 	Scroll();
 	socket?.emit("message", {date: new Date().toLocaleString("en-de"), content : message, userId: props.user.id, chatId : props.chatidp, displayName: props.user.displayName});
 	setMessage("");
 }
 
 function sendMassagetoBackend() {
-	// const bobi = new Date().toLocaleString("en-de");
 	axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : message ,  chatId : props.chatidp, date : new Date().toLocaleString("en-de")}, {withCredentials: true})
 		.then(
 		)
@@ -74,16 +70,14 @@ useEffect(() => {
 const container = useRef<HTMLDivElement>(null);
 
 const Scroll = () => {
-	container.current?.scrollTo(0, 9999);
-	// container.current?.scrollTo(0, savescrollHeight)
-	console.log("RUN....");
+	const {scrollHeight } = container.current as HTMLDivElement;
+	// container.current?.scrollTo(0, 9999);
+	container.current?.scrollTo(0, scrollHeight)
+	// console.log("RUN....");
 	// console.log(savescrollHeight);
 }
 
 useEffect(() => {
-	// const {scrollHeight } = container.current as HTMLDivElement;
-	// const {scrollHeight} = container.current as HTMLDivElement;
-	// setsaveScrollHeight(scrollHeight);
   Scroll();
 }, [messages])
 
