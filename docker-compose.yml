@@ -41,9 +41,7 @@ services:
         POSTGRES_PASSWORD: $POSTGRES_PASSWORD
         POSTGRES_HOST: postgres_db
         PORT: $PORT
-        CHAT_PORT: $CHAT_PORT
-        GAME_PORT: $GAME_PORT
-        USER_PORT: $USER_PORT
+        SOCKET_PORT: $SOCKET_PORT
         FORTYTWO_APP_ID: $FORTYTWO_APP_ID
         FORTYTWO_APP_SECRET: $FORTYTWO_APP_SECRET
         HOST_IP: $HOST_IP
@@ -54,9 +52,7 @@ services:
       - volnest:/nest/
       ports:
       - ${PORT}:${PORT}
-      - ${CHAT_PORT}:${CHAT_PORT}
-      - ${GAME_PORT}:${GAME_PORT}
-      - ${USER_PORT}:${USER_PORT}
+      - ${SOCKET_PORT}:${SOCKET_PORT}
       networks:
       - transcendence
       depends_on:

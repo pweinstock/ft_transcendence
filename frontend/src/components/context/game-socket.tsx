@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 
 //todo change to env
-const socket = io(window.location.hostname + ":5002" + "/game", {transports: ["websocket"]}),
+const socket = io(window.location.hostname + ":5001" + "/game", {transports: ["websocket"]}),
     GameSocketContext = createContext<Socket>(socket);
 
 const GameSocketProvider = ({ children }: any) => {

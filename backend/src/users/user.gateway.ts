@@ -13,7 +13,7 @@ import {UserService} from "./user.service";
 import {UserInfoDto} from "./dto/user-info.dto";
 
 
-@WebSocketGateway(Number(process.env.USER_PORT), {
+@WebSocketGateway(Number(process.env.SOCKET_PORT), {
     namespace: "user",
     cors: {	origin: '*' },
 })
