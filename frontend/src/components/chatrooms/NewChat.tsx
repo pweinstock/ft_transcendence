@@ -7,6 +7,7 @@ import MessageList from './MessageList';
 import InputMessage from './InputMessage';
 import { ChatSocketProvider } from '../context/chat-socket';
 import { color } from '@mui/system';
+import { Link } from 'react-router-dom';
 
 interface ChatProps {
 	user : User;
@@ -18,10 +19,13 @@ interface ChatProps {
 
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
 const [usersData, setUsersData] = useState<any[]>([]);
+const [usersInThisChat, setusersInThisChat] = useState<{[key: string]: string;}[]>([]);
 const [chatData, setchatData] = useState<{users: any[], admins: any[], owner :string}>();
 
 const [addThisUser, setaddThisUser] = useState<string>("");
 const [errorPrint, setErrorPrint] = useState<string>("");
+
+
 
 const [title, setTitle] = useState('');
 const [urlpost, setUrlpost] = useState('');
@@ -59,8 +63,18 @@ useEffect(() => {
 	}, [props.chatidp, props.updatestate]);
 
 useEffect(() => {
+	console.log("Users data");
 	console.log(usersData);
-}, [props.chatidp, props.updatestate]);
+	setusersInThisChat([]);
+	usersData.map((item, index) => (
+		item && ( chatData?.users.includes(item.id) ) && (
+			setusersInThisChat((arr) => [...arr, {[item.id]: item.displayName}])
+			)
+			));
+			console.log("users in chat");
+			console.log(usersInThisChat);
+
+}, [props.chatidp, props.updatestate, usersData, chatData]);
 
 // useEffect(() => {
 // 	if (addThisUser !== "" && chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
@@ -127,9 +141,22 @@ return (
 		<div className='formholder'>
 
 				<div className='chatheader'>
+					<div className='usersinchatcontainer'>
 					<span>
-						{props.chatName} chat:
+						{props.chatName} chat with: 
 					</span>
+					{usersInThisChat && usersInThisChat.map((userObj, index) => (
+						<div key={index} className='usersinchatsingle'>
+							   <Link key={"users"}  className="newpostlink" to={"/users/" + Object.values(userObj)} >
+                 				   <button>{Object.values(userObj)}</button>
+          					    </Link>
+
+							<button title="Add to admin">A</button>
+							<button title="Remove from chat">X</button>
+							<button title="Mute this user">M</button>
+						</div>
+					))}
+					</div>
 					<div className='adduserdivcontainer'>
 						<span>Add users: </span>
 						{errorPrint === "Wrong credentials!" && <span style={{color:"red"}}>{errorPrint}</span>}
