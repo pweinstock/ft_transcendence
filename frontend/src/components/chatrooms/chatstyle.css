@@ -176,7 +176,10 @@
 	flex-direction: row;
 }
 
-.usersinchatsingle p {
+.usersinchatsingle button:first-child:hover {
+	background-color: #68bd9b9c;
+}
+.usersinchatsingle a button:first-child {
 	background-color: #68bd9b70;
 	padding-right: 2px;
 	padding-left: 4px;
@@ -185,6 +188,8 @@
 	margin:  0;
 	border-bottom-left-radius: 10px;
 	border-top-left-radius: 10px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 	font-size: smaller;
 }
 .usersinchatsingle button:hover {

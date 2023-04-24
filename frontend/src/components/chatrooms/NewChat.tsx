@@ -7,6 +7,7 @@ import MessageList from './MessageList';
 import InputMessage from './InputMessage';
 import { ChatSocketProvider } from '../context/chat-socket';
 import { color } from '@mui/system';
+import { Link } from 'react-router-dom';
 
 interface ChatProps {
 	user : User;
@@ -146,9 +147,10 @@ return (
 					</span>
 					{usersInThisChat && usersInThisChat.map((userObj, index) => (
 						<div key={index} className='usersinchatsingle'>
-							<p>
-								{Object.values(userObj)}
-							</p>
+							   <Link key={"users"}  className="newpostlink" to={"/users/" + Object.values(userObj)} >
+                 				   <button>{Object.values(userObj)}</button>
+          					    </Link>
+
 							<button title="Add to admin">A</button>
 							<button title="Remove from chat">X</button>
 							<button title="Mute this user">M</button>
