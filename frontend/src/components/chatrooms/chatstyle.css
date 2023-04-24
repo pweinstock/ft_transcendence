@@ -171,6 +171,49 @@
 	cursor:pointer;
 }
 
+.usersinchatcontainer {
+	display: flex;
+	flex-direction: row;
+}
+
+.usersinchatsingle p {
+	background-color: #68bd9b70;
+	padding-right: 2px;
+	padding-left: 4px;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	margin:  0;
+	border-bottom-left-radius: 10px;
+	border-top-left-radius: 10px;
+	font-size: smaller;
+}
+.usersinchatsingle button:hover {
+	background-color: #7868bd93;
+}
+.usersinchatsingle button:last-child {
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+.usersinchatsingle button {
+	background-color: #7868bd56;
+	border: none;
+	margin-right: 1px;
+	height: 100%;
+}
+
+.usersinchatsingle {
+	display: flex;
+	align-items: center;
+	font-size: small;
+	margin-right: 3px;
+	border-style: solid;
+	border-radius: 10px;
+	justify-content: center;
+	/* padding: 5px; */
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 .adduserdivcontainer {
 	font-size: x-small;
 	display: flex;
