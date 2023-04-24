@@ -135,7 +135,8 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           </TableHead>
           <TableBody>
             {gameHistory.map((game : GameMeta) => (
-              <TableRow key={game.id} style={{backgroundColor: game.firstPlayer === publicUser?.displayName ? 'green' : 'red'}}>
+              // <TableRow key={game.id} style={{backgroundColor: game.winner === publicUser?.displayName ? 'green' : 'red'}}>
+              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === publicUser?.displayName ? 'green' : 'red'}}>
                 <TableCell>{game.date.toString()}</TableCell>
                 <TableCell>
                   {userMap[game.firstPlayer] &&

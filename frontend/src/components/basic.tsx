@@ -1,5 +1,6 @@
 import { Edit, FileUpload, Save, Settings } from '@mui/icons-material';
 import { Avatar, Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Switch, TextField, Tooltip, Typography } from '@mui/material';
+import { display, positions } from '@mui/system';
 import axios from 'axios';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import Game from "./game/Game";
@@ -19,17 +20,17 @@ export default function Basic() {
     const [code, setCode] = useState("");
     
     useEffect(() => {
-        async function fetchUser() {
-          const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
-          setNewName(response.data.displayName);
-          setPhoto(response.data.photo);
-          setFirst(response.data.first);
-          if (response.data.first) {
-            setOpen(true);
-          }
-          setToggle(response.data.isTwoFactorAuthenticationEnabled);
+      async function fetchUser() {
+        const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
+        setNewName(response.data.displayName);
+        setPhoto(response.data.photo);
+        setFirst(response.data.first);
+        if (response.data.first) {
+          setOpen(true);
         }
-        fetchUser();
+        setToggle(response.data.isTwoFactorAuthenticationEnabled);
+      }
+      fetchUser();
     }, []);
 
     const handleClose = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, reason: string) => {
@@ -168,24 +169,21 @@ export default function Basic() {
             </Dialog>
             <section>
                 <h1> Welcome {newName}! </h1>
-                <Tooltip title="Settings">
-                  <Badge 
-                    badgeContent={
+                <Badge
+                  badgeContent={
+                    <Tooltip title="Settings">
                       <IconButton sx={{ fontSize: 32, color: 'white' }} onClick={() => setSettingsOpen(!settingsOpen)}>
                         <Settings/>
                       </IconButton>
-                  }
-                    //color="success"
-                    //overlap="circular"
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                    //variant="dot"
-                    sx={{ width: 64, height: 64 }}
-                    >
-                    <Avatar sx={{ width: 112, height: 112 }} src={`http://${window.location.hostname}:5000/users/image/${photo}`}>
-                    </Avatar>
-                  </Badge>
-                </Tooltip>
-                {/*<Game/>*/}
+                    </Tooltip>
+                }
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  sx={{ width: 64, height: 64 }}
+                  onClick={() => setSettingsOpen(!settingsOpen)}
+                  >
+                  <Avatar src={`http://${window.location.hostname}:5000/users/image/${photo}`} sx={{ width: 64, height: 64}}>
+                  </Avatar> 
+                </Badge>
                 {settingsOpen ? (
                 <List
                   sx={{ width: '25%', height: 'auto', bgcolor: 'background.paper' }}
