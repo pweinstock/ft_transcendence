@@ -13,7 +13,6 @@ enum GameUIState {
     NEW,
     JOIN,
     WATCH,
-    HIGHSCORE,
     RECONNECT
 }
 
@@ -39,7 +38,6 @@ export default function Game(props : GameProps) {
     const newGameClick = () => setGameUIState(GameUIState.NEW);
     const joinGameClick = () => setGameUIState(GameUIState.JOIN);
     const watchGameClick = () => setGameUIState(GameUIState.WATCH);
-    const viewHighScore = () => setGameUIState(GameUIState.HIGHSCORE);
 
 
     const leaveGame = () => {
@@ -58,7 +56,6 @@ export default function Game(props : GameProps) {
             <button className='navbutton' onClick={newGameClick}>New Game</button>
             <button className='navbutton' onClick={joinGameClick}>Join Game</button>
             <button className='navbutton' onClick={watchGameClick}>Watch Game</button>
-            <button className='navbutton' onClick={viewHighScore}>High Score</button>
         </>
         :
         <>
@@ -68,8 +65,6 @@ export default function Game(props : GameProps) {
                 <JoinGame user={props.user} leaveGame={leaveGame}/>}
             {UIState === GameUIState.WATCH &&
                 <WatchGame/>}
-            {UIState === GameUIState.HIGHSCORE &&
-                <HighScore/>}
             {UIState === GameUIState.RECONNECT &&
                 <ReconnectGame user={props.user} leaveGame={leaveGame}/>}
         </>

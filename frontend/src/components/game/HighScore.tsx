@@ -4,7 +4,11 @@ import { Avatar, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 import { User } from "../BaseInterface";
 import { useNavigate } from "react-router-dom";
 
-export default function HighScore() {
+interface BaseUserProps {
+  currentUser: User;
+}
+
+const HighScore: React.FC<BaseUserProps> = (props: BaseUserProps) => {
   const [data, setData] = useState([]);
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc" | undefined>("desc");
   const navigate = useNavigate();
@@ -44,7 +48,10 @@ export default function HighScore() {
   
 
   const handleAvatarClick = (displayName: string) => {
-    window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
+    if (displayName === props.currentUser.displayName)
+      window.location.href = `http://${window.location.hostname}:3000`;
+    else
+      window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
     //navigate('/users/${displayName}');
   }
 
@@ -82,3 +89,5 @@ export default function HighScore() {
     </TableContainer>
   );
 }
+
+export default HighScore;

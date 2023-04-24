@@ -22,6 +22,8 @@ import PublicProfile from './users/PublicProfile';
 import Friends from './users/Friends';
 import {UserSocketContext, UserSocketProvider} from "./context/user-socket";
 import {Socket} from "socket.io-client";
+import { Logout } from '@mui/icons-material';
+import HighScore from './game/HighScore';
 
 
 
@@ -68,7 +70,7 @@ export default function App() {
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
                     <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
-                    <Route path="/users" element={<BaseUser currentUser={currentUsersData}/>}/>
+                    <Route path="/highscore" element={<HighScore currentUser={currentUsersData}/>}/>
                     <Route path="/users/:user" element={<PublicProfile currentUser={currentUsersData}/>}/>
                     </>
                 }
@@ -88,8 +90,8 @@ export default function App() {
               <Link key={"game"}  className="newpostlink" to="/game">
                     <button className='navbutton'>Game</button>
               </Link>
-              <Link key={"users"}  className="newpostlink" to="/users">
-                    <button className='navbutton'>Users</button>
+              <Link key={"HighScore"}  className="newpostlink" to="/highscore">
+                    <button className='navbutton'>HighScore</button>
               </Link>
               <Link key={"friends"}  className="newpostlink" to="/friends">
                   <button className='navbutton'>Friends</button>
