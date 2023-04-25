@@ -12,7 +12,7 @@ interface JoinGameProps {
 
 
 export default function JoinGame(props : JoinGameProps) {
-    const [gamestoJoin, setGamestoJoin] = useState<GameInfo[]>([]);
+    const [gamesToJoin, setGamesToJoin] = useState<GameInfo[]>([]);
     const [gameOption, setGameOption] = useState<GameOption>();
 
     const socket = useContext(GameSocketContext);
@@ -24,7 +24,7 @@ export default function JoinGame(props : JoinGameProps) {
         axios.get(`http://${window.location.hostname}:5000/game/join`, {withCredentials: true})
             .then(response => {
                 if (response && response.status === 200)
-                    setGamestoJoin(response.data);
+                    setGamesToJoin(response.data);
             })
             .catch(e => {
                 //todo : handle error
@@ -47,7 +47,7 @@ export default function JoinGame(props : JoinGameProps) {
             </>
             :
             <div style={{color: "white"}}>
-                {gamestoJoin.map((game) => (
+                {gamesToJoin.map((game) => (
                     <button className='navbutton' key={game.gameId} onClick={() => {
                         joinServer(game.gameId)
                     }}>

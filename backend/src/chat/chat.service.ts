@@ -13,9 +13,9 @@ import {User} from "../users/user.entity";
 import {Socket} from 'socket.io';
 import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
-import { NewMessageDto } from './dto/new-message.dto';
+import {NewMessageDto} from './dto/new-message.dto';
 import * as bcrypt from 'bcrypt';
-import { PasswordChatDto } from './dto/password-chat.dto';
+import {PasswordChatDto} from './dto/password-chat.dto';
 
 interface Room {
     userId : string,
@@ -127,10 +127,9 @@ export class ChatService {
     async getUserChats(user : User) : Promise<Chat[]> {
         if (user.chats.length === 0)
             return null;
-        let chats : Chat[] = await Promise.all(
+        const chats : Chat[] = await Promise.all(
             user.chats.map(async (chatId) => {
-                const chat = await this.findChatById(chatId);
-                return chat;
+                return await this.findChatById(chatId);
             })
         );
         return chats;
@@ -177,7 +176,7 @@ export class ChatService {
             }
         }
         this.userServices.addChat(user, chat.id);
-        this.chatRepository.save(chat);
+        await this.chatRepository.save(chat);
         return chat;
     }
 
@@ -191,7 +190,7 @@ export class ChatService {
             this.removeBan(chat, user.id);
             this.removeMute(chat, user.id);
             chat.admins.push(user.id);
-            this.chatRepository.save(chat);
+            await this.chatRepository.save(chat);
         }
     }
 
@@ -200,7 +199,7 @@ export class ChatService {
         this.checkAdmin(chat, adminId);
         if (chat.admins.includes(dto.userId)) {
             chat.admins = chat.admins.filter((admin) => admin != dto.userId);
-            this.chatRepository.save(chat);
+            await this.chatRepository.save(chat);
         }
     }
 
@@ -247,9 +246,7 @@ export class ChatService {
 
     clientInChat(clientId : string, dto: CreateMessageDto) : boolean {
         const room = this.clienttoUser.get(clientId);
-        if (room && room.userId === dto.userId && room.chatId === dto.chatId)
-            return true;
-        return false;
+        return (room && room.userId === dto.userId && room.chatId === dto.chatId);
     }
 
     disconnectClient(client : Socket) : void {
@@ -273,8 +270,7 @@ export class ChatService {
     }
 
     getClientRoom(clientId : string) : Room {
-        const room = this.clienttoUser.get(clientId);
-        return room;
+        return this.clienttoUser.get(clientId);
     }
 
     async createMessage(user : User, dto : NewMessageDto) : Promise<Message> {
