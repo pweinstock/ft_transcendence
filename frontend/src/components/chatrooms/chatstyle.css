@@ -174,7 +174,15 @@
 .usersinchatcontainer {
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
+
+.buttonholderusersinchat {
+	display: flex;
+	justify-content: flex-end;
+}
+
+
 
 .usersinchatsingle button:first-child:hover {
 	background-color: #68bd9b9c;
@@ -210,6 +218,7 @@
 	display: flex;
 	align-items: center;
 	font-size: small;
+	border-width: 1px;
 	margin-right: 3px;
 	border-style: solid;
 	border-radius: 10px;

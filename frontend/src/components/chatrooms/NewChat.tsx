@@ -101,10 +101,10 @@ useEffect(() => {
 
 
 
-function addUserHandler() {
+async function addUserHandler() {
 	if (addThisUser !== "" && chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
 	{
-		axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
+		await axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
 		.then( () => {
 			props.onUpdate("", false);
 			// setaddThisUser(""); //do i need this?
@@ -121,6 +121,25 @@ function addUserHandler() {
 	else if (addThisUser !== "")
 	{
 		// setErrorPrint("Wrong credentials!");
+	}
+}
+async function addAsAdminHandler(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/admin`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+			// setaddThisUser(""); //do i need this?
+		}).catch((reason) => {
+			// if (reason.response!.status !== 200) {
+				// }
+				console.log(reason.message);
+				console.log("Error while adding user to admins:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});
+			
 	}
 }
 
@@ -145,17 +164,23 @@ return (
 					<span>
 						{props.chatName} chat with: 
 					</span>
-					{usersInThisChat && usersInThisChat.map((userObj, index) => (
-						<div key={index} className='usersinchatsingle'>
-							   <Link key={"users"}  className="newpostlink" to={"/users/" + Object.values(userObj)} >
-                 				   <button>{Object.values(userObj)}</button>
-          					    </Link>
+						<div className='buttonholderusersinchat'>
+							{usersInThisChat && usersInThisChat.map((userObj, index) => (
+								<div key={index} className='usersinchatsingle'>
+									<Link className="newpostlink" to={"/users/" + Object.values(userObj)} >
+										<button>{Object.values(userObj)}</button>
+										</Link>
 
-							<button title="Add to admin">A</button>
-							<button title="Remove from chat">X</button>
-							<button title="Mute this user">M</button>
+									<button title="Add to admin" onClick={() => {
+										console.log("keys:");
+										console.log(Object.keys(userObj)[0]);
+												addAsAdminHandler(Object.keys(userObj)[0]);
+												}}>A</button>
+									<button title="Remove from chat">X</button>
+									<button title="Mute this user">M</button>
+								</div>
+							))}
 						</div>
-					))}
 					</div>
 					<div className='adduserdivcontainer'>
 						<span>Add users: </span>
