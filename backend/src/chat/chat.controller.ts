@@ -10,6 +10,7 @@ import {DeleteMessageDto} from "./dto/delete-message.dto";
 import {JoinChatDto} from "./dto/join-chat.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
 import { NewMessageDto } from './dto/new-message.dto';
+import { PasswordChatDto } from './dto/password-chat.dto';
 
 
 @Controller('chat')
@@ -168,5 +169,22 @@ export class ChatController {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         this.chatService.unmuteUser(request.user.id, dto);
+    }
+
+	//PASSWORD FUNCTIONS
+	@Post('/addPass')
+	@UseGuards(AuthGuard('2FA'))
+    addChatPassword(@Req() request, @Body() dto: PasswordChatDto) : void {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        this.chatService.addChatPassword(request.user, dto);
+    }
+
+	@Post('/deletePass')
+	@UseGuards(AuthGuard('2FA'))
+    deleteChatPassword(@Req() request, @Body() dto: PasswordChatDto) : void {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+        this.chatService.deleteChatPassword(request.user, dto);
     }
 }
