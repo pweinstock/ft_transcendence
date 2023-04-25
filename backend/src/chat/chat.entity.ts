@@ -16,7 +16,7 @@ export class Chat {
     name: string;
 
     @Column({nullable: true})
-    password?: string;
+    password: string;
 
     @Column({type: 'enum', enum: ChatType, default: [ChatType.PUBLIC]})
     type: ChatType;

@@ -15,6 +15,7 @@ import {CreateMessageDto} from "./message/dto/create-message.dto";
 import {ChatPublicDataDto} from "./dto/chat-public-data.dto";
 import { NewMessageDto } from './dto/new-message.dto';
 import * as bcrypt from 'bcrypt';
+import { PasswordChatDto } from './dto/password-chat.dto';
 
 interface Room {
     userId : string,
@@ -47,6 +48,24 @@ export class ChatService {
         await this.userServices.addChat(owner, chat.id);
         return chat;
     }
+
+	async addChatPassword(user : User, dto : PasswordChatDto) : Promise<void> {
+		const chat = await this.findChatById(dto.chatId);
+		if (chat.owner !== user.id || !dto.password)
+			throw new HttpException("Not allowed!", HttpStatus.BAD_REQUEST);
+		chat.type = ChatType.PROTECTED;
+		chat.password = await this.hashPassword(dto.password);
+		await this.chatRepository.save(chat);
+	}
+
+	async deleteChatPassword(user : User, chatId : string) : Promise<void> {
+		const chat = await this.findChatById(chatId);
+		if (chat.owner !== user.id || chat.type != ChatType.PROTECTED)
+			throw new HttpException("Not allowed!", HttpStatus.BAD_REQUEST);
+		chat.type = ChatType.PUBLIC;
+		chat.password = null;
+		await this.chatRepository.save(chat);
+	}
 
     async deleteChat(owner : User, chatId: string): Promise<void> {
         const chat = await this.findChatById(chatId);
