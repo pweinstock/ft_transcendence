@@ -63,6 +63,7 @@ export class ChatController {
         return chat;
     }
 
+    
 	@Get('/leave/:id')
     @UseGuards(AuthGuard('2FA'))
     async leave(@Req() request, @Param('id') chatId: string) : Promise<void> {

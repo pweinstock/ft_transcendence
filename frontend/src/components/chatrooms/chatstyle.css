@@ -270,6 +270,14 @@
 	background-color: rgba(190, 35, 0, 0.568) !important;
 }
 
+/* OWNER HIDDEN */
+
+.hiddenownersettings {
+	display: block;
+	position: absolute;
+	background-color: #97ccb79c;
+}
+
 /* scrollbar */
 
 /* width */

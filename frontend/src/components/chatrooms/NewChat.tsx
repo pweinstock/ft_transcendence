@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import astroman from '../img/littleman.png';
 import axios from "axios";
 import Chat from "../chat/Chat"
@@ -25,6 +25,8 @@ const [chatData, setchatData] = useState<{users: any[], admins: any[], mutedUser
 
 const [addThisUser, setaddThisUser] = useState<string>("");
 const [errorPrint, setErrorPrint] = useState<string>("");
+const [chatPassValue, setchatPassValue] = useState<string>("");
+
 
 
 
@@ -34,7 +36,10 @@ const [bigtext, setBigtext] = useState('');
 const [msg, setmsg] = useState([]);
 
 // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
-
+const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
+	setchatPassValue(event.target.value);
+  };
+  
 useEffect(() => {
     // console.log("massage log");
     async function getChatData() {
@@ -189,6 +194,31 @@ async function removeAdmin(addadminthisuser: string) {
 	}
 }
 
+async function leaveChat() {
+	await axios.get(`http://${window.location.hostname}:5000/chat/leave/`+  props.chatidp , {withCredentials: true})
+		.then(() => {
+			props.onUpdate("", false);
+		})
+		.catch((reason) => {
+			console.log("Error leaving chat chat, in chatid:");
+			console.log(props.chatidp);
+			console.log(reason.message);
+		});
+}
+
+async function removePasswordl() {
+	await axios.get(`http://${window.location.hostname}:5000/chat/deletePass/`+  props.chatidp , {withCredentials: true})
+		.then(() => {
+			props.onUpdate("", false);
+		})
+		.catch((reason) => {
+			console.log("Error leaving chat chat, in chatid:");
+			console.log(props.chatidp);
+			console.log(reason.message);
+		});
+
+}
+
 function isInAdminorOwner(isThisUserinIT: string): boolean {
 	if (chatData && (chatData.owner === isThisUserinIT || chatData.admins.includes(isThisUserinIT)))
 		return (true);
@@ -222,9 +252,18 @@ const handleParentStateUpdate = (newState: string) => {
 	setParentState(newState);
 };
 
-function handOnClickSend() {
-	let temp = "Anonymus";
-	let anopic = astroman;
+async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
+	event.preventDefault();
+	await axios.post(`http://${window.location.hostname}:5000/chat/addPass`,  { chatId : props.chatidp, password: chatPassValue}, {withCredentials: true})
+		.then(() => {
+			// props.onUpdate("", true);
+			setchatPassValue("");
+			props.onUpdate("", false);
+		}
+		).catch(reason => {
+			console.log("failed to change password")
+			console.log(reason.message);
+	});
 }
 
 return (
@@ -250,7 +289,9 @@ return (
 											{ isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
 												removeAdmin(Object.keys(userObj)[0]);
 											}}>XA</button>}
-											<button className="redbutton" title="Remove from chat">X</button>
+											{props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
+												leaveChat();
+											}}>X</button>}
 											{ !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
 												muteUserInThisChat(Object.keys(userObj)[0]);
 											}}>&#128266;</button>}
@@ -259,7 +300,26 @@ return (
 											}}>&#128263;</button>}
 										</>
 									}
-									{userIsChatownerr(Object.keys(userObj)[0]) && <span>owner</span>}
+									{userIsChatownerr(Object.keys(userObj)[0]) &&
+									<div>
+										<span>owner</span>
+										<div className='hiddenownersettings'>
+										<button title="Remove passworld" onClick={() => {
+												removePasswordl();
+											}}>remove password</button>
+										<form onSubmit={handOnClickSend}>
+												<label>
+													change password:
+												</label>
+												<label>
+													Password:
+													<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
+												</label>
+												<br/>
+												<button className='' type="submit">add/change Passworld</button>
+											</form>
+										</div>
+									</div>}
 								</div>
 							))}
 						</div>
