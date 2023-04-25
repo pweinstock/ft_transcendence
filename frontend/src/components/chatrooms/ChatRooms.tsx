@@ -49,7 +49,7 @@ useEffect(() => {
 
 
 async function deleteChatNutton(id : string) {
-	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
+	await axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
 		.then(() => {
 			setchatNameValue("");
 			updateOtherUsers();
@@ -63,6 +63,7 @@ async function deleteChatNutton(id : string) {
 		});
 
 }
+
 const handleParentStateUpdate = (newState: string, deside: boolean) => {
 	if (deside)
 		setchatNameValue(newState);

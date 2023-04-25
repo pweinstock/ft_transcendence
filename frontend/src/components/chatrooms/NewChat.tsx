@@ -189,6 +189,20 @@ async function removeAdmin(addadminthisuser: string) {
 	}
 }
 
+async function leaveChat() {
+	await axios.get(`http://${window.location.hostname}:5000/chat/leave/`+  props.chatidp , {withCredentials: true})
+		.then(() => {
+			// setchatNameValue("");
+			// updateOtherUsers();
+		})
+		.catch((reason) => {
+			console.log("Error leaving chat chat, in chatid:");
+			console.log(props.chatidp);
+			console.log(reason.message);
+		});
+
+}
+
 function isInAdminorOwner(isThisUserinIT: string): boolean {
 	if (chatData && (chatData.owner === isThisUserinIT || chatData.admins.includes(isThisUserinIT)))
 		return (true);
@@ -250,7 +264,9 @@ return (
 											{ isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
 												removeAdmin(Object.keys(userObj)[0]);
 											}}>XA</button>}
-											<button className="redbutton" title="Remove from chat">X</button>
+											{props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
+												leaveChat();
+											}}>X</button>}
 											{ !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
 												muteUserInThisChat(Object.keys(userObj)[0]);
 											}}>&#128266;</button>}
@@ -259,7 +275,13 @@ return (
 											}}>&#128263;</button>}
 										</>
 									}
-									{userIsChatownerr(Object.keys(userObj)[0]) && <span>owner</span>}
+									{userIsChatownerr(Object.keys(userObj)[0]) &&
+									<div>
+										<span>owner</span>
+										<div className='hiddenownersettings'>
+											
+										</div>
+									</div>}
 								</div>
 							))}
 						</div>
