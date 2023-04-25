@@ -62,6 +62,12 @@ export class ChatController {
         return chat;
     }
 
+	@Get('/leave/:id')
+    @UseGuards(AuthGuard('2FA'))
+    async leave(@Req() request, @Param('id') chatId: string) : Promise<void> {
+        await this.chatService.leaveChat(request.user, chatId);
+    }
+
     @Get('/users/:id')
     @UseGuards(AuthGuard('2FA'))
     async getUsersInChat(@Param('id') chatId: string) : Promise<User[]> {
