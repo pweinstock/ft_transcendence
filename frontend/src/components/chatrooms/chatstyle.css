@@ -275,6 +275,7 @@
 .hiddenownersettings {
 	display: block;
 	position: absolute;
+	background-color: #97ccb79c;
 }
 
 /* scrollbar */
