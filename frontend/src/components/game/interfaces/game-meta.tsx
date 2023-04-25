@@ -5,6 +5,6 @@ export interface GameMeta {
     readonly secondPlayer: string;
     readonly firstPlayerScore: string;
     readonly secondPlayerScore : string;
-    readonly date: Date;
+    readonly date: string;
     readonly finished: boolean;
 }

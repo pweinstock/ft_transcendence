@@ -1,5 +1,5 @@
 import { Check, Close, DoNotDisturb, DoNotDisturbOff, DoNotDisturbOffOutlined, PersonAdd, PersonRemove } from '@mui/icons-material';
-import { Avatar, Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip } from '@mui/material';
+import { Avatar, Badge, Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip } from '@mui/material';
 import { waitFor } from '@testing-library/react';
 import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
@@ -24,6 +24,8 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
         axios.get(`http://${window.location.hostname}:5000/users/name/${param.user}`, { withCredentials: true })
           .then((response) => {
             setPublicUser(response.data);
+            if (response.data.displayName === props.currentUser.displayName)
+              window.location.href = `http://${window.location.hostname}:3000`;
             setIsFriend(props.currentUser.friends.includes(response.data.id));
             setIsBlocked(props.currentUser.bannedUsers.includes(response.data.id));
             const matchHistory = response.data.matchHistory;
@@ -136,18 +138,34 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           <TableBody>
             {gameHistory.map((game : GameMeta) => (
               // <TableRow key={game.id} style={{backgroundColor: game.winner === publicUser?.displayName ? 'green' : 'red'}}>
-              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === publicUser?.displayName ? 'green' : 'red'}}>
+              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === publicUser?.displayName ? 'lightgreen' : 'lightcoral'}}>
                 <TableCell>{game.date.toString()}</TableCell>
                 <TableCell>
                   {userMap[game.firstPlayer] &&
-                  <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`}>
-                  </Avatar>}
+                  <Tooltip title={userMap[game.firstPlayer].status}>
+                    <Badge
+                      color={userMap[game.firstPlayer].status === 'online' ? "success" : "error"}
+                      overlap="circular"
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                      variant="dot">
+                      <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`}>
+                      </Avatar>
+                    </Badge>
+                  </Tooltip>}
                   {game.firstPlayer}
                 </TableCell>
                 <TableCell>
                   {userMap[game.secondPlayer] &&
-                  <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`}>
-                  </Avatar>}
+                  <Tooltip title={userMap[game.secondPlayer].status}>
+                    <Badge
+                      color={userMap[game.secondPlayer].status === 'online' ? "success" : "error"}
+                      overlap="circular"
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                      variant="dot">
+                      <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`}>
+                      </Avatar>
+                    </Badge>  
+                  </Tooltip>}
                   {game.secondPlayer}
                 </TableCell>
                 <TableCell align="right">{game.firstPlayerScore + " : " + game.secondPlayerScore}</TableCell>

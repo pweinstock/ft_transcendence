@@ -86,6 +86,10 @@ const Friends: React.FC<BaseUserProps> = (props: BaseUserProps) => {
     });
   };
 
+  const handleAvatarClick = (displayName: string) => {
+    window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
+  }
+
   return (
     <>
     <List
@@ -110,29 +114,16 @@ const Friends: React.FC<BaseUserProps> = (props: BaseUserProps) => {
       {friends.map((friend) => (
         <ListItem key={friend.id}>
           <ListItemAvatar>
-            {friend.status === "online" ? (
-            <Tooltip title={"online"}>
+            <Tooltip title={friend.status}>
               <Badge
-                color="success"
+                color={friend.status === 'online' ? 'success' : 'error'}
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
                 >
-                <Avatar src={`http://${window.location.hostname}:5000/users/image/${friend.photo}`} />
+                <Avatar src={`http://${window.location.hostname}:5000/users/image/${friend.photo}`} onClick={() => handleAvatarClick(friend.displayName)}/>
               </Badge>
             </Tooltip>
-            ) : (
-              <Tooltip title={"offline"}>
-              <Badge
-                color="error"
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-                >
-                <Avatar src={`http://${window.location.hostname}:5000/users/image/${friend.photo}`} />
-              </Badge>
-            </Tooltip>
-            )}
           </ListItemAvatar>
           <ListItemText primary={friend.displayName} />
           <Button variant="contained" endIcon={<Send/>}>

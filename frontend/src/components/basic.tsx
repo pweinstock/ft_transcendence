@@ -1,9 +1,11 @@
-import { Edit, FileUpload, Save, Settings } from '@mui/icons-material';
-import { Avatar, Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Switch, TextField, Tooltip, Typography } from '@mui/material';
+import { Check, Close, Edit, FileUpload, Save, Settings } from '@mui/icons-material';
+import { Avatar, Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material';
 import { display, positions } from '@mui/system';
 import axios from 'axios';
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import { User } from './BaseInterface';
 import Game from "./game/Game";
+import { GameMeta } from './game/interfaces/game-meta';
 
 export default function Basic() {
 
@@ -18,6 +20,8 @@ export default function Basic() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [imageSrc, setImageSrc] = useState("");
     const [code, setCode] = useState("");
+    const [gameHistory, setGameHistory] = useState<GameMeta[]>([]);
+    const [userMap, setUserMap] = useState<{[key: string]: User}>({});
     
     useEffect(() => {
       async function fetchUser() {
@@ -29,9 +33,30 @@ export default function Basic() {
           setOpen(true);
         }
         setToggle(response.data.isTwoFactorAuthenticationEnabled);
+        const matchHistory = response.data.matchHistory;
+        Promise.all(matchHistory.map((id: string) => {
+          return axios.get(`http://${window.location.hostname}:5000/game/id/${id}`, { withCredentials: true })
+            .then((response) => response.data)
+        })).then((gameMetaList) => {
+          setGameHistory(gameMetaList);
+        }).catch((error) => {
+          console.error(error);
+        });
       }
       fetchUser();
     }, []);
+
+    useEffect(() => {
+      if (gameHistory.length === 0)
+        return;
+      gameHistory.forEach((game) => {
+        axios.get(`http://${window.location.hostname}:5000/users/name/${game.firstPlayer}`, { withCredentials: true })
+        .then((response) => {
+          setUserMap((prevState) => ({...prevState, [game.firstPlayer]: response.data,}));
+        })
+        .catch((error) => console.log(error));
+      });
+    }, [gameHistory]);
 
     const handleClose = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, reason: string) => {
         if (reason && reason === "backdropClick" && "escapeKeyDown") 
@@ -207,7 +232,57 @@ export default function Basic() {
                   </ListItem>
                 </List>
                 ) : <></>}
-            </section>  
+            </section>
+            <TableContainer component={Paper}>
+              <Table aria-label="simple table" stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Date</TableCell>
+                    <TableCell align="left">Player 1</TableCell>
+                    <TableCell align="left">Player 2</TableCell>
+                    <TableCell align="right">Score</TableCell>
+                    <TableCell align="right">Finished</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {gameHistory.map((game : GameMeta) => (
+                    <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === newName ? 'lightgreen' : 'lightcoral'}}>
+                      <TableCell>{game.date} gameWinner: {game.winner}</TableCell>
+                      <TableCell>
+                        {userMap[game.firstPlayer] &&
+                        <Tooltip title={userMap[game.firstPlayer].status}>
+                          <Badge
+                            color={userMap[game.firstPlayer].status === 'online' ? "success" : "error"}
+                            overlap="circular"
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            variant="dot">
+                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`}>
+                            </Avatar>
+                          </Badge>
+                        </Tooltip>}
+                        {game.firstPlayer}
+                      </TableCell>
+                      <TableCell>
+                        {userMap[game.secondPlayer] &&
+                        <Tooltip title={userMap[game.secondPlayer].status}>
+                          <Badge
+                            color={userMap[game.secondPlayer].status === 'online' ? "success" : "error"}
+                            overlap="circular"
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            variant="dot">
+                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`}>
+                            </Avatar>
+                          </Badge>
+                        </Tooltip>}
+                        {game.secondPlayer}
+                      </TableCell>
+                      <TableCell align="right">{game.firstPlayerScore + " : " + game.secondPlayerScore}</TableCell>
+                      <TableCell align="right">{game.finished ? <Check/> : <Close/>}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer> 
         </>
     );
 }

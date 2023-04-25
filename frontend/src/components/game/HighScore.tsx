@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Avatar, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from "@mui/material";
+import { Avatar, Badge, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip } from "@mui/material";
 import { User } from "../BaseInterface";
 import { useNavigate } from "react-router-dom";
 
@@ -75,7 +75,15 @@ const HighScore: React.FC<BaseUserProps> = (props: BaseUserProps) => {
           {data.map((user : User) => (
             <TableRow key={user.id}>
               <TableCell>
-                <Avatar alt={user.displayName} src={`http://${window.location.hostname}:5000/users/image/${user.photo}`} onClick={() => handleAvatarClick(user.displayName)}/>
+                <Tooltip title={user.status}>
+                  <Badge
+                  color={user.status === 'online' ? 'success' : 'error'}
+                  overlap="circular"
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  variant="dot">
+                    <Avatar alt={user.displayName} src={`http://${window.location.hostname}:5000/users/image/${user.photo}`} onClick={() => handleAvatarClick(user.displayName)}/>
+                  </Badge>
+                </Tooltip>
                 {user.displayName}
               </TableCell>
               <TableCell align="right">{user.wins}</TableCell>
