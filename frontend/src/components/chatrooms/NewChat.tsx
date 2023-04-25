@@ -20,7 +20,8 @@ interface ChatProps {
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
 const [usersData, setUsersData] = useState<any[]>([]);
 const [usersInThisChat, setusersInThisChat] = useState<{[key: string]: string;}[]>([]);
-const [chatData, setchatData] = useState<{users: any[], admins: any[], owner :string}>();
+const [chatData, setchatData] = useState<{users: any[], admins: any[], mutedUsers
+	: any[], owner :string}>();
 
 const [addThisUser, setaddThisUser] = useState<string>("");
 const [errorPrint, setErrorPrint] = useState<string>("");
@@ -101,10 +102,10 @@ useEffect(() => {
 
 
 
-function addUserHandler() {
+async function addUserHandler() {
 	if (addThisUser !== "" && chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
 	{
-		axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
+		await axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : addThisUser,  chatId : props.chatidp }, {withCredentials: true})
 		.then( () => {
 			props.onUpdate("", false);
 			// setaddThisUser(""); //do i need this?
@@ -122,6 +123,96 @@ function addUserHandler() {
 	{
 		// setErrorPrint("Wrong credentials!");
 	}
+}
+async function addAsAdminHandler(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/admin`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+		
+				console.log(reason.message);
+				console.log("Error while adding user to admins:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});
+			
+	}
+}
+async function muteUserInThisChat(addadminthisuser: string) {
+	if (chatData && chatData.owner !== addadminthisuser && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/mute`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while muting useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});	
+	}
+}
+async function unMuteUserInThisChat(addadminthisuser: string) {
+	if (chatData && chatData.owner !== addadminthisuser && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/unmute`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while unmuting useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});
+			
+	}
+}
+async function removeAdmin(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/removeAdmin`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while muting useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});
+			
+	}
+}
+
+function isInAdminorOwner(isThisUserinIT: string): boolean {
+	if (chatData && (chatData.owner === isThisUserinIT || chatData.admins.includes(isThisUserinIT)))
+		return (true);
+	else
+		return (false);
+}
+function isInAdmin(isThisUserinIT: string): boolean {
+	if (chatData && (chatData.owner === isThisUserinIT || chatData.admins.includes(isThisUserinIT)))
+		return (true);
+	else
+		return (false);
+}
+
+function isMuted(isThisUserinIT: string): boolean {
+	if (chatData && chatData.mutedUsers.includes(isThisUserinIT))
+		return (true);
+	else
+		return (false);
+}
+function userIsChatownerr(isThisUserinIT: string): boolean {
+	if (chatData && chatData.owner === isThisUserinIT)
+		return (true);
+	else
+		return (false);
 }
 
 
@@ -145,17 +236,33 @@ return (
 					<span>
 						{props.chatName} chat with: 
 					</span>
-					{usersInThisChat && usersInThisChat.map((userObj, index) => (
-						<div key={index} className='usersinchatsingle'>
-							   <Link key={"users"}  className="newpostlink" to={"/users/" + Object.values(userObj)} >
-                 				   <button>{Object.values(userObj)}</button>
-          					    </Link>
-
-							<button title="Add to admin">A</button>
-							<button title="Remove from chat">X</button>
-							<button title="Mute this user">M</button>
+						<div className='buttonholderusersinchat'>
+							{usersInThisChat && usersInThisChat.map((userObj, index) => (
+								<div key={index} className='usersinchatsingle'>
+										<Link className="newpostlink" to={"/users/" + Object.values(userObj)} >
+											<button>{Object.values(userObj)}</button>
+										</Link>
+									{ !userIsChatownerr(Object.keys(userObj)[0]) && 
+										<>
+											{ !isInAdmin(Object.keys(userObj)[0]) && <button title="Add to admin" onClick={() => {
+												addAsAdminHandler(Object.keys(userObj)[0]);
+											}}>A</button>}
+											{ isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
+												removeAdmin(Object.keys(userObj)[0]);
+											}}>XA</button>}
+											<button className="redbutton" title="Remove from chat">X</button>
+											{ !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
+												muteUserInThisChat(Object.keys(userObj)[0]);
+											}}>&#128266;</button>}
+											{ isMuted(Object.keys(userObj)[0]) && <button title="UnMute this user" onClick={() => {
+												unMuteUserInThisChat(Object.keys(userObj)[0]);
+											}}>&#128263;</button>}
+										</>
+									}
+									{userIsChatownerr(Object.keys(userObj)[0]) && <span>owner</span>}
+								</div>
+							))}
 						</div>
-					))}
 					</div>
 					<div className='adduserdivcontainer'>
 						<span>Add users: </span>

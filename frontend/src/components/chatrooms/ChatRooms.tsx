@@ -27,9 +27,6 @@ const updateOtherUsers = () =>{
 	socket?.emit('userUpdate',  {});
 }
 
-// listening to any update in the server.
-// socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
-
 useEffect(() => {
 	socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
 }, [updateStatesGlobal, setaupdateStatesGlobal])
@@ -87,7 +84,7 @@ return (
 									setactualChatid(item.id);
 									setactualChatName(item.name);
 									}} >{item.name}</button>
-								<button className='chatbuttondel' onClick={() => {
+								<button className='chatbuttondel' title="Delete this chat" onClick={() => {
 									deleteChatNutton(item.id);
 									}} >X</button>
 							</div>
