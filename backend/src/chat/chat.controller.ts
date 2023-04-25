@@ -180,11 +180,11 @@ export class ChatController {
         this.chatService.addChatPassword(request.user, dto);
     }
 
-	@Post('/deletePass')
+	@Get('/deletePass/:id')
 	@UseGuards(AuthGuard('2FA'))
-    deleteChatPassword(@Req() request, @Body() dto: PasswordChatDto) : void {
+    deleteChatPassword(@Req() request, @Param('id') chatId: string) : void {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
-        this.chatService.deleteChatPassword(request.user, dto);
+        this.chatService.deleteChatPassword(request.user, chatId);
     }
 }

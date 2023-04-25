@@ -58,9 +58,9 @@ export class ChatService {
 		await this.chatRepository.save(chat);
 	}
 
-	async deleteChatPassword(user : User, dto : PasswordChatDto) : Promise<void> {
-		const chat = await this.findChatById(dto.chatId);
-		if (chat.owner !== user.id || !dto.password || chat.type != ChatType.PROTECTED)
+	async deleteChatPassword(user : User, chatId : string) : Promise<void> {
+		const chat = await this.findChatById(chatId);
+		if (chat.owner !== user.id || chat.type != ChatType.PROTECTED)
 			throw new HttpException("Not allowed!", HttpStatus.BAD_REQUEST);
 		chat.type = ChatType.PUBLIC;
 		chat.password = null;
