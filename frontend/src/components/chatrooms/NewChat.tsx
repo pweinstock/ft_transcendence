@@ -242,19 +242,24 @@ return (
 										<Link className="newpostlink" to={"/users/" + Object.values(userObj)} >
 											<button>{Object.values(userObj)}</button>
 										</Link>
-									{ !isInAdmin(Object.keys(userObj)[0]) && <button title="Add to admin" onClick={() => {
+									{ !userIsChatownerr(Object.keys(userObj)[0]) && 
+										<>
+											{ !isInAdmin(Object.keys(userObj)[0]) && <button title="Add to admin" onClick={() => {
 												addAsAdminHandler(Object.keys(userObj)[0]);
-												}}>A</button>}
-									{ isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
-											removeAdmin(Object.keys(userObj)[0]);
-												}}>XA</button>}
-									<button className="redbutton" title="Remove from chat">X</button>
-									{ !userIsChatownerr(Object.keys(userObj)[0]) && !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
-											muteUserInThisChat(Object.keys(userObj)[0]);
-												}}>&#128266;</button>}
-									{ !userIsChatownerr(Object.keys(userObj)[0]) && isMuted(Object.keys(userObj)[0]) && <button title="UnMute this user" onClick={() => {
-											unMuteUserInThisChat(Object.keys(userObj)[0]);
-												}}>&#128263;</button>}
+											}}>A</button>}
+											{ isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
+												removeAdmin(Object.keys(userObj)[0]);
+											}}>XA</button>}
+											<button className="redbutton" title="Remove from chat">X</button>
+											{ !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
+												muteUserInThisChat(Object.keys(userObj)[0]);
+											}}>&#128266;</button>}
+											{ isMuted(Object.keys(userObj)[0]) && <button title="UnMute this user" onClick={() => {
+												unMuteUserInThisChat(Object.keys(userObj)[0]);
+											}}>&#128263;</button>}
+										</>
+									}
+									{userIsChatownerr(Object.keys(userObj)[0]) && <span>owner</span>}
 								</div>
 							))}
 						</div>
