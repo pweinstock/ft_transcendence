@@ -59,6 +59,13 @@ export class ChatService {
         this.chatRepository.remove(chat);
     }
 
+	async leaveChat(user : User, chatId: string): Promise<void> {
+		await this.userServices.deleteChat(user.id, chatId);
+		const chat = await this.findChatById(chatId);
+		chat.users = chat.users.filter(userId => userId !== user.id);
+		await this.chatRepository.save(chat);
+    }
+
     async findChatById(chatId: string): Promise<Chat> {
         const chat : Chat = await this.chatRepository.findOneBy({id: chatId});
         if (!chat)
