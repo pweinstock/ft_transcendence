@@ -279,7 +279,7 @@ return (
 									<div>
 										<span>owner</span>
 										<div className='hiddenownersettings'>
-											
+											<p>TEst</p>
 										</div>
 									</div>}
 								</div>
