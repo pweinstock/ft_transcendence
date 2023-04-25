@@ -27,7 +27,7 @@ export class GameController {
     @Get('id/:id')
     @UseGuards(AuthGuard('2FA'))
     async getById(@Param('id') id : string) : Promise<Game> {
-        return this.gameService.findGamebyId(id);
+        return this.gameService.findGameById(id);
     }
 
     @Get('watch')

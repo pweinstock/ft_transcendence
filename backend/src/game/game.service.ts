@@ -47,11 +47,12 @@ export class GameService {
         this.gameIdtoGameData.delete(gameId);
     }
 
-    joinGame (clientId : string, dto : JoinGameDto) : GameOptionDto {
+    async joinGame (clientId : string, dto : JoinGameDto) : Promise<GameOptionDto> {
         const gameOption : GameOptionDto = this.getGameOptions(dto.gameId);
         if (!gameOption || gameOption.isStarted) {
             return null;
         }
+        await this.setSecondPlayer(dto.gameId, dto.displayName);
         gameOption.secondPlayer = dto.displayName;
         gameOption.isStarted = true;
         this.gameIdToGameOption.set(dto.gameId, gameOption);
@@ -61,8 +62,15 @@ export class GameService {
         return gameOption;
     }
 
+    async setSecondPlayer(gameId : string, secondPlayer : string) : Promise<void> {
+        const game : Game = await this.findGameById(gameId);
+        game.secondPlayer = secondPlayer;
+        await this.gameRepository.save(game);
+    }
+
+
     async viewGame (clientId : string, gameId : string) : Promise<boolean> {
-        const gameData = await this.findGamebyId(gameId);
+        const gameData = await this.findGameById(gameId);
         if (!gameData)
             return false;
         this.viewerToGameId.set(clientId, gameId);
@@ -123,17 +131,15 @@ export class GameService {
 
     //WORKING WITH DATABASE
     async findAllGame() : Promise<Game[]> {
-        const games = await this.gameRepository.find();
-        return games;
+        return await this.gameRepository.find();
     }
 
-    async findGamebyId(gameId : string) : Promise<Game> {
-        const gameData = await this.gameRepository.findOneBy({id : gameId});
-        return gameData;
+    async findGameById(gameId : string) : Promise<Game> {
+        return await this.gameRepository.findOneBy({id: gameId});
     }
 
     async finalScore(dto : GameScoreDto, gameId : string) {
-        const game : Game = await this.findGamebyId(gameId);
+        const game : Game = await this.findGameById(gameId);
         if (game) {
             game.firstPlayerScore = dto.firstPlayerScore;
             game.secondPlayerScore = dto.secondPlayerScore;
@@ -154,7 +160,7 @@ export class GameService {
 
     //Helpers
     async recordTechnicalLoose (gameId : string, playerName : string) : Promise <boolean> {
-        const game : Game = await this.findGamebyId(gameId);
+        const game : Game = await this.findGameById(gameId);
         if (game && game.finished === false) {
             const matchData = this.gameIdToGameOption.get(gameId);
             this.userService.changeStatus(game.firstPlayer, "online");
@@ -191,16 +197,12 @@ export class GameService {
     }
 
     isPlayer(clientId : string) : boolean {
-        if (this.playerToGameId.has(clientId))
-            return true;
-        return false;
+        return this.playerToGameId.has(clientId);
     }
 
     getPlayerGameId(clientId : string) : string {
         const gameId = this.playerToGameId.get(clientId);
-        if (gameId)
-            return gameId.gameId;
-        return null;
+        return gameId ? gameId.gameId : null;
     }
 
     getClientRoom(clientId : string) : ClientRoom {

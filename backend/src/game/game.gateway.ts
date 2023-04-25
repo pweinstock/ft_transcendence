@@ -27,7 +27,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly gameService: GameService) {}
 
-    afterInit(server: Server) {}
+    afterInit() {}
 
     handleConnection() {}
 
