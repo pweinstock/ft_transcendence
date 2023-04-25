@@ -27,9 +27,6 @@ const updateOtherUsers = () =>{
 	socket?.emit('userUpdate',  {});
 }
 
-// listening to any update in the server.
-// socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
-
 useEffect(() => {
 	socket.on("userUpdate", () => {setaupdateStatesGlobal(updateStatesGlobal + 1)});
 }, [updateStatesGlobal, setaupdateStatesGlobal])
