@@ -87,7 +87,7 @@ return (
 									setactualChatid(item.id);
 									setactualChatName(item.name);
 									}} >{item.name}</button>
-								<button className='chatbuttondel' onClick={() => {
+								<button className='chatbuttondel' title="Delete this chat" onClick={() => {
 									deleteChatNutton(item.id);
 									}} >X</button>
 							</div>

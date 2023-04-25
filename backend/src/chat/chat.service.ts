@@ -203,7 +203,7 @@ export class ChatService {
     async muteUser(adminId : string, dto: ChangeStatusDTO) : Promise<void> {
         const chat = await this.findChatById(dto.chatId);
         if (dto.userId === chat.owner)
-            throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
+        throw new HttpException('Not enough rights!', HttpStatus.FORBIDDEN);
         this.checkAdmin(chat, adminId);
         const user = await this.userServices.findById(dto.userId);
         this.addMute(chat, user.id);
@@ -307,8 +307,9 @@ export class ChatService {
     }
 
     addMute(chat : Chat, userId: string) : void {
-        if (this.isMuted(chat, userId)) {
+        if (!this.isMuted(chat, userId)) {
             chat.mutedUsers.push(userId);
+            this.chatRepository.save(chat);
         }
     }
 
