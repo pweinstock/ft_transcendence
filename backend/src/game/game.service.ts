@@ -23,7 +23,7 @@ export class GameService {
     private playerToGameId = new Map<string, ClientRoom>();
     private viewerToGameId = new Map<string, string>();
     private gameIdToGameOption = new Map<string, GameOptionDto>();
-    private gameIdtoGameData = new Map<string, GameDataDto>();
+    private gameIdToGameData = new Map<string, GameDataDto>();
 
     async newGame (clientId : string, dto : GameOptionDto ) : Promise<string> {
         const gameId = this.getPlayerGameId(clientId);
@@ -36,15 +36,15 @@ export class GameService {
     }
 
     getGameData (gameId :string) : GameDataDto {
-        return this.gameIdtoGameData.get(gameId);
+        return this.gameIdToGameData.get(gameId);
     }
 
     setGameData (gameId :string, gameData : GameDataDto) {
-        this.gameIdtoGameData.set(gameId, gameData);
+        this.gameIdToGameData.set(gameId, gameData);
     }
 
     deleteGameData (gameId : string) {
-        this.gameIdtoGameData.delete(gameId);
+        this.gameIdToGameData.delete(gameId);
     }
 
     async joinGame (clientId : string, dto : JoinGameDto) : Promise<GameOptionDto> {
