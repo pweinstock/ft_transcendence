@@ -194,6 +194,38 @@ async function removeAdmin(addadminthisuser: string) {
 	}
 }
 
+async function blockUser(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/ban`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while blocking useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});		
+	}
+}
+
+async function unblockUser(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/unban`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while unblocking useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});		
+	}
+}
+
 async function leaveChat() {
 	await axios.get(`http://${window.location.hostname}:5000/chat/leave/`+  props.chatidp , {withCredentials: true})
 		.then(() => {
@@ -234,6 +266,12 @@ function isInAdmin(isThisUserinIT: string): boolean {
 
 function isMuted(isThisUserinIT: string): boolean {
 	if (chatData && chatData.mutedUsers.includes(isThisUserinIT))
+		return (true);
+	else
+		return (false);
+}
+function isBlocked(isThisUserinIT: string): boolean {
+	if (chatData && chatData.bannedUsers.includes(isThisUserinIT))
 		return (true);
 	else
 		return (false);
@@ -290,6 +328,12 @@ return (
 											{props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
 												leaveChat();
 											}}>X</button>}
+											{ props.user.id !== Object.keys(userObj)[0] && !isBlocked(Object.keys(userObj)[0]) && <button title="block this user" onClick={() => {
+												blockUser(Object.keys(userObj)[0]);
+											}}>&#x26d4;</button>}
+											{ props.user.id !== Object.keys(userObj)[0] && isBlocked(Object.keys(userObj)[0]) && <button title="UnBlock this user" onClick={() => {
+												unblockUser(Object.keys(userObj)[0]);
+											}}>&#9749;</button>}
 											{ props.user.id !== Object.keys(userObj)[0] && !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
 												muteUserInThisChat(Object.keys(userObj)[0]);
 											}}>&#128266;</button>}

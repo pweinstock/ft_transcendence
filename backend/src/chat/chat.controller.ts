@@ -154,6 +154,7 @@ export class ChatController {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         this.chatService.unbanUser(request.user.id, dto);
+
     }
 
     @Post('/mute')

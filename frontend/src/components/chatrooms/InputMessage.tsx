@@ -91,7 +91,7 @@ return (
 			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 			{messages.map((message, index) => {
 				return (
-						<>
+					<>
 					{ !props.chatThisData.bannedUsers.includes(message.userId) &&
 						<Message key={index + props.chatidp}
 						content={message.content}
@@ -100,7 +100,7 @@ return (
 						user={props.user.displayName}
 						/>
 						}
-						</>
+					</>
 				);
 			})}
 		</div>

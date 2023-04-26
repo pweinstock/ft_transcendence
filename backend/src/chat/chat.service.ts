@@ -316,7 +316,7 @@ export class ChatService {
 
     removeBan(chat : Chat, userId: string) : void {
         if (chat.bannedUsers.includes(userId)) {
-            chat.bannedUsers.filter(user => user !== userId);
+            chat.bannedUsers = chat.bannedUsers.filter(user => user !== userId);
             this.chatRepository.save(chat);
         }
     }
