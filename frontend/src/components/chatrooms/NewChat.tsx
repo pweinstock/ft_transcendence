@@ -241,6 +241,7 @@ async function leaveChat() {
 	await axios.get(`http://${window.location.hostname}:5000/chat/leave/`+  props.chatidp , {withCredentials: true})
 		.then(() => {
 			props.onUpdate("", false);
+			props.onUpdate("", true);
 		})
 		.catch((reason) => {
 			console.log("Error leaving chat chat, in chatid:");
