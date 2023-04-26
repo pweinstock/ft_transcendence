@@ -292,8 +292,18 @@
 .hiddenownersettings {
 	display: none;
 	position: absolute;
-	background-color: #97ccb79c;
+	padding: 2px;
+	border-radius: 10px;
+	background-color: #a6d6c3b9;
 	z-index: 1;
+}
+
+.hiddenownersettings button {
+	background-color: #5536dda2;
+	width: 100%;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	border-radius: 10px;
 }
 
 .ownercontainerinchat:hover .hiddenownersettings {

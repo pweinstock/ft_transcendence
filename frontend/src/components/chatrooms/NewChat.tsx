@@ -245,7 +245,6 @@ function userIsChatownerr(isThisUserinIT: string): boolean {
 		return (false);
 }
 
-
 const [parentState, setParentState] = useState("Initial parent state");
 
 const handleParentStateUpdate = (newState: string) => {
@@ -308,16 +307,13 @@ return (
 													removePasswordl();
 												}}>remove password</button>
 											<form onSubmit={handOnClickSend}>
-													<label>
-														change password:
-													</label>
-													<label>
-														Password:
-														<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
-													</label>
-													<br/>
-													<button className='' type="submit">add/change Passworld</button>
-												</form>
+												<label>
+													Password:
+													<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
+												</label>
+												<br/>
+												<button className='' type="submit">add/change Passworld</button>
+											</form>
 										</div>
 									</div>}
 								</div>
