@@ -78,10 +78,10 @@ export class ChatService {
         this.chatRepository.remove(chat);
     }
 
-	async leaveChat(user : User, chatId: string): Promise<void> {
-		await this.userServices.deleteChat(user.id, chatId);
+	async leaveChat(userthisid : string, chatId: string): Promise<void> {
+		await this.userServices.deleteChat(userthisid, chatId);
 		const chat = await this.findChatById(chatId);
-		chat.users = chat.users.filter(userId => userId !== user.id);
+		chat.users = chat.users.filter(userId => userId !== userthisid);
 		await this.chatRepository.save(chat);
     }
 
@@ -316,7 +316,7 @@ export class ChatService {
 
     removeBan(chat : Chat, userId: string) : void {
         if (chat.bannedUsers.includes(userId)) {
-            chat.bannedUsers.filter(user => user !== userId);
+            chat.bannedUsers = chat.bannedUsers.filter(user => user !== userId);
             this.chatRepository.save(chat);
         }
     }

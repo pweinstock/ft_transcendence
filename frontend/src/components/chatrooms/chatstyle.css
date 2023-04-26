@@ -196,6 +196,23 @@
 	margin-bottom: 0;
 }
 
+.ownercontainerinchat {
+	height: 100%;
+}
+.ownerboxinchat:hover {
+	background-color: #e44a4a95;
+}
+
+.ownerboxinchat {
+	background-color: #e44a4a66;
+	display: flex;
+	align-items: center;
+	height: 100%;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	cursor:pointer;
+}
+
 .usersinchatsingle button {
 	background-color: #7868bd56;
 	border: none;
@@ -273,9 +290,24 @@
 /* OWNER HIDDEN */
 
 .hiddenownersettings {
-	display: block;
+	display: none;
 	position: absolute;
-	background-color: #97ccb79c;
+	padding: 2px;
+	border-radius: 10px;
+	background-color: #a6d6c3b9;
+	z-index: 1;
+}
+
+.hiddenownersettings button {
+	background-color: #5536dda2;
+	width: 100%;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	border-radius: 10px;
+}
+
+.ownercontainerinchat:hover .hiddenownersettings {
+	display: block;
 }
 
 /* scrollbar */

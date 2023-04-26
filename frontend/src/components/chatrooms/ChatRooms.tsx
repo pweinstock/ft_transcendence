@@ -97,7 +97,7 @@ return (
 				</div>
 				<div className='chatcontent'>
 					{actualChatid && actualChatName && <NewChat updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
-					{!actualChatid && <h1>No Chat</h1> }
+					{!chatNameValue && <h1>No Chat</h1> }
 
 				</div>
 			</div>

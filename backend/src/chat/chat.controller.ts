@@ -67,7 +67,7 @@ export class ChatController {
 	@Get('/leave/:id')
     @UseGuards(AuthGuard('2FA'))
     async leave(@Req() request, @Param('id') chatId: string) : Promise<void> {
-        await this.chatService.leaveChat(request.user, chatId);
+        await this.chatService.leaveChat(request.user.id, chatId);
     }
 
     @Get('/users/:id')
@@ -140,6 +140,15 @@ export class ChatController {
         this.chatService.removeAdmin(request.user.id, dto);
     }
 
+    @Post('/kickoutuser')
+    @UseGuards(AuthGuard('2FA'))
+    kickoutuser(@Req() request, @Body() dto: ChangeStatusDTO) : void {
+        if (!request || !request.user)
+            throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
+                this.chatService.leaveChat(dto.userId, dto.chatId);
+    }
+
+
     @Post('/ban')
     @UseGuards(AuthGuard('2FA'))
     ban(@Req() request, @Body() dto: ChangeStatusDTO) : void {
@@ -154,6 +163,7 @@ export class ChatController {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
         this.chatService.unbanUser(request.user.id, dto);
+
     }
 
     @Post('/mute')
