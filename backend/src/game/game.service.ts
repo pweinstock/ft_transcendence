@@ -146,9 +146,9 @@ export class GameService {
             this.userService.changeStatus(game.firstPlayer, "online");
             this.userService.changeStatus(game.secondPlayer, "online");
             game.finished = true;
-            if (game.firstPlayerScore > game.secondPlayer)
+            if (Number(game.firstPlayerScore) > Number(game.secondPlayerScore))
                 game.winner = game.firstPlayer;
-            else if (game.firstPlayerScore < game.secondPlayer)
+            else if (Number(game.firstPlayerScore) < Number(game.secondPlayerScore))
                 game.winner = game.secondPlayer;
             await this.gameRepository.save(game);
         }
@@ -167,13 +167,13 @@ export class GameService {
             this.userService.changeStatus(game.secondPlayer, "online");
             game.finished = true;
             if (game.firstPlayer === playerName) {
-                game.secondPlayerScore = "11";
+                game.secondPlayerScore = 11;
                 game.winner = game.secondPlayer;
                 this.userService.lostGame(matchData.firstPlayer, gameId);
                 this.userService.wonGame(matchData.secondPlayer, gameId);
             }
             else {
-                game.firstPlayerScore = "11";
+                game.firstPlayerScore = 11;
                 game.winner = game.firstPlayer;
                 this.userService.lostGame(matchData.secondPlayer, gameId);
                 this.userService.wonGame(matchData.firstPlayer, gameId);

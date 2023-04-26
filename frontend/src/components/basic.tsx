@@ -55,6 +55,11 @@ export default function Basic() {
           setUserMap((prevState) => ({...prevState, [game.firstPlayer]: response.data,}));
         })
         .catch((error) => console.log(error));
+        axios.get(`http://${window.location.hostname}:5000/users/name/${game.secondPlayer}`, { withCredentials: true })
+        .then((response) => {
+          setUserMap((prevState) => ({...prevState, [game.secondPlayer]: response.data,}));
+        })
+        .catch((error) => console.log(error));
       });
     }, [gameHistory]);
 
