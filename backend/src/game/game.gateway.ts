@@ -27,7 +27,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly gameService: GameService) {}
 
-    afterInit(server: Server) {}
+    afterInit() {}
 
     handleConnection() {}
 
@@ -108,10 +108,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('join')
-    joinGame (
+    async joinGame (
         @ConnectedSocket() client: Socket,
         @MessageBody() dto : JoinGameDto
-    ) : void {
+    ) : Promise<void> {
         if (!dto)
             client.emit('notStarted');
         else {
@@ -119,7 +119,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 const clientRoom = this.gameService.getClientRoom(client.id);
                 this.gameService.cancelGame(clientRoom.gameId);
             }
-            const gameOption : GameOptionDto = this.gameService.joinGame(client.id, dto);
+            const gameOption : GameOptionDto = await this.gameService.joinGame(client.id, dto);
             if (gameOption) {
                 client.join(dto.gameId);
                 this.server.to(dto.gameId).emit("started", gameOption);

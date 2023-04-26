@@ -25,7 +25,7 @@ export class ChatController {
 
     @Get('/all')
     @UseGuards(AuthGuard('2FA'))
-    async getAllchats() : Promise<ChatPublicDataDto[]> {
+    async getAllChats() : Promise<ChatPublicDataDto[]> {
         const chats = await this.chatService.findAllChats();
         return chats;
     }

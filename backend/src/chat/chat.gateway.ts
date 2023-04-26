@@ -18,7 +18,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(private readonly chatService: ChatService) {}
 
-    afterInit(server: Server) {}
+    afterInit() {}
 
     handleDisconnect(@ConnectedSocket() client: Socket) {
         this.chatService.disconnectClient(client);

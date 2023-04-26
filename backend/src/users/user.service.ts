@@ -1,10 +1,10 @@
 import {HttpException, HttpStatus, Injectable, Res} from '@nestjs/common';
-import { UserDTO } from './dto/user.dto';
+import {UserDTO} from './dto/user.dto';
 import {User} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import { join } from 'path';
-import { Observable, of } from 'rxjs';
+import {join} from 'path';
+import {Observable, of} from 'rxjs';
 import {UserInfoDto} from "./dto/user-info.dto";
 
 @Injectable()
@@ -28,8 +28,7 @@ export class UserService {
 
     //Geting User
     async findAll(): Promise<User[]> {
-        const users = await this.userRepository.find();
-        return users;
+        return await this.userRepository.find();
     }
 
     async findByEmail(userEmail: string): Promise<User> {
@@ -93,7 +92,7 @@ export class UserService {
         const user = await this.userRepository.findOneBy({displayName: name});
         if (user && user.status != "offline") {
             user.status = status;
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
@@ -136,9 +135,7 @@ export class UserService {
 
     //Black List
     isBanned(user : User, userToCheck : User) : boolean {
-        if (user.bannedUsers.includes(userToCheck.id))
-            return true;
-        return false;
+        return user.bannedUsers.includes(userToCheck.id);
     }
 
     banUser(user : User, userToBan : User) : void {
@@ -167,7 +164,7 @@ export class UserService {
             user.score += 3;
             if (user.status != "offline")
                 user.status = "online";
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
@@ -179,7 +176,7 @@ export class UserService {
             user.score += 1;
             if (user.status != "offline")
                 user.status = "online";
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
@@ -190,7 +187,7 @@ export class UserService {
             user.losses += 1;
             if (user.status != "offline")
                 user.status = "online";
-            this.userRepository.save(user);
+            await this.userRepository.save(user);
         }
     }
 
@@ -205,7 +202,7 @@ export class UserService {
     async deleteChat (userId : string, chat : string) : Promise<void> {
         const user = await this.findById(userId);
         user.chats = user.chats.filter(chatId => chatId !== chat);
-        this.userRepository.save(user);
+        await this.userRepository.save(user);
     }
 
 	//TwoFactorAuthentication
