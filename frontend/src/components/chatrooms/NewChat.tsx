@@ -301,23 +301,23 @@ return (
 										</>
 									}
 									{userIsChatownerr(Object.keys(userObj)[0]) &&
-									<div>
-										<span>owner</span>
+									<div className='ownercontainerinchat'>
+										<div className='ownerboxinchat'>owner</div>
 										<div className='hiddenownersettings'>
-										<button title="Remove passworld" onClick={() => {
-												removePasswordl();
-											}}>remove password</button>
-										<form onSubmit={handOnClickSend}>
-												<label>
-													change password:
-												</label>
-												<label>
-													Password:
-													<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
-												</label>
-												<br/>
-												<button className='' type="submit">add/change Passworld</button>
-											</form>
+											<button title="Remove passworld" onClick={() => {
+													removePasswordl();
+												}}>remove password</button>
+											<form onSubmit={handOnClickSend}>
+													<label>
+														change password:
+													</label>
+													<label>
+														Password:
+														<input type="password" value={chatPassValue} onChange={handleChatPassChange}/>
+													</label>
+													<br/>
+													<button className='' type="submit">add/change Passworld</button>
+												</form>
 										</div>
 									</div>}
 								</div>
