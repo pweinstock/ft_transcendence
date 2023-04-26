@@ -20,7 +20,7 @@ interface ChatProps {
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
 const [usersData, setUsersData] = useState<any[]>([]);
 const [usersInThisChat, setusersInThisChat] = useState<{[key: string]: string;}[]>([]);
-const [chatData, setchatData] = useState<{users: any[], admins: any[], mutedUsers
+const [chatData, setchatData] = useState<{bannedUsers: any[], users: any[], admins: any[], mutedUsers
 	: any[], owner :string}>();
 
 const [addThisUser, setaddThisUser] = useState<string>("");
@@ -268,7 +268,6 @@ async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
 return (
 	<>
 		<div className='formholder'>
-
 				<div className='chatheader'>
 					<div className='usersinchatcontainer'>
 					<span>
@@ -282,19 +281,19 @@ return (
 										</Link>
 									{ !userIsChatownerr(Object.keys(userObj)[0]) && 
 										<>
-											{ !isInAdmin(Object.keys(userObj)[0]) && <button title="Add to admin" onClick={() => {
+											{ props.user.id !== Object.keys(userObj)[0] && !isInAdmin(Object.keys(userObj)[0]) && <button title="Add to admin" onClick={() => {
 												addAsAdminHandler(Object.keys(userObj)[0]);
 											}}>A</button>}
-											{ isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
+											{ props.user.id !== Object.keys(userObj)[0] && isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
 												removeAdmin(Object.keys(userObj)[0]);
 											}}>XA</button>}
 											{props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
 												leaveChat();
 											}}>X</button>}
-											{ !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
+											{ props.user.id !== Object.keys(userObj)[0] && !isMuted(Object.keys(userObj)[0]) && <button title="Mute this user" onClick={() => {
 												muteUserInThisChat(Object.keys(userObj)[0]);
 											}}>&#128266;</button>}
-											{ isMuted(Object.keys(userObj)[0]) && <button title="UnMute this user" onClick={() => {
+											{ props.user.id !== Object.keys(userObj)[0] && isMuted(Object.keys(userObj)[0]) && <button title="UnMute this user" onClick={() => {
 												unMuteUserInThisChat(Object.keys(userObj)[0]);
 											}}>&#128263;</button>}
 										</>
@@ -302,7 +301,8 @@ return (
 									{userIsChatownerr(Object.keys(userObj)[0]) &&
 									<div className='ownercontainerinchat'>
 										<div className='ownerboxinchat'>owner</div>
-										<div className='hiddenownersettings'>
+
+										{ userIsChatownerr(props.user.id) && <div className='hiddenownersettings'>
 											<button title="Remove passworld" onClick={() => {
 													removePasswordl();
 												}}>remove password</button>
@@ -314,7 +314,7 @@ return (
 												<br/>
 												<button className='' type="submit">add/change Passworld</button>
 											</form>
-										</div>
+										</div>}
 									</div>}
 								</div>
 							))}
@@ -343,7 +343,7 @@ return (
 					</div>
 				</div>
 			<ChatSocketProvider>	
-				<InputMessage user={props.user} chatidp={props.chatidp} chatName={props.chatName} onUpdate={handleParentStateUpdate}/>
+				{chatData && <InputMessage chatThisData={chatData} user={props.user} chatidp={props.chatidp} chatName={props.chatName} onUpdate={handleParentStateUpdate}/>}
 			</ChatSocketProvider>
 		</div>
 	</>

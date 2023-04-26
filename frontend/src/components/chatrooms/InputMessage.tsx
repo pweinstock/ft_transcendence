@@ -12,6 +12,8 @@ interface ChatProps {
 	user : User;
 	chatidp: string;
 	chatName : string;
+	chatThisData : {bannedUsers: any[], users: any[], admins: any[], mutedUsers
+		: any[], owner :string};
 	onUpdate: (newState: string) => void;
 }
 
@@ -20,7 +22,7 @@ const socket = useContext(ChatSocketContext);
 
 // const [savescrollHeight, setsaveScrollHeight] = useState<number>(0);
 const [message, setMessage] = useState<string | "">("");
-const [messages, setMessages] = useState<{content: string, date: string, id: string, displayName : string}[]>([]);
+const [messages, setMessages] = useState<{content: string, date: string, id: string, displayName : string, userId: string}[]>([]);
 
 
 socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
@@ -78,6 +80,8 @@ const Scroll = () => {
 }
 
 useEffect(() => {
+	console.log("messages");
+	console.log(messages);
   Scroll();
 }, [messages])
 
@@ -87,19 +91,23 @@ return (
 			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
 			{messages.map((message, index) => {
 				return (
-					<Message key={index + props.chatidp}
+						<>
+					{ !props.chatThisData.bannedUsers.includes(message.userId) &&
+						<Message key={index + props.chatidp}
 						content={message.content}
 						date={message.date}
 						displayName={message.displayName}
 						user={props.user.displayName}
-					/>
+						/>
+						}
+						</>
 				);
 			})}
 		</div>
 
 		<div className="inputgroup">
 			<form onSubmit={handleOnClickSend}>
-			<input
+			{!props.chatThisData.mutedUsers.includes(props.user.id) && <input
 				type="text"
 				id="input-message"
 				name="input-message"
@@ -107,7 +115,17 @@ return (
 				className="form-control"
 				value={message}
 				onChange = {handleChatinputChange}
-			/>
+			/>}
+			{props.chatThisData.mutedUsers.includes(props.user.id) && <input
+				type="text"
+				id="input-message"
+				name="input-message"
+				placeholder="you are muted by admins, RTFM!"
+				className="form-control"
+				value={message}
+				onChange = {handleChatinputChange}
+				disabled
+			/>}
 			<div className="input-group-append">
 				<button type="submit" className="chatsendbutton">&#62;</button>
 			</div>
