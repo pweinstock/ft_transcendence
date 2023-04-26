@@ -115,18 +115,13 @@ async function addUserHandler() {
 			props.onUpdate("", false);
 			// setaddThisUser(""); //do i need this?
 		}).catch((reason) => {
-			// if (reason.response!.status !== 200) {
-			// }
+
 			console.log(reason.message);
 			console.log("Error while adding user:");
 			console.log(addThisUser);
 			console.log("in chatid:");
 			console.log(props.chatidp);
 		});
-	}
-	else if (addThisUser !== "")
-	{
-		// setErrorPrint("Wrong credentials!");
 	}
 }
 async function addAsAdminHandler(addadminthisuser: string) {
@@ -219,6 +214,22 @@ async function unblockUser(addadminthisuser: string) {
 		}).catch((reason) => {
 				console.log(reason.message);
 				console.log("Error while unblocking useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});		
+	}
+}
+
+async function kickUserout(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/kickoutuser`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while kicking out this user:");
 				console.log(addadminthisuser);
 				console.log("in chatid:");
 				console.log(props.chatidp);
@@ -328,6 +339,9 @@ return (
 											{props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
 												leaveChat();
 											}}>X</button>}
+											{props.user.id !== Object.keys(userObj)[0] && <button className="redbutton" title="kick User out"onClick={() => {
+												kickUserout(Object.keys(userObj)[0]);
+											}}>&#9889;</button>}
 											{ props.user.id !== Object.keys(userObj)[0] && !isBlocked(Object.keys(userObj)[0]) && <button title="block this user" onClick={() => {
 												blockUser(Object.keys(userObj)[0]);
 											}}>&#x26d4;</button>}
@@ -345,7 +359,6 @@ return (
 									{userIsChatownerr(Object.keys(userObj)[0]) &&
 									<div className='ownercontainerinchat'>
 										<div className='ownerboxinchat'>owner</div>
-
 										{ userIsChatownerr(props.user.id) && <div className='hiddenownersettings'>
 											<button title="Remove passworld" onClick={() => {
 													removePasswordl();

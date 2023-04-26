@@ -78,10 +78,10 @@ export class ChatService {
         this.chatRepository.remove(chat);
     }
 
-	async leaveChat(user : User, chatId: string): Promise<void> {
-		await this.userServices.deleteChat(user.id, chatId);
+	async leaveChat(userthisid : string, chatId: string): Promise<void> {
+		await this.userServices.deleteChat(userthisid, chatId);
 		const chat = await this.findChatById(chatId);
-		chat.users = chat.users.filter(userId => userId !== user.id);
+		chat.users = chat.users.filter(userId => userId !== userthisid);
 		await this.chatRepository.save(chat);
     }
 
