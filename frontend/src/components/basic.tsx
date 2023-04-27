@@ -78,7 +78,7 @@ export default function Basic() {
             if (first)
               setUploadOpen(true);
           } catch(e) {
-              alert("Username already exists!");
+              alert(e);
           }
         } else {
           alert("Username cannot be empty!");
@@ -86,8 +86,12 @@ export default function Basic() {
     };
 
     const handleNewNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+      const regex = /^[A-Za-z]*$/;
+      if (regex.test(event.target.value))
         setNewName(event.target.value);
-      };
+      else
+        alert("Username can only contains letters!")
+    };
     
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
       if (event.target.files) {
@@ -105,7 +109,8 @@ export default function Basic() {
       if (image) {
         const formData = new FormData();
         formData.append("file", image);
-        await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true });
+        await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true })
+        .catch((error) => { alert(error)});
         setUploadOpen(false);
       }
       else
@@ -157,6 +162,15 @@ export default function Basic() {
           return;
       setDialogOpen(false);
     };
+
+    const dateToString = ( date : Date) => {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString("de-DE") + ' - ' + dateObj.toLocaleTimeString("de-DE");
+    }
+
+    const handleAvatarClick = (displayName: string) => {
+      window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
+    }
     
     return (
         <>
@@ -252,7 +266,7 @@ export default function Basic() {
                 <TableBody>
                   {gameHistory.map((game : GameMeta) => (
                     <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === newName ? 'lightgreen' : 'lightcoral'}}>
-                      <TableCell>{game.date} gameWinner: {game.winner}</TableCell>
+                      <TableCell>{dateToString(game.date)}</TableCell>
                       <TableCell>
                         {userMap[game.firstPlayer] &&
                         <Tooltip title={userMap[game.firstPlayer].status}>
@@ -261,7 +275,7 @@ export default function Basic() {
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             variant="dot">
-                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`}>
+                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`} onClick={() => handleAvatarClick(userMap[game.firstPlayer].displayName)}>
                             </Avatar>
                           </Badge>
                         </Tooltip>}
@@ -275,7 +289,7 @@ export default function Basic() {
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             variant="dot">
-                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`}>
+                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`} onClick={() => handleAvatarClick(userMap[game.secondPlayer].displayName)}>
                             </Avatar>
                           </Badge>
                         </Tooltip>}
@@ -287,7 +301,7 @@ export default function Basic() {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer> 
+            </TableContainer>
         </>
     );
 }

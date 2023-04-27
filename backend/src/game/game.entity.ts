@@ -21,7 +21,7 @@ export class Game {
     secondPlayerScore: number;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
-    date: string;
+    date: Date;
 
     @Column({default: false})
     finished : boolean
