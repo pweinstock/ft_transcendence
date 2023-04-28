@@ -142,10 +142,10 @@ export class ChatController {
 
     @Post('/kickoutuser')
     @UseGuards(AuthGuard('2FA'))
-    kickoutuser(@Req() request, @Body() dto: ChangeStatusDTO) : void {
+    async kickoutuser(@Req() request, @Body() dto: ChangeStatusDTO) {
         if (!request || !request.user)
             throw new HttpException('No request found!', HttpStatus.BAD_REQUEST);
-                this.chatService.leaveChat(dto.userId, dto.chatId);
+        await this.chatService.leaveChat(dto.userId, dto.chatId);
     }
 
 

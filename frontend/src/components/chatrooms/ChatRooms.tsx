@@ -7,6 +7,7 @@ import NewChat from './NewChat';
 import CreateChat from './CreateChat';
 import PublicChatList from './PublicChatList';
 import {UserSocketContext} from "../context/user-socket";
+import Game from '../game/Game';
 
 interface ChatProps {
     user: User;
@@ -16,6 +17,7 @@ const ChatRooms: React.FC<ChatProps> = (props) => {
 
 const [value, setValue] = useState<{id: string, name: string }[]>([]);
 const [chatNameValue, setchatNameValue] = useState<string>("");
+const [gamewithfreind, setgamewithfreind] = useState<boolean>(true);
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 const [addThisUserId, setaddThisUserId] = useState<string>("");
@@ -34,22 +36,39 @@ useEffect(() => {
 
 
 useEffect(() => {
-	async function fetchChatrooms() {
-		try{
-			const response = await axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true});
-			if (response)
-				setValue(response.data);
-			}
-			catch(e) {
-				console.log("error");
-			}
-	}
 	fetchChatrooms();
-},[chatNameValue, value, updateStatesGlobal]);
-
+},[updateStatesGlobal]);
+	
+async function fetchChatrooms() {
+	axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true})
+	.then((response) => {
+		setValue(response.data);
+		console.log("fetcch chat---");
+		console.log(response.data);
+		let chatInList : boolean = false;
+		response.data.map((item : any) => {
+			if (item.id == actualChatid)
+				chatInList = true;
+		})
+		if (chatInList == false)
+			setactualChatid("");
+		
+		// if (!response.data.chats.includes(actualChatid))
+		// {
+		// 	console.log("here");
+		// 	setactualChatid("");
+		// }
+	})
+	.catch((reason) => {
+		if (reason.response!.status !== 200) {
+			console.log("Error getting all chat data");
+		}
+		console.log(reason.message);
+	});
+}
 
 async function deleteChatNutton(id : string) {
-	await axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
+	axios.get(`http://${window.location.hostname}:5000/chat/delete/`+  id , {withCredentials: true})
 		.then(() => {
 			setchatNameValue("");
 			updateOtherUsers();
@@ -61,12 +80,15 @@ async function deleteChatNutton(id : string) {
 			}
 			console.log(reason.message);
 		});
-
 }
 
 const handleParentStateUpdate = (newState: string, deside: boolean) => {
 	if (deside)
+	{
 		setchatNameValue(newState);
+		if (newState === "")
+			setactualChatid("");
+	}
 	else
 		updateOtherUsers();
 };
@@ -87,6 +109,7 @@ return (
 									}} >{item.name}</button>
 								<button className='chatbuttondel' title="Delete this chat" onClick={() => {
 									deleteChatNutton(item.id);
+									setactualChatid("");
 									}} >X</button>
 							</div>
 						))}
@@ -97,12 +120,13 @@ return (
 				</div>
 				<div className='chatcontent'>
 					{actualChatid && actualChatName && <NewChat updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
-					{!chatNameValue && <h1>No Chat</h1> }
-
+					{!actualChatid && <h1>No Chat</h1> }
 				</div>
 			</div>
-
 		</section>
+		<aside>
+			gamewithfreind ? <Game user={props.user} /> : <div>Let's Play?</div>
+		</aside>
 	</>
 );
 }
