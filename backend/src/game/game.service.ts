@@ -29,10 +29,10 @@ export class GameService {
         const gameId = this.getPlayerGameId(clientId);
         if (gameId)
             return null;
-        const game = await this.gameRepository.save({firstPlayer : dto.firstPlayer, secondPlayer : null});
         const user = await this.userService.findByName(dto.firstPlayer);
-        if (user)
-            game.secondPlayer = user.id;
+        if (!user)
+            return null;
+        const game = await this.gameRepository.save({firstPlayer : user.id, secondPlayer : null});
         this.playerToGameId.set(clientId, {gameId : game.id, isFirst : true});
         this.gameIdToGameOption.set(game.id, dto);
         return game.id;
