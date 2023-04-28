@@ -20,6 +20,7 @@ const PublicChatList: React.FC<ChatProps> = (props : ChatProps) => {
 		axios.post(`http://${window.location.hostname}:5000/chat/join`,  { userId : props.user.id,  chatId : id, password : chatPassValue }, {withCredentials: true}).then( () => {
 			const socket = io("http://localhost:5001/chat" );
 			socket?.emit('joinRoom', id);
+			props.onUpdate("", false);
 		}).catch((reason) => {
 			if (reason.response!.status !== 200) {
 				console.log("Error while joing chat, in chatid:");

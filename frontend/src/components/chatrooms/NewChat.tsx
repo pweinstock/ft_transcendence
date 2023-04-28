@@ -141,6 +141,24 @@ async function addAsAdminHandler(addadminthisuser: string) {
 			
 	}
 }
+
+async function removeAdmin(addadminthisuser: string) {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
+	{
+		await axios.post(`http://${window.location.hostname}:5000/chat/removeAdmin`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
+		.then( () => {
+			props.onUpdate("", false);
+		}).catch((reason) => {
+				console.log(reason.message);
+				console.log("Error while removing from admin useer:");
+				console.log(addadminthisuser);
+				console.log("in chatid:");
+				console.log(props.chatidp);
+			});
+			
+	}
+}
+
 async function muteUserInThisChat(addadminthisuser: string) {
 	if (chatData && chatData.owner !== addadminthisuser && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
 	{
@@ -156,6 +174,7 @@ async function muteUserInThisChat(addadminthisuser: string) {
 			});	
 	}
 }
+
 async function unMuteUserInThisChat(addadminthisuser: string) {
 	if (chatData && chatData.owner !== addadminthisuser && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
 	{
@@ -172,22 +191,7 @@ async function unMuteUserInThisChat(addadminthisuser: string) {
 			
 	}
 }
-async function removeAdmin(addadminthisuser: string) {
-	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
-	{
-		await axios.post(`http://${window.location.hostname}:5000/chat/removeAdmin`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
-		.then( () => {
-			props.onUpdate("", false);
-		}).catch((reason) => {
-				console.log(reason.message);
-				console.log("Error while muting useer:");
-				console.log(addadminthisuser);
-				console.log("in chatid:");
-				console.log(props.chatidp);
-			});
-			
-	}
-}
+
 
 async function blockUser(addadminthisuser: string) {
 	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
@@ -227,6 +231,7 @@ async function kickUserout(addadminthisuser: string) {
 		await axios.post(`http://${window.location.hostname}:5000/chat/kickoutuser`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
 		.then( () => {
 			props.onUpdate("", false);
+			// props.onUpdate(props.chatName + " ", true);
 		}).catch((reason) => {
 				console.log(reason.message);
 				console.log("Error while kicking out this user:");
@@ -263,8 +268,8 @@ async function removePasswordl() {
 
 }
 
-function isInAdminorOwner(isThisUserinIT: string): boolean {
-	if (chatData && (chatData.owner === isThisUserinIT || chatData.admins.includes(isThisUserinIT)))
+function isInAdminorOwner(): boolean {
+	if (chatData && (chatData.owner === props.user.id || chatData.admins.includes(props.user.id)))
 		return (true);
 	else
 		return (false);
@@ -301,6 +306,10 @@ const handleParentStateUpdate = (newState: string) => {
 	setParentState(newState);
 };
 
+useEffect(() => {
+	props.onUpdate("", false);
+},[parentState]);
+
 async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();
 	await axios.post(`http://${window.location.hostname}:5000/chat/addPass`,  { chatId : props.chatidp, password: chatPassValue}, {withCredentials: true})
@@ -329,7 +338,7 @@ return (
 										<Link className="newpostlink" to={"/users/" + Object.values(userObj)} >
 											<button>{Object.values(userObj)}</button>
 										</Link>
-									{ !userIsChatownerr(Object.keys(userObj)[0]) && 
+									{ !userIsChatownerr(Object.keys(userObj)[0]) && isInAdminorOwner() &&
 										<>
 											{ props.user.id !== Object.keys(userObj)[0] && !isInAdmin(Object.keys(userObj)[0]) && <button title="Add to admin" onClick={() => {
 												addAsAdminHandler(Object.keys(userObj)[0]);
@@ -337,9 +346,6 @@ return (
 											{ props.user.id !== Object.keys(userObj)[0] && isInAdmin(Object.keys(userObj)[0]) && <button className="redbutton" title="Rewmove admin" onClick={() => {
 												removeAdmin(Object.keys(userObj)[0]);
 											}}>XA</button>}
-											{props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
-												leaveChat();
-											}}>X</button>}
 											{props.user.id !== Object.keys(userObj)[0] && <button className="redbutton" title="kick User out"onClick={() => {
 												kickUserout(Object.keys(userObj)[0]);
 											}}>&#9889;</button>}
@@ -357,6 +363,9 @@ return (
 											}}>&#128263;</button>}
 										</>
 									}
+									{!userIsChatownerr(Object.keys(userObj)[0]) && props.user.id === Object.keys(userObj)[0] && <button className="redbutton" title="leave chat"onClick={() => {
+												leaveChat();
+											}}>X</button>}
 									{userIsChatownerr(Object.keys(userObj)[0]) &&
 									<div className='ownercontainerinchat'>
 										<div className='ownerboxinchat'>owner</div>
