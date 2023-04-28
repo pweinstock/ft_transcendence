@@ -90,6 +90,10 @@ const Friends: React.FC<BaseUserProps> = (props: BaseUserProps) => {
     window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
   }
 
+  const handleSendClick = () => {
+    window.location.href = `http://${window.location.hostname}:3000/chatrooms/`;
+  }
+
   return (
     <>
     <List
@@ -116,7 +120,7 @@ const Friends: React.FC<BaseUserProps> = (props: BaseUserProps) => {
           <ListItemAvatar>
             <Tooltip title={friend.status}>
               <Badge
-                color={friend.status === 'online' ? 'success' : 'error'}
+                color={friend.status === 'online' ? 'success' : friend.status === 'offline ' ? 'error' : 'warning'}
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
@@ -126,7 +130,7 @@ const Friends: React.FC<BaseUserProps> = (props: BaseUserProps) => {
             </Tooltip>
           </ListItemAvatar>
           <ListItemText primary={friend.displayName} />
-          <Button variant="contained" endIcon={<Send/>}>
+          <Button variant="contained" endIcon={<Send/>} onClick={handleSendClick}>
           Send Message
           </Button>
           <Button variant="outlined" onClick={() => handleRemoveFriend(friend.id)} startIcon={<PersonRemove/>}>

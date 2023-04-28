@@ -32,7 +32,10 @@ export class AuthController {
 		const accessToken = this.jwtService.sign(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true});
 		if (req.user['isTwoFactorAuthenticationEnabled'])
+		{
+			console.log("2FA!");
 			res.redirect(`http://${process.env.HOST_IP}:3000/auth/2FA`);
+		}
 		res.redirect(`http://${process.env.HOST_IP}:3000`);
 	}
 
@@ -66,6 +69,9 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt'))
 	@Post('validate')
 	async verify(@Req() req: any, @Res({passthrough: true}) res: Response, @Body('code') code: string | null) {
+		const regex = /^\d{6}$/;
+		if (!regex.test(code))
+			throw new HttpException('Invalid 2FA code', HttpStatus.NOT_ACCEPTABLE);
 		const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(code, req.user);
 		if (!isCodeValid)
 			throw new HttpException('Wrong 2FA code', HttpStatus.NOT_ACCEPTABLE);

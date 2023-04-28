@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res, ParseFilePipe, MaxFileSizeValidator, HttpException, HttpStatus} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -50,6 +50,9 @@ export class UserController {
     @Get('/name/:name')
     @UseGuards(AuthGuard('2FA'))
     async getPublicUser(@Param('name') displayName : string) : Promise<User> {
+        const regex = /^[A-Za-z0-9]+$/;
+        if (!regex.test(displayName))
+            throw new HttpException("Username is invalid", HttpStatus.NOT_ACCEPTABLE);
         return this.usersService.findByName(displayName);
     }
 
@@ -62,14 +65,13 @@ export class UserController {
     @Post('changeName')
     @UseGuards(AuthGuard('2FA'))
     async changeName(@Req() request: any, @Body('newName') newName: string) : Promise<void>{
-       await this.usersService.changeName(request.user.id, newName);
+        await this.usersService.changeName(request.user.id, newName);
     }
 
     @Post('upload')
     @UseGuards(AuthGuard('2FA'))
     @UseInterceptors(FileInterceptor('file', storage))
     uploadFile(@UploadedFile() file, @Req() req) : Promise<string> {
-        console.log('req.user.photo: %s', req.user.photo);
         if (req.user.photo != 'null')
             this.usersService.deleteImage(req.user.photo); 
         return this.usersService.uploadAvatar(req.user.id, file.filename)

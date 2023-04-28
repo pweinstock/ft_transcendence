@@ -2,12 +2,18 @@ import { Check, Close, Edit, FileUpload, Save, Settings } from '@mui/icons-mater
 import { Avatar, Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material';
 import { display, positions } from '@mui/system';
 import axios from 'axios';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, {ChangeEvent, useContext, useEffect, useState} from 'react';
 import { User } from './BaseInterface';
 import Game from "./game/Game";
 import { GameMeta } from './game/interfaces/game-meta';
+import {Socket} from "socket.io-client";
+import {UserSocketContext} from "./context/user-socket";
 
-export default function Basic() {
+interface BaseUserProps {
+  user : User;
+}
+
+const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
 
     const [open, setOpen] = useState(false);
     const [newName, setNewName] = useState("");
@@ -22,18 +28,29 @@ export default function Basic() {
     const [code, setCode] = useState("");
     const [gameHistory, setGameHistory] = useState<GameMeta[]>([]);
     const [userMap, setUserMap] = useState<{[key: string]: User}>({});
-    
+    const [userUpdate, setUserUpdate] = useState<boolean>(false);
+
+    const socket : Socket= useContext(UserSocketContext);
+
+    const updateOtherUsers = () =>{
+        socket?.emit('userUpdate');
+    }
+
+    socket.on('userUpdate', () => {
+        userUpdate ? setUserUpdate(false) : setUserUpdate(true);
+    });
+
     useEffect(() => {
       async function fetchUser() {
-        const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
-        setNewName(response.data.displayName);
-        setPhoto(response.data.photo);
-        setFirst(response.data.first);
-        if (response.data.first) {
+        //const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
+        setNewName(props.user.displayName);
+        setPhoto(props.user.photo);
+        setFirst(props.user.first);
+        if (props.user.first) {
           setOpen(true);
         }
-        setToggle(response.data.isTwoFactorAuthenticationEnabled);
-        const matchHistory = response.data.matchHistory;
+        setToggle(props.user.isTwoFactorAuthenticationEnabled);
+        const matchHistory = props.user.matchHistory;
         Promise.all(matchHistory.map((id: string) => {
           return axios.get(`http://${window.location.hostname}:5000/game/id/${id}`, { withCredentials: true })
             .then((response) => response.data)
@@ -44,18 +61,18 @@ export default function Basic() {
         });
       }
       fetchUser();
-    }, []);
+    }, [props.user]);
 
     useEffect(() => {
       if (gameHistory.length === 0)
         return;
       gameHistory.forEach((game) => {
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.firstPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.firstPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.firstPlayer]: response.data,}));
         })
         .catch((error) => console.log(error));
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.secondPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.secondPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.secondPlayer]: response.data,}));
         })
@@ -74,11 +91,12 @@ export default function Basic() {
           try {
             await axios.post(`http://${window.location.hostname}:5000/users/changeName`, { newName }, { withCredentials: true });
             //setNewName("");
+            updateOtherUsers();
             setOpen(false);
             if (first)
               setUploadOpen(true);
           } catch(e) {
-              alert("Username already exists!");
+              alert(e);
           }
         } else {
           alert("Username cannot be empty!");
@@ -86,8 +104,12 @@ export default function Basic() {
     };
 
     const handleNewNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+      const regex = /^[A-Za-z0-9]*$/;
+      if (regex.test(event.target.value))
         setNewName(event.target.value);
-      };
+      else
+        alert("Username can only contains letters and digits!")
+    };
     
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
       if (event.target.files) {
@@ -105,8 +127,10 @@ export default function Basic() {
       if (image) {
         const formData = new FormData();
         formData.append("file", image);
-        await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true });
+        await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true })
+        .catch((error) => { alert(error)});
         setUploadOpen(false);
+        updateOtherUsers();
       }
       else
           setUploadOpen(false);
@@ -157,6 +181,15 @@ export default function Basic() {
           return;
       setDialogOpen(false);
     };
+
+    const dateToString = ( date : Date) => {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString("de-DE") + ' - ' + dateObj.toLocaleTimeString("de-DE");
+    }
+
+    const handleAvatarClick = (displayName: string) => {
+      window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
+    }
     
     return (
         <>
@@ -211,8 +244,9 @@ export default function Basic() {
                   sx={{ width: 64, height: 64 }}
                   onClick={() => setSettingsOpen(!settingsOpen)}
                   >
+                  {String(photo).length && (
                   <Avatar src={`http://${window.location.hostname}:5000/users/image/${photo}`} sx={{ width: 64, height: 64}}>
-                  </Avatar> 
+                  </Avatar> )}
                 </Badge>
                 {settingsOpen ? (
                 <List
@@ -249,37 +283,36 @@ export default function Basic() {
                     <TableCell align="right">Finished</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
-                  {gameHistory.map((game : GameMeta) => (
-                    <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === newName ? 'lightgreen' : 'lightcoral'}}>
-                      <TableCell>{game.date} gameWinner: {game.winner}</TableCell>
+                <TableBody> {userMap && gameHistory && gameHistory.map((game : GameMeta) => (
+                    <TableRow key={game.id} style={{backgroundColor: !game.winner || !userMap[game.winner] ? 'lightyellow' : userMap[game.winner].displayName === newName ? 'lightgreen' : 'lightcoral'}}>
+                      <TableCell>{dateToString(game.date)}</TableCell>
                       <TableCell>
                         {userMap[game.firstPlayer] &&
                         <Tooltip title={userMap[game.firstPlayer].status}>
                           <Badge
-                            color={userMap[game.firstPlayer].status === 'online' ? "success" : "error"}
+                            color={userMap[game.firstPlayer].status === 'online' ? "success" : userMap[game.firstPlayer].status === 'offline' ? "error" : "warning"}
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             variant="dot">
-                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`}>
+                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`} onClick={() => handleAvatarClick(userMap[game.firstPlayer].displayName)}>
                             </Avatar>
                           </Badge>
                         </Tooltip>}
-                        {game.firstPlayer}
+                        {userMap[game.firstPlayer] && userMap[game.firstPlayer].displayName}
                       </TableCell>
                       <TableCell>
                         {userMap[game.secondPlayer] &&
                         <Tooltip title={userMap[game.secondPlayer].status}>
                           <Badge
-                            color={userMap[game.secondPlayer].status === 'online' ? "success" : "error"}
+                            color={userMap[game.secondPlayer].status === 'online' ? "success" : userMap[game.secondPlayer].status === 'offline' ? "error" : "warning"}
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             variant="dot">
-                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`}>
+                            <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`} onClick={() => handleAvatarClick(userMap[game.secondPlayer].displayName)}>
                             </Avatar>
                           </Badge>
                         </Tooltip>}
-                        {game.secondPlayer}
+                        {userMap[game.secondPlayer] && userMap[game.secondPlayer].displayName}
                       </TableCell>
                       <TableCell align="right">{game.firstPlayerScore + " : " + game.secondPlayerScore}</TableCell>
                       <TableCell align="right">{game.finished ? <Check/> : <Close/>}</TableCell>
@@ -287,7 +320,8 @@ export default function Basic() {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer> 
+            </TableContainer>
         </>
-    );
+    ); 
 }
+export default Basic

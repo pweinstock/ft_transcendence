@@ -12,7 +12,7 @@ export class Game {
     firstPlayer: string;
 
     @Column({nullable : true, default: null})
-    secondPlayer: string;0
+    secondPlayer: string;
 
     @Column({default: 0})
     firstPlayerScore: number;
@@ -21,7 +21,7 @@ export class Game {
     secondPlayerScore: number;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
-    date: string;
+    date: Date;
 
     @Column({default: false})
     finished : boolean

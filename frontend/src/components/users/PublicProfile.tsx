@@ -44,18 +44,22 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
             // })
           })
           .catch((error) => {
-            alert("User " + param.user + " does not exist!");
+            alert(error + ": User " + param.user + " does not exist!");
           });
-        }, []);
+        }, [props.currentUser]);
 
     useEffect(() => {
-      console.log("gameHistory: %s", gameHistory.length);
       if (gameHistory.length === 0)
         return;
       gameHistory.forEach((game) => {
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.firstPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.firstPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.firstPlayer]: response.data,}));
+        })
+        .catch((error) => console.log(error));
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.secondPlayer}`, { withCredentials: true })
+        .then((response) => {
+          setUserMap((prevState) => ({...prevState, [game.secondPlayer]: response.data,}));
         })
         .catch((error) => console.log(error));
       });
@@ -102,9 +106,19 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
       });
     };
 
+    const dateToString = ( date : Date) => {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString("de-DE") + ' - ' + dateObj.toLocaleTimeString("de-DE");
+    }
+
+    const handleAvatarClick = (displayName: string) => {
+      window.location.href = `http://${window.location.hostname}:3000/users/${displayName}`;
+    }
+
 	return (
     <>
       <Avatar  sx={{ width: 112, height: 112 }} src={`http://${window.location.hostname}:5000/users/image/${publicUser?.photo}`}/>
+      <h1 style={{ color: 'white' }}>{publicUser?.displayName}</h1>
       {isFriend ? 
       <Button variant="outlined" onClick={handleRemoveFriend} startIcon={<PersonRemove/>}>
         Remove from friends
@@ -137,36 +151,35 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           </TableHead>
           <TableBody>
             {gameHistory.map((game : GameMeta) => (
-              // <TableRow key={game.id} style={{backgroundColor: game.winner === publicUser?.displayName ? 'green' : 'red'}}>
-              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === publicUser?.displayName ? 'lightgreen' : 'lightcoral'}}>
-                <TableCell>{game.date.toString()}</TableCell>
+              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'lightyellow' : game.winner === publicUser?.displayName ? 'lightgreen' : 'lightcoral'}}>
+                <TableCell>{dateToString(game.date)}</TableCell>
                 <TableCell>
                   {userMap[game.firstPlayer] &&
                   <Tooltip title={userMap[game.firstPlayer].status}>
                     <Badge
-                      color={userMap[game.firstPlayer].status === 'online' ? "success" : "error"}
+                      color={userMap[game.firstPlayer].status === 'online' ? "success" : userMap[game.firstPlayer].status === 'offline' ? "error" : "warning"}
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot">
-                      <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`}>
+                      <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.firstPlayer].photo}`} onClick={() => handleAvatarClick(userMap[game.firstPlayer].displayName)}>
                       </Avatar>
                     </Badge>
                   </Tooltip>}
-                  {game.firstPlayer}
+                  {userMap[game.firstPlayer] && userMap[game.firstPlayer].displayName}
                 </TableCell>
                 <TableCell>
                   {userMap[game.secondPlayer] &&
                   <Tooltip title={userMap[game.secondPlayer].status}>
                     <Badge
-                      color={userMap[game.secondPlayer].status === 'online' ? "success" : "error"}
+                      color={userMap[game.secondPlayer].status === 'online' ? "success" : userMap[game.secondPlayer].status === 'offline' ? "error" : "warning"}
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot">
-                      <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`}>
+                      <Avatar src={`http://${window.location.hostname}:5000/users/image/${userMap[game.secondPlayer].photo}`} onClick={() => handleAvatarClick(userMap[game.secondPlayer].displayName)}>
                       </Avatar>
                     </Badge>  
                   </Tooltip>}
-                  {game.secondPlayer}
+                  {userMap[game.secondPlayer] && userMap[game.secondPlayer].displayName}
                 </TableCell>
                 <TableCell align="right">{game.firstPlayerScore + " : " + game.secondPlayerScore}</TableCell>
                 <TableCell align="right">{game.finished ? <Check/> : <Close/>}</TableCell>
