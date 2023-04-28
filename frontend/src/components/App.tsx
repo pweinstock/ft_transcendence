@@ -29,25 +29,28 @@ import Logout from './auth/login/Logout';
 
 export default function App() {
     const [currentUsersData, setcurrentUsersData] = useState<User>();
+    const [userUpdate, setUserUpdate] = useState<boolean>(false);
     const socket : Socket= useContext(UserSocketContext);
 
-  useEffect(() => {
+    socket.on('userUpdate', () => {
+        userUpdate ? setUserUpdate(false) : setUserUpdate(true);
+    });
+
+    useEffect(() => {
     axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true })
       .then((response) => {
         setcurrentUsersData(response.data);
       })
       .catch((error) => {
-        console.error(error);
         if (error.response && error.response.status !== 200) {
-          //console.log("Error get current user....");
         }
       });
-  }, []);
+    }, [userUpdate]);
   
-  useEffect(() => {
-    if (currentUsersData)  
-      socket?.emit('userConnect',  {userId: currentUsersData.id});
-  }, [currentUsersData])
+    useEffect(() => {
+        if (currentUsersData)
+            socket?.emit('userConnect',  {userId: currentUsersData.id});
+    }, [currentUsersData])
 
     return (
         <>
@@ -75,7 +78,7 @@ export default function App() {
                 }
             </Routes>
             <aside>
-              currentUsersData ? <Logout /> : <Login />
+                {currentUsersData ? <Logout /> : <Login />}
             </aside>
           </main>
           <footer>

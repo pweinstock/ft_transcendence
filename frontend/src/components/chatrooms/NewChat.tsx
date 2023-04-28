@@ -29,12 +29,6 @@ const [chatPassValue, setchatPassValue] = useState<string>("");
 
 
 
-
-const [title, setTitle] = useState('');
-const [urlpost, setUrlpost] = useState('');
-const [bigtext, setBigtext] = useState('');
-const [msg, setmsg] = useState([]);
-
 // const [chatId, setchatId] = useState(0 || chatidp); //set with basic value 0
 const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
 	setchatPassValue(event.target.value);

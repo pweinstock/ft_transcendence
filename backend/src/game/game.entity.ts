@@ -12,7 +12,7 @@ export class Game {
     firstPlayer: string;
 
     @Column({nullable : true, default: null})
-    secondPlayer: string;0
+    secondPlayer: string;
 
     @Column({default: 0})
     firstPlayerScore: number;

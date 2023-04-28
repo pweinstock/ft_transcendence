@@ -88,8 +88,8 @@ export class UserService {
         return of(res.sendFile(join(process.cwd(), './uploads/image/' + imagename)));
     }
 
-    async changeStatus(name : string, status : string) : Promise<void> {
-        const user = await this.userRepository.findOneBy({displayName: name});
+    async changeStatus(userId : string, status : string) : Promise<void> {
+        const user = await this.userRepository.findOneBy({displayName : userId});
         if (user && user.status != "offline") {
             user.status = status;
             await this.userRepository.save(user);

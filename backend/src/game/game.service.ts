@@ -30,6 +30,9 @@ export class GameService {
         if (gameId)
             return null;
         const game = await this.gameRepository.save({firstPlayer : dto.firstPlayer, secondPlayer : null});
+        const user = await this.userService.findByName(dto.firstPlayer);
+        if (user)
+            game.secondPlayer = user.id;
         this.playerToGameId.set(clientId, {gameId : game.id, isFirst : true});
         this.gameIdToGameOption.set(game.id, dto);
         return game.id;
@@ -64,7 +67,9 @@ export class GameService {
 
     async setSecondPlayer(gameId : string, secondPlayer : string) : Promise<void> {
         const game : Game = await this.findGameById(gameId);
-        game.secondPlayer = secondPlayer;
+        const user = await this.userService.findByName(secondPlayer);
+        if (user)
+            game.secondPlayer = user.id;
         await this.gameRepository.save(game);
     }
 

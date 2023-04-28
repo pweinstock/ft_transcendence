@@ -2,10 +2,12 @@ import { Check, Close, Edit, FileUpload, Save, Settings } from '@mui/icons-mater
 import { Avatar, Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Paper, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material';
 import { display, positions } from '@mui/system';
 import axios from 'axios';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, {ChangeEvent, useContext, useEffect, useState} from 'react';
 import { User } from './BaseInterface';
 import Game from "./game/Game";
 import { GameMeta } from './game/interfaces/game-meta';
+import {Socket} from "socket.io-client";
+import {UserSocketContext} from "./context/user-socket";
 
 interface BaseUserProps {
   user : User;
@@ -26,7 +28,18 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
     const [code, setCode] = useState("");
     const [gameHistory, setGameHistory] = useState<GameMeta[]>([]);
     const [userMap, setUserMap] = useState<{[key: string]: User}>({});
-    
+    const [userUpdate, setUserUpdate] = useState<boolean>(false);
+
+    const socket : Socket= useContext(UserSocketContext);
+
+    const updateOtherUsers = () =>{
+        socket?.emit('userUpdate');
+    }
+
+    socket.on('userUpdate', () => {
+        userUpdate ? setUserUpdate(false) : setUserUpdate(true);
+    });
+
     useEffect(() => {
       async function fetchUser() {
         //const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
@@ -48,7 +61,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
         });
       }
       fetchUser();
-    }, []);
+    }, [userUpdate]);
 
     useEffect(() => {
       if (gameHistory.length === 0)
@@ -78,6 +91,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           try {
             await axios.post(`http://${window.location.hostname}:5000/users/changeName`, { newName }, { withCredentials: true });
             //setNewName("");
+            updateOtherUsers();
             setOpen(false);
             if (first)
               setUploadOpen(true);
@@ -116,6 +130,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
         await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true })
         .catch((error) => { alert(error)});
         setUploadOpen(false);
+        updateOtherUsers();
       }
       else
           setUploadOpen(false);
