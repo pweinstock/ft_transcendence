@@ -66,7 +66,11 @@ async function deleteChatNutton(id : string) {
 
 const handleParentStateUpdate = (newState: string, deside: boolean) => {
 	if (deside)
+	{
 		setchatNameValue(newState);
+		if (newState === "")
+			setactualChatid("");
+	}
 	else
 		updateOtherUsers();
 };
@@ -87,6 +91,7 @@ return (
 									}} >{item.name}</button>
 								<button className='chatbuttondel' title="Delete this chat" onClick={() => {
 									deleteChatNutton(item.id);
+									setactualChatid("");
 									}} >X</button>
 							</div>
 						))}
@@ -97,7 +102,7 @@ return (
 				</div>
 				<div className='chatcontent'>
 					{actualChatid && actualChatName && <NewChat updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
-					{!chatNameValue && <h1>No Chat</h1> }
+					{!actualChatid && <h1>No Chat</h1> }
 
 				</div>
 			</div>
