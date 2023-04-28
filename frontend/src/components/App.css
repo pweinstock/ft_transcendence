@@ -164,6 +164,7 @@ article {
 aside {
   display: flex;
   flex-direction: column;
+  align-items: center;
   flex: 25%;
   margin: 0.5%;
 }
