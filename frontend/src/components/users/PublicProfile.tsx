@@ -46,19 +46,18 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           .catch((error) => {
             alert(error + ": User " + param.user + " does not exist!");
           });
-        }, []);
+        }, [props.currentUser]);
 
     useEffect(() => {
-      console.log("gameHistory: %s", gameHistory.length);
       if (gameHistory.length === 0)
         return;
       gameHistory.forEach((game) => {
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.firstPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.firstPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.firstPlayer]: response.data,}));
         })
         .catch((error) => console.log(error));
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.secondPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.secondPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.secondPlayer]: response.data,}));
         })
@@ -166,7 +165,7 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                       </Avatar>
                     </Badge>
                   </Tooltip>}
-                  {game.firstPlayer}
+                  {userMap[game.firstPlayer] && userMap[game.firstPlayer].displayName}
                 </TableCell>
                 <TableCell>
                   {userMap[game.secondPlayer] &&
@@ -180,7 +179,7 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                       </Avatar>
                     </Badge>  
                   </Tooltip>}
-                  {game.secondPlayer}
+                  {userMap[game.secondPlayer] && userMap[game.secondPlayer].displayName}
                 </TableCell>
                 <TableCell align="right">{game.firstPlayerScore + " : " + game.secondPlayerScore}</TableCell>
                 <TableCell align="right">{game.finished ? <Check/> : <Close/>}</TableCell>

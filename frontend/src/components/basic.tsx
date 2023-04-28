@@ -61,18 +61,18 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
         });
       }
       fetchUser();
-    }, [userUpdate]);
+    }, [props.user]);
 
     useEffect(() => {
       if (gameHistory.length === 0)
         return;
       gameHistory.forEach((game) => {
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.firstPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.firstPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.firstPlayer]: response.data,}));
         })
         .catch((error) => console.log(error));
-        axios.get(`http://${window.location.hostname}:5000/users/name/${game.secondPlayer}`, { withCredentials: true })
+        axios.get(`http://${window.location.hostname}:5000/users/id/${game.secondPlayer}`, { withCredentials: true })
         .then((response) => {
           setUserMap((prevState) => ({...prevState, [game.secondPlayer]: response.data,}));
         })
@@ -283,9 +283,8 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                     <TableCell align="right">Finished</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
-                  {gameHistory.map((game : GameMeta) => (
-                    <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'lightyellow' : game.winner === newName ? 'lightgreen' : 'lightcoral'}}>
+                <TableBody> {userMap && gameHistory && gameHistory.map((game : GameMeta) => (
+                    <TableRow key={game.id} style={{backgroundColor: !game.winner || !userMap[game.winner] ? 'lightyellow' : userMap[game.winner].displayName === newName ? 'lightgreen' : 'lightcoral'}}>
                       <TableCell>{dateToString(game.date)}</TableCell>
                       <TableCell>
                         {userMap[game.firstPlayer] &&
@@ -299,7 +298,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                             </Avatar>
                           </Badge>
                         </Tooltip>}
-                        {game.firstPlayer}
+                        {userMap[game.firstPlayer] && userMap[game.firstPlayer].displayName}
                       </TableCell>
                       <TableCell>
                         {userMap[game.secondPlayer] &&
@@ -313,7 +312,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                             </Avatar>
                           </Badge>
                         </Tooltip>}
-                        {game.secondPlayer}
+                        {userMap[game.secondPlayer] && userMap[game.secondPlayer].displayName}
                       </TableCell>
                       <TableCell align="right">{game.firstPlayerScore + " : " + game.secondPlayerScore}</TableCell>
                       <TableCell align="right">{game.finished ? <Check/> : <Close/>}</TableCell>
