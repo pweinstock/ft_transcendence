@@ -9,7 +9,6 @@ import {GameInfoDto} from "./dto/game-info.dto";
 import {GameDataDto} from "./dto/game-data.dto";
 import {GameOptionDto} from "./dto/game-option.dto";
 
-
 interface ClientRoom {
     gameId : string;
     isFirst : boolean;
@@ -158,6 +157,7 @@ export class GameService {
             await this.gameRepository.save(game);
         }
     }
+
 
     deleteGameOption(gameId : string) : void {
         this.gameIdToGameOption.delete(gameId);

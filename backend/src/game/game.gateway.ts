@@ -167,6 +167,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             else
                 dto.rightPaddle.dy = 0;
             this.server.to(clientRoom.gameId).emit("update", dto);
+            this.gameService.setGameData(clientRoom.gameId, dto);
         }
     }
 
@@ -182,6 +183,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             else
                 dto.rightPaddle.dy = -dto.paddleSpeed;
             this.server.to(clientRoom.gameId).emit("update", dto);
+            this.gameService.setGameData(clientRoom.gameId, dto);
         }
     }
 
@@ -197,6 +199,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             else
                 dto.rightPaddle.dy = dto.paddleSpeed;
             this.server.to(clientRoom.gameId).emit("update", dto);
+            this.gameService.setGameData(clientRoom.gameId, dto);
         }
     }
 

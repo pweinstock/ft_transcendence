@@ -1,4 +1,4 @@
-export interface Paddle {
+export class Paddle {
     x: number;
     y: number;
     width: number;
@@ -6,7 +6,7 @@ export interface Paddle {
     dy: number;
 }
 
-export interface Ball {
+export class  Ball {
     x: number;
     y: number;
     width: number;
@@ -16,21 +16,21 @@ export interface Ball {
     dy: number;
 }
 
-export interface Players {
+export class Players {
     firstPlayer : string
     firstScore : number
     secondPlayer : string
     secondScore : number
 }
 
-export interface GameDataDto {
-    readonly leftPaddle : Paddle;
-    readonly rightPaddle : Paddle;
-    readonly maxPaddleY : number;
-    readonly ball : Ball;
-    readonly players : Players;
-    readonly timer : number;
-    readonly paddleSpeed :number;
-    readonly ballSpeed : number;
-    readonly maxScore : number;
+export class GameDataDto {
+    leftPaddle : Paddle;
+    rightPaddle : Paddle;
+    maxPaddleY : number;
+    ball : Ball;
+    players : Players;
+    timer : number;
+    paddleSpeed :number;
+    ballSpeed : number;
+    maxScore : number;
 }

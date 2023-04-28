@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useContext} from 'react';
 import {Ball, GameData, Paddle, Players} from "./interfaces/game-data-props";
-import {GameOption} from "./interfaces/game-option";
 import {GameSocketContext} from "../context/game-socket";
 import {Socket} from "socket.io-client";
 import {GameScore} from "./interfaces/game-score";
@@ -21,6 +20,8 @@ export default function PingPongReconnect(props : PingPongProps) {
         let isPaused : boolean = false;
         let playerLeft : string = "";
 
+        const initGame = (data : GameData) => socket.emit("init", data);
+
         const keyUp = (data : GameData) => socket.emit("KeyUp", data);
 
         const wKeyDown = (data : GameData) => socket.emit("wKey", data);
@@ -31,7 +32,7 @@ export default function PingPongReconnect(props : PingPongProps) {
 
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
-
+        let gameData = props.gameData;
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
@@ -46,7 +47,7 @@ export default function PingPongReconnect(props : PingPongProps) {
             context.fillStyle = "black";
             context.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         };
-        let oldx = props.gameData.ball.x;
+        let oldx = gameData.ball.x;
         const drawBall = (ball: Ball) => {
             context.fillStyle = "black";
             context.fillRect(ball.x, ball.y, ball.width, ball.height);
@@ -59,7 +60,7 @@ export default function PingPongReconnect(props : PingPongProps) {
             context.textAlign = "center";
             const x = 400;
             const y= 15;
-            context.fillText(String(props.gameData.timer), x, y);
+            context.fillText(String(gameData.timer), x, y);
         };
 
         const drawPause = () => {
@@ -77,10 +78,10 @@ export default function PingPongReconnect(props : PingPongProps) {
             context.textBaseline = "middle";
             if (playerLeft !== "")
                 context.fillText(playerLeft + " LEFT!", canvas.width / 2, canvas.height / 2);
-            else if (props.gameData.players.firstScore > props.gameData.players.secondScore)
-                context.fillText(props.gameData.players.firstPlayer + " WON", canvas.width / 2, canvas.height / 2);
-            else if (props.gameData.players.firstScore < props.gameData.players.secondScore)
-                context.fillText(props.gameData.players.secondPlayer + " WON!", canvas.width / 2, canvas.height / 2);
+            else if (gameData.players.firstScore > gameData.players.secondScore)
+                context.fillText(gameData.players.firstPlayer + " WON", canvas.width / 2, canvas.height / 2);
+            else if (gameData.players.firstScore < gameData.players.secondScore)
+                context.fillText(gameData.players.secondPlayer + " WON!", canvas.width / 2, canvas.height / 2);
             else
                 context.fillText("DRAW!", canvas.width / 2, canvas.height / 2);
         };
@@ -98,106 +99,106 @@ export default function PingPongReconnect(props : PingPongProps) {
         };
 
         const moveBall = () => {
-            if (props.gameData.ball.resetting) {
-                props.gameData.ball.x = canvas.width / 2;
-                props.gameData.ball.y = canvas.height / 2;
-                props.gameData.ball.resetting = false;
+            if (gameData.ball.resetting) {
+                gameData.ball.x = canvas.width / 2;
+                gameData.ball.y = canvas.height / 2;
+                gameData.ball.resetting = false;
             }
             else {
-                props.gameData.ball.x += props.gameData.ball.dx;
-                props.gameData.ball.y += props.gameData.ball.dy;
+                gameData.ball.x += gameData.ball.dx;
+                gameData.ball.y += gameData.ball.dy;
             }
         };
 
         const checkWallCollision = () => {
-            if (props.gameData.ball.y <= 0 || props.gameData.ball.y + props.gameData.ball.height >= canvas.height) {
-                props.gameData.ball.dy = -props.gameData.ball.dy;
+            if (gameData.ball.y <= 0 || gameData.ball.y + gameData.ball.height >= canvas.height) {
+                gameData.ball.dy = -gameData.ball.dy;
             }
-            if (props.gameData.ball.x <= 0) {
-                resetBall(props.gameData.rightPaddle);
-                props.gameData.players.secondScore += 1;
+            if (gameData.ball.x <= 0) {
+                resetBall(gameData.rightPaddle);
+                gameData.players.secondScore += 1;
             }
-            if (props.gameData.ball.x + props.gameData.ball.width >= canvas.width) {
-                resetBall(props.gameData.leftPaddle);
-                props.gameData.players.firstScore += 1;
+            if (gameData.ball.x + gameData.ball.width >= canvas.width) {
+                resetBall(gameData.leftPaddle);
+                gameData.players.firstScore += 1;
             }
         };
 
         const checkScore = () => {
-            if (props.gameData.players.secondScore >= props.gameData.maxScore ||
-                props.gameData.players.firstScore >= props.gameData.maxScore) {
+            if (gameData.players.secondScore >= gameData.maxScore ||
+                gameData.players.firstScore >= gameData.maxScore) {
                 endGame({
-                    firstPlayerScore: String(props.gameData.players.firstScore),
-                    secondPlayerScore: String(props.gameData.players.secondScore)
+                    firstPlayerScore: String(gameData.players.firstScore),
+                    secondPlayerScore: String(gameData.players.secondScore)
                 });
             }
         }
 
         const resetBall = (paddle: Paddle) => {
-            props.gameData.ball.resetting = true;
-            props.gameData.ball.dx = -props.gameData.ball.dx;
-            props.gameData.ball.dy = -props.gameData.ball.dy;
-            props.gameData.ball.x = paddle.x - props.gameData.ball.width;
-            props.gameData.ball.y = canvas.height / 2;
+            gameData.ball.resetting = true;
+            gameData.ball.dx = -gameData.ball.dx;
+            gameData.ball.dy = -gameData.ball.dy;
+            gameData.ball.x = paddle.x - gameData.ball.width;
+            gameData.ball.y = canvas.height / 2;
         };
 
         const movePaddle = (paddle: Paddle) => {
             paddle.y += paddle.dy;
             if (paddle.y < grid) {
                 paddle.y = grid;
-            } else if (paddle.y > props.gameData.maxPaddleY) {
-                paddle.y = props.gameData.maxPaddleY;
+            } else if (paddle.y > gameData.maxPaddleY) {
+                paddle.y = gameData.maxPaddleY;
             }
         };
 
         const checkPaddleCollision = (paddle: Paddle, isLeft : boolean) => {
             if (
-                props.gameData.ball.x < paddle.x + paddle.width &&
-                props.gameData.ball.x + props.gameData.ball.width > paddle.x &&
-                props.gameData.ball.y < paddle.y + paddle.height &&
-                props.gameData.ball.y + props.gameData.ball.height > paddle.y
+                gameData.ball.x < paddle.x + paddle.width &&
+                gameData.ball.x + gameData.ball.width > paddle.x &&
+                gameData.ball.y < paddle.y + paddle.height &&
+                gameData.ball.y + gameData.ball.height > paddle.y
             ) {
-                props.gameData.ball.dx *= -1
+                gameData.ball.dx *= -1
                 if (isLeft)
-                    props.gameData.ball.x = paddle.x + paddle.width;
+                    gameData.ball.x = paddle.x + paddle.width;
                 else
-                    props.gameData.ball.x = paddle.x - paddle.width;
-                const ballCenter = props.gameData.ball.y + props.gameData.ball.height / 2;
+                    gameData.ball.x = paddle.x - paddle.width;
+                const ballCenter = gameData.ball.y + gameData.ball.height / 2;
                 const paddleCenter = paddle.y + paddle.height / 2;
                 const centerDiff = ballCenter - paddleCenter;
                 const maxBounceAngle = Math.PI / 3;
                 let bounceAngle = centerDiff / (paddle.height / 2) * maxBounceAngle;
 
-                if (props.gameData.ball.dx > 0) {
+                if (gameData.ball.dx > 0) {
                     bounceAngle = Math.PI - bounceAngle; // flip angle
                 }
 
-                props.gameData.ball.dx = props.gameData.ballSpeed * Math.cos(bounceAngle);
-                props.gameData.ball.dy = props.gameData.ballSpeed * -Math.sin(bounceAngle);
-                props.gameData.ball.dx *= -1; // switch direction
+                gameData.ball.dx = gameData.ballSpeed * Math.cos(bounceAngle);
+                gameData.ball.dy = gameData.ballSpeed * -Math.sin(bounceAngle);
+                gameData.ball.dx *= -1; // switch direction
             }
         };
 
         const draw = () => {
             context.clearRect(0, 0, canvas.width, canvas.height);
             drawNet();
-            drawPaddle(props.gameData.leftPaddle);
-            drawPaddle(props.gameData.rightPaddle);
-            drawBall(props.gameData.ball);
+            drawPaddle(gameData.leftPaddle);
+            drawPaddle(gameData.rightPaddle);
+            drawBall(gameData.ball);
             drawTimer();
-            drawScore(props.gameData.players);
+            drawScore(gameData.players);
         };
 
         const update = () => {
             const currentTime = new Date().getTime();
-            props.gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
+            gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
             moveBall();
             checkScore();
             checkWallCollision();
-            checkPaddleCollision(props.gameData.leftPaddle, true);
-            checkPaddleCollision(props.gameData.rightPaddle, false);
-            movePaddle(props.gameData.leftPaddle);
-            movePaddle(props.gameData.rightPaddle);
+            checkPaddleCollision(gameData.leftPaddle, true);
+            checkPaddleCollision(gameData.rightPaddle, false);
+            movePaddle(gameData.leftPaddle);
+            movePaddle(gameData.rightPaddle);
             draw();
             if (isPaused)
                 drawPause()
@@ -210,10 +211,10 @@ export default function PingPongReconnect(props : PingPongProps) {
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
                 case 'w':
-                    wKeyDown(props.gameData);
+                    wKeyDown(gameData);
                     break;
                 case 's':
-                    sKeyDown(props.gameData);
+                    sKeyDown(gameData);
                     break;
             }
         };
@@ -222,23 +223,24 @@ export default function PingPongReconnect(props : PingPongProps) {
             switch (event.key) {
                 case 'w':
                 case 's':
-                    keyUp(props.gameData);
+                    keyUp(gameData);
                     break;
             }
         };
 
+        initGame(gameData);
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        socket.on("update", (data : GameData) => props.gameData = data);
+        socket.on("update", (data : GameData) => gameData = data);
         socket.on("playerDisconnected", () => isPaused = true);
         socket.on("reconnect", () => isPaused = false);
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;
-            playerLeft = player
+            playerLeft = player;
+            console.log('player left');
         });
-
 
 
         update();
