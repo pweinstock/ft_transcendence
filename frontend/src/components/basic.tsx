@@ -7,7 +7,11 @@ import { User } from './BaseInterface';
 import Game from "./game/Game";
 import { GameMeta } from './game/interfaces/game-meta';
 
-export default function Basic() {
+interface BaseUserProps {
+  user : User;
+}
+
+const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
 
     const [open, setOpen] = useState(false);
     const [newName, setNewName] = useState("");
@@ -25,15 +29,15 @@ export default function Basic() {
     
     useEffect(() => {
       async function fetchUser() {
-        const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
-        setNewName(response.data.displayName);
-        setPhoto(response.data.photo);
-        setFirst(response.data.first);
-        if (response.data.first) {
+        //const response = await axios.get(`http://${window.location.hostname}:5000/users/current`, { withCredentials: true });
+        setNewName(props.user.displayName);
+        setPhoto(props.user.photo);
+        setFirst(props.user.first);
+        if (props.user.first) {
           setOpen(true);
         }
-        setToggle(response.data.isTwoFactorAuthenticationEnabled);
-        const matchHistory = response.data.matchHistory;
+        setToggle(props.user.isTwoFactorAuthenticationEnabled);
+        const matchHistory = props.user.matchHistory;
         Promise.all(matchHistory.map((id: string) => {
           return axios.get(`http://${window.location.hostname}:5000/game/id/${id}`, { withCredentials: true })
             .then((response) => response.data)
@@ -86,11 +90,11 @@ export default function Basic() {
     };
 
     const handleNewNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-      const regex = /^[A-Za-z]*$/;
+      const regex = /^[A-Za-z0-9]*$/;
       if (regex.test(event.target.value))
         setNewName(event.target.value);
       else
-        alert("Username can only contains letters!")
+        alert("Username can only contains letters and digits!")
     };
     
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -225,8 +229,9 @@ export default function Basic() {
                   sx={{ width: 64, height: 64 }}
                   onClick={() => setSettingsOpen(!settingsOpen)}
                   >
+                  {String(photo).length && (
                   <Avatar src={`http://${window.location.hostname}:5000/users/image/${photo}`} sx={{ width: 64, height: 64}}>
-                  </Avatar> 
+                  </Avatar> )}
                 </Badge>
                 {settingsOpen ? (
                 <List
@@ -265,13 +270,13 @@ export default function Basic() {
                 </TableHead>
                 <TableBody>
                   {gameHistory.map((game : GameMeta) => (
-                    <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === newName ? 'lightgreen' : 'lightcoral'}}>
+                    <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'lightyellow' : game.winner === newName ? 'lightgreen' : 'lightcoral'}}>
                       <TableCell>{dateToString(game.date)}</TableCell>
                       <TableCell>
                         {userMap[game.firstPlayer] &&
                         <Tooltip title={userMap[game.firstPlayer].status}>
                           <Badge
-                            color={userMap[game.firstPlayer].status === 'online' ? "success" : "error"}
+                            color={userMap[game.firstPlayer].status === 'online' ? "success" : userMap[game.firstPlayer].status === 'offline' ? "error" : "warning"}
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             variant="dot">
@@ -285,7 +290,7 @@ export default function Basic() {
                         {userMap[game.secondPlayer] &&
                         <Tooltip title={userMap[game.secondPlayer].status}>
                           <Badge
-                            color={userMap[game.secondPlayer].status === 'online' ? "success" : "error"}
+                            color={userMap[game.secondPlayer].status === 'online' ? "success" : userMap[game.secondPlayer].status === 'offline' ? "error" : "warning"}
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                             variant="dot">
@@ -303,5 +308,6 @@ export default function Basic() {
               </Table>
             </TableContainer>
         </>
-    );
+    ); 
 }
+export default Basic

@@ -77,7 +77,7 @@ const HighScore: React.FC<BaseUserProps> = (props: BaseUserProps) => {
               <TableCell>
                 <Tooltip title={user.status}>
                   <Badge
-                  color={user.status === 'online' ? 'success' : 'error'}
+                  color={user.status === 'online' ? 'success' : user.status === 'offline' ? 'error' : 'warning'}
                   overlap="circular"
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                   variant="dot">

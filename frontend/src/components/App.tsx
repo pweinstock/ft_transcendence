@@ -10,7 +10,6 @@ import Basic from './basic';
 import ChatRooms from './chatrooms/ChatRooms';
 import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
-import Settings2 from "./settings/settings2";
 import BaseUser from './users/BaseUser';
 import React, { useContext, useState, useEffect } from 'react';
 import axios from "axios";
@@ -22,8 +21,8 @@ import PublicProfile from './users/PublicProfile';
 import Friends from './users/Friends';
 import {UserSocketContext, UserSocketProvider} from "./context/user-socket";
 import {Socket} from "socket.io-client";
-import { Logout } from '@mui/icons-material';
 import HighScore from './game/HighScore';
+import Logout from './auth/login/Logout';
 
 
 
@@ -40,7 +39,7 @@ export default function App() {
       .catch((error) => {
         console.error(error);
         if (error.response && error.response.status !== 200) {
-          console.log("Error get current user....");
+          //console.log("Error get current user....");
         }
       });
   }, []);
@@ -63,10 +62,10 @@ export default function App() {
             <Routes>
                 <Route path="/auth" element={<Login/>}/>
                 <Route path="/auth/2FA" element={<TwoFactorAuth/>}/>
-                <Route path="/"  element={<Basic />}/>
-                <Route path="/settings"  element={<Settings2 />}/>
+                {/* <Route path="/"  element={<Basic />}/> */}
                 {currentUsersData &&
                     <>
+                    <Route path="/"  element={<Basic  user={currentUsersData}/>}/>
                     <Route path="/chatrooms" element={<ChatRooms user={currentUsersData}/>}/>
                     <Route path="/game" element={<GameSocketProvider><Game user={currentUsersData}/></GameSocketProvider>}/>
                     <Route path="/friends" element={<Friends currentUser={currentUsersData}/>}/>
@@ -95,9 +94,6 @@ export default function App() {
               </Link>
               <Link key={"friends"}  className="newpostlink" to="/friends">
                   <button className='navbutton'>Friends</button>
-              </Link>
-              <Link key={"settings"}  className="newpostlink" to="/settings">
-                  <button className='navbutton'>Settings</button>
               </Link>
             </nav>
           </footer>

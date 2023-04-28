@@ -152,13 +152,13 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
           </TableHead>
           <TableBody>
             {gameHistory.map((game : GameMeta) => (
-              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'yellow' : game.winner === publicUser?.displayName ? 'lightgreen' : 'lightcoral'}}>
+              <TableRow key={game.id} style={{backgroundColor: game.winner === null ? 'lightyellow' : game.winner === publicUser?.displayName ? 'lightgreen' : 'lightcoral'}}>
                 <TableCell>{dateToString(game.date)}</TableCell>
                 <TableCell>
                   {userMap[game.firstPlayer] &&
                   <Tooltip title={userMap[game.firstPlayer].status}>
                     <Badge
-                      color={userMap[game.firstPlayer].status === 'online' ? "success" : "error"}
+                      color={userMap[game.firstPlayer].status === 'online' ? "success" : userMap[game.firstPlayer].status === 'offline' ? "error" : "warning"}
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot">
@@ -172,7 +172,7 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                   {userMap[game.secondPlayer] &&
                   <Tooltip title={userMap[game.secondPlayer].status}>
                     <Badge
-                      color={userMap[game.secondPlayer].status === 'online' ? "success" : "error"}
+                      color={userMap[game.secondPlayer].status === 'online' ? "success" : userMap[game.secondPlayer].status === 'offline' ? "error" : "warning"}
                       overlap="circular"
                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                       variant="dot">

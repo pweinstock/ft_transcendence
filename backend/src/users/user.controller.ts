@@ -50,7 +50,7 @@ export class UserController {
     @Get('/name/:name')
     @UseGuards(AuthGuard('2FA'))
     async getPublicUser(@Param('name') displayName : string) : Promise<User> {
-        const regex = /^[A-Za-z]+$/;
+        const regex = /^[A-Za-z0-9]+$/;
         if (!regex.test(displayName))
             throw new HttpException("Username is invalid", HttpStatus.NOT_ACCEPTABLE);
         return this.usersService.findByName(displayName);

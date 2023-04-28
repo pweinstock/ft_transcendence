@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '@mui/material/Button';
+import { LoginOutlined, LoginRounded } from '@mui/icons-material';
 
 const Login = () => {
   const handleLogin = () => {
@@ -8,7 +9,7 @@ const Login = () => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-      <Button variant="contained" color="primary" onClick={handleLogin}>
+      <Button variant="contained" color="primary" onClick={handleLogin} startIcon={<LoginOutlined/>}>
         Sign In with 42
       </Button>
     </div>
