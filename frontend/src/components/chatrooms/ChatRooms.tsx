@@ -43,26 +43,15 @@ async function fetchChatrooms() {
 	axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true})
 	.then((response) => {
 		setValue(response.data);
-		console.log("fetcch chat---");
-		console.log(response.data);
 		let chatInList : boolean = false;
-		response.data.map((item : any) => {
-			if (item.id == actualChatid)
-				chatInList = true;
-		})
+			response.data.map((item : any) => {
+				if (item.id == actualChatid)
+					chatInList = true;});
 		if (chatInList == false)
 			setactualChatid("");
-		
-		// if (!response.data.chats.includes(actualChatid))
-		// {
-		// 	console.log("here");
-		// 	setactualChatid("");
-		// }
 	})
 	.catch((reason) => {
-		if (reason.response!.status !== 200) {
-			console.log("Error getting all chat data");
-		}
+		console.log("Error getting all chat data");
 		console.log(reason.message);
 	});
 }
