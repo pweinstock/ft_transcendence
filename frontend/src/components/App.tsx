@@ -77,6 +77,7 @@ export default function App() {
                     </>
                 }
             </Routes>
+            {!currentUsersData && <Login/>}
           </main>
           <footer>
             <nav>
