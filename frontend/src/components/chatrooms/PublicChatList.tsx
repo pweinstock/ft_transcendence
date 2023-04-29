@@ -48,7 +48,7 @@ const PublicChatList: React.FC<ChatProps> = (props : ChatProps) => {
 	
 	useEffect(() => {
 		getAllPubliChat();
-	},[props.chatName, props.updatestate]);
+	},[props.updatestate]);
 
 return (
 	<>

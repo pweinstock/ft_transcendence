@@ -18,11 +18,9 @@ interface ChatProps {
 }
 
 const InputMessage: React.FC<ChatProps> = (props : ChatProps) => {
-const socket = useContext(ChatSocketContext);
-
-// const [savescrollHeight, setsaveScrollHeight] = useState<number>(0);
-const [message, setMessage] = useState<string | "">("");
-const [messages, setMessages] = useState<{content: string, date: string, id: string, displayName : string, userId: string}[]>([]);
+	const socket = useContext(ChatSocketContext);
+	const [message, setMessage] = useState<string | "">("");
+	const [messages, setMessages] = useState<{content: string, date: string, id: string, displayName : string, userId: string}[]>([]);
 
 
 socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
@@ -30,14 +28,10 @@ socket?.emit('joinRoom',  {userId: props.user.id, chatId : props.chatidp});
 
 useEffect(() => {
 	setMessages([]);
-
 	}, [props.chatidp]); 
-//when we call it with a different chat id its triggers the clearing fo the variable handleled by the usstate
-// important revelation how the states can be handleed. how they update and how to prevent default behaviour of forms
-// usstate variables constalty watched and the usefect runs when the setted aruables are changed. 
+
 const handleChatinputChange = (event : ChangeEvent<HTMLInputElement>) => {
 	setMessage(event.target.value);
-	props.onUpdate(event.target.value);
 };
 
 async function handleOnClickSend(event: React.FormEvent<HTMLFormElement>) {
@@ -73,15 +67,10 @@ const container = useRef<HTMLDivElement>(null);
 
 const Scroll = () => {
 	const {scrollHeight } = container.current as HTMLDivElement;
-	// container.current?.scrollTo(0, 9999);
 	container.current?.scrollTo(0, scrollHeight)
-	// console.log("RUN....");
-	// console.log(savescrollHeight);
 }
 
 useEffect(() => {
-	console.log("messages");
-	console.log(messages);
   Scroll();
 }, [messages])
 

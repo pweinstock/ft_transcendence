@@ -8,6 +8,7 @@ import Game from "./game/Game";
 import { GameMeta } from './game/interfaces/game-meta';
 import {Socket} from "socket.io-client";
 import {UserSocketContext} from "./context/user-socket";
+import Logout from './auth/login/Logout';
 
 interface BaseUserProps {
   user : User;
@@ -232,6 +233,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
             </Dialog>
             <section>
                 <h1> Welcome {newName}! </h1>
+                <Logout/>
                 <Badge
                   badgeContent={
                     <Tooltip title="Settings">

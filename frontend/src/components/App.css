@@ -24,10 +24,11 @@ canvas {
 
 header {
   display: flex;
-
   width: 100%;
+  background-position: center;
   background-image: url("./img/ee7dbc369fd1cf1cce4714002480a8ad.jpg") ;
   background-color: #585252;
+  justify-content: center;
   text-align: center;
   color: wheat;
   /* margin-bottom: 2%; */
@@ -51,6 +52,7 @@ header p {
 }
 
 footer  {
+  background-position: center;
   background-image: url("./img/ee7dbc369fd1cf1cce4714002480a8ad.jpg") ;
   width: 100%;
   display: flex;
