@@ -22,6 +22,8 @@ const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 const [addThisUserId, setaddThisUserId] = useState<string>("");
 const [updateStatesGlobal, setaupdateStatesGlobal] = useState<number>(0);
+const [usersData, setUsersData] = useState<any[]>([]);
+
 
 const socket : Socket= useContext(UserSocketContext);
 
@@ -71,6 +73,19 @@ async function deleteChatNutton(id : string) {
 		});
 }
 
+useEffect(() => {
+	axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
+		.then((response) => {
+			setUsersData(response.data);
+		})
+		.catch((error) => {
+			console.error(error);
+			if (error.response && error.response.status !== 200) {
+				console.log("error in getting all user data");
+			}
+		});
+	}, [actualChatid, updateStatesGlobal]);
+
 const handleParentStateUpdate = (newState: string, deside: boolean) => {
 	if (deside)
 	{
@@ -103,18 +118,18 @@ return (
 							</div>
 						))}
 					</div>
-					<CreateChat chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
+					<CreateChat userId={props.user.id} usersData={usersData} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 					<PublicChatList user={props.user} updatestate={updateStatesGlobal} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 				</div>
 				</div>
 				<div className='chatcontent'>
-					{actualChatid && actualChatName && <NewChat updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
+					{actualChatid && actualChatName && <NewChat usersData={usersData} updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
 					{!actualChatid && <h1>No Chat</h1> }
 				</div>
 			</div>
 		</section>
 		<aside>
-			gamewithfreind ? <Game user={props.user} /> : <div>Let's Play?</div>
+			{gamewithfreind ? <Game user={props.user} /> : <div>Let's Play?</div>}
 		</aside>
 	</>
 );

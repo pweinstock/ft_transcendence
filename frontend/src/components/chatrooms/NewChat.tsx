@@ -14,14 +14,14 @@ interface ChatProps {
 	chatidp: string;
 	updatestate: number;
 	chatName : string;
+	usersData : any[];
 	onUpdate: (newState: string, deside: boolean) => void;
 }
 
 const NewChat: React.FC<ChatProps> = (props : ChatProps) => {
-	const [usersData, setUsersData] = useState<any[]>([]);
 	const [usersInThisChat, setusersInThisChat] = useState<{[key: string]: string;}[]>([]);
 	const [chatData, setchatData] = useState<{bannedUsers: any[], users: any[], admins: any[], mutedUsers
-		: any[], owner :string}>();
+		: any[], owner :string, type : string}>();
 
 	const [addThisUser, setaddThisUser] = useState<string>("");
 	const [chatPassValue, setchatPassValue] = useState<string>("");
@@ -41,26 +41,13 @@ useEffect(() => {
 }, [props.chatidp, addThisUser, props.updatestate]);
 
 useEffect(() => {
-	axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
-		.then((response) => {
-			setUsersData(response.data);
-		})
-		.catch((error) => {
-			console.error(error);
-			if (error.response && error.response.status !== 200) {
-				console.log("error in getting all user data");
-			}
-		});
-	}, [props.chatidp, props.updatestate]);
-
-useEffect(() => {
 	setusersInThisChat([]);
-	usersData.map((item, index) => (
+	props.usersData.map((item, index) => (
 		item && ( chatData?.users.includes(item.id) ) && (
 			setusersInThisChat((arr) => [...arr, {[item.id]: item.displayName}])
 			)
 			));
-}, [props.chatidp, props.updatestate, usersData, chatData]);
+}, [props.chatidp, props.updatestate, props.usersData, chatData]);
 
 
 async function addUserHandler() {
@@ -183,7 +170,6 @@ async function kickUserout(addadminthisuser: string) {
 		await axios.post(`http://${window.location.hostname}:5000/chat/kickoutuser`,  { userId : addadminthisuser,  chatId : props.chatidp }, {withCredentials: true})
 		.then( () => {
 			props.onUpdate("", false);
-			// props.onUpdate(props.chatName + " ", true);
 		}).catch((reason) => {
 				console.log(reason.message);
 				console.log("Error while kicking out this user:");
@@ -341,7 +327,8 @@ return (
 					</div>
 					<div className='adduserdivcontainer'>
 						<span>Add users: </span>
-						{usersData && usersData.map((item, index) => (
+						{chatData && !(chatData.type === "direct" && chatData.users.length === 2) &&
+						props.usersData && props.usersData.map((item, index) => (
 							<div key={index} className='adduserdiv' style={{color: "white"}}>
 									{item.id !== props.user.id 
 										&& chatData 
