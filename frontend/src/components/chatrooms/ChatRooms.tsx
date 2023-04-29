@@ -22,6 +22,8 @@ const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
 const [addThisUserId, setaddThisUserId] = useState<string>("");
 const [updateStatesGlobal, setaupdateStatesGlobal] = useState<number>(0);
+const [usersData, setUsersData] = useState<any[]>([]);
+
 
 const socket : Socket= useContext(UserSocketContext);
 
@@ -43,26 +45,15 @@ async function fetchChatrooms() {
 	axios.get(`http://${window.location.hostname}:5000/chat`, {withCredentials: true})
 	.then((response) => {
 		setValue(response.data);
-		console.log("fetcch chat---");
-		console.log(response.data);
 		let chatInList : boolean = false;
-		response.data.map((item : any) => {
-			if (item.id == actualChatid)
-				chatInList = true;
-		})
+			response.data.map((item : any) => {
+				if (item.id == actualChatid)
+					chatInList = true;});
 		if (chatInList == false)
 			setactualChatid("");
-		
-		// if (!response.data.chats.includes(actualChatid))
-		// {
-		// 	console.log("here");
-		// 	setactualChatid("");
-		// }
 	})
 	.catch((reason) => {
-		if (reason.response!.status !== 200) {
-			console.log("Error getting all chat data");
-		}
+		console.log("Error getting all chat data");
 		console.log(reason.message);
 	});
 }
@@ -81,6 +72,19 @@ async function deleteChatNutton(id : string) {
 			console.log(reason.message);
 		});
 }
+
+useEffect(() => {
+	axios.get(`http://${window.location.hostname}:5000/users`, { withCredentials: true })
+		.then((response) => {
+			setUsersData(response.data);
+		})
+		.catch((error) => {
+			console.error(error);
+			if (error.response && error.response.status !== 200) {
+				console.log("error in getting all user data");
+			}
+		});
+	}, [actualChatid, updateStatesGlobal]);
 
 const handleParentStateUpdate = (newState: string, deside: boolean) => {
 	if (deside)
@@ -114,18 +118,18 @@ return (
 							</div>
 						))}
 					</div>
-					<CreateChat chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
+					<CreateChat userId={props.user.id} usersData={usersData} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 					<PublicChatList user={props.user} updatestate={updateStatesGlobal} chatName={chatNameValue} onUpdate={handleParentStateUpdate}/>
 				</div>
 				</div>
 				<div className='chatcontent'>
-					{actualChatid && actualChatName && <NewChat updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
+					{actualChatid && actualChatName && <NewChat usersData={usersData} updatestate={updateStatesGlobal} user={props.user} chatidp={actualChatid} chatName={actualChatName} onUpdate={handleParentStateUpdate}/>}
 					{!actualChatid && <h1>No Chat</h1> }
 				</div>
 			</div>
 		</section>
 		<aside>
-			gamewithfreind ? <Game user={props.user} /> : <div>Let's Play?</div>
+			{gamewithfreind ? <Game user={props.user} /> : <div>Let's Play?</div>}
 		</aside>
 	</>
 );

@@ -10,9 +10,9 @@ export enum ChatType {
 	};
 
 interface ChatProps {
-	// user : User;
-	// chatidp: string;
+	usersData : any[];
 	chatName : string;
+	userId : string;
 	onUpdate: (newState: string, deside: boolean) => void;
 }
 
@@ -20,9 +20,17 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 
 	const [chaTypeValue, setchaTypeValue] = useState<ChatType>(ChatType.PUBLIC);
 	const [chatPassValue, setchatPassValue] = useState<string>("");
+	const [gameWithThisUser, setgameWithThisUser] = useState<string>("");
+	const [usersData, setUsersData] = useState<any[]>([]);
+
+
 
 	const handleChatTypeChange = (event : ChangeEvent<HTMLSelectElement>) => {
 		setchaTypeValue(event.target.value as ChatType);
+	  };
+
+	const handlegameWithThisUserChange = (event : ChangeEvent<HTMLSelectElement>) => {
+		setgameWithThisUser(event.target.value);
 	  };
 	
 	const handleChatNameChange = (event : ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +39,25 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 	const handleChatPassChange = (event : ChangeEvent<HTMLInputElement>) => {
 		setchatPassValue(event.target.value);
 	  };
+
+	async function handleGameInviteOnClick (event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.DIRECT,  name : "Game "}, {withCredentials: true})
+			.then((response) => {
+				axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : gameWithThisUser,  chatId : response.data.id}, {withCredentials: true}).then( () => {
+					props.onUpdate("", true);
+					props.onUpdate("", false);
+				}).catch((reason) => {
+					console.log("Error while joing game chat, in chatid:");
+					console.log(gameWithThisUser);
+					console.log(reason.message);
+				});
+			}
+			).catch(reason => {
+				console.log("failed to create game room")
+				console.log(reason.message);
+		});
+	}
 
 	async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -46,6 +73,7 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 			console.log(reason.message);
 		});
 	}
+
 
 return (
 	<>
@@ -75,6 +103,19 @@ return (
 				</form>
 			</div>
 		</div>
+		<form onSubmit={handleGameInviteOnClick}>
+			<label>
+			Select User to play with:
+			<select value={gameWithThisUser}  onChange={handlegameWithThisUserChange} required>
+			{props.usersData && props.usersData.map((item, index) => (
+				<>
+				{item.id !== props.userId && <option key={index} value={item.id}>{item.displayName}</option>}
+				</>
+				))}
+			</select>
+			</label>
+			<button className='chatbutton' type="submit">Invite</button>
+		</form>
 	</>
 );
 }
