@@ -10,19 +10,16 @@ import Basic from './basic';
 import ChatRooms from './chatrooms/ChatRooms';
 import Login from "./auth/login/Login";
 import TwoFactorAuth from "./auth/login/TwoFactorAuth";
-import BaseUser from './users/BaseUser';
 import React, { useContext, useState, useEffect } from 'react';
 import axios from "axios";
 import { User } from "./BaseInterface";
 import Game from "./game/Game";
-import Users from "./users/users";
 import {GameSocketProvider} from "./context/game-socket";
 import PublicProfile from './users/PublicProfile';
 import Friends from './users/Friends';
 import {UserSocketContext, UserSocketProvider} from "./context/user-socket";
 import {Socket} from "socket.io-client";
 import HighScore from './game/HighScore';
-import Logout from './auth/login/Logout';
 
 
 

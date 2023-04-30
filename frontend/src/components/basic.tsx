@@ -285,7 +285,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
                     <TableCell align="right">Finished</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody> {userMap && gameHistory && gameHistory.map((game : GameMeta) => (
+                <TableBody>{userMap && gameHistory && gameHistory.map((game : GameMeta) => (
                     <TableRow key={game.id} style={{backgroundColor: !game.winner || !userMap[game.winner] ? 'lightyellow' : userMap[game.winner].displayName === newName ? 'lightgreen' : 'lightcoral'}}>
                       <TableCell>{dateToString(game.date)}</TableCell>
                       <TableCell>

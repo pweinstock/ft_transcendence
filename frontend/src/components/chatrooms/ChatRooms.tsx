@@ -46,9 +46,11 @@ async function fetchChatrooms() {
 	.then((response) => {
 		setValue(response.data);
 		let chatInList : boolean = false;
+		if (response.data) {
 			response.data.map((item : any) => {
 				if (item.id == actualChatid)
-					chatInList = true;});
+				chatInList = true;});
+		}
 		if (chatInList == false)
 			setactualChatid("");
 	})
