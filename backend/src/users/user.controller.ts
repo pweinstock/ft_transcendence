@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res, ParseFilePipe, MaxFileSizeValidator, HttpException, HttpStatus} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, UseInterceptors, UploadedFile, Param, Res, ParseFilePipe, MaxFileSizeValidator, HttpException, HttpStatus, FileTypeValidator} from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -9,18 +9,27 @@ import path = require('path');
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 import {User} from "./user.entity";
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 
-export const storage = {
+const multerOptions: MulterOptions = {
     storage: diskStorage({
-        destination: './uploads/image',
-        filename: (req, file, cb) => {
-            const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-            const extension: string = path.parse(file.originalname).ext;
-
-            cb(null, `${filename}${extension}`)
+                destination: './uploads/image',
+                filename: (req, file, cb) => {
+                    const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+                    const extension: string = path.parse(file.originalname).ext;
+        
+                    cb(null, `${filename}${extension}`)
+                }
+            }),
+    fileFilter: (request, file, callback) => {
+        if (!file.mimetype.includes('image')) {
+          return callback(new HttpException('Provide a valid image', HttpStatus.BAD_REQUEST),false);
         }
-    })
-
+        callback(null, true);
+      },
+    limits :{
+      fileSize: Math.pow(1024, 2) * 2
+    }
 }
 
 
@@ -56,12 +65,6 @@ export class UserController {
         return this.usersService.findByName(displayName);
     }
 
-    @Post()
-    async create(@Body() userDto: UserDTO) : Promise<User> {
-        return this.usersService.createUser(userDto);
-    } //todo delete later: Testing purpose only
-
-
     @Post('changeName')
     @UseGuards(AuthGuard('2FA'))
     async changeName(@Req() request: any, @Body('newName') newName: string) : Promise<void>{
@@ -70,7 +73,7 @@ export class UserController {
 
     @Post('upload')
     @UseGuards(AuthGuard('2FA'))
-    @UseInterceptors(FileInterceptor('file', storage))
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     uploadFile(@UploadedFile() file, @Req() req) : Promise<string> {
         if (req.user.photo != 'null')
             this.usersService.deleteImage(req.user.photo); 

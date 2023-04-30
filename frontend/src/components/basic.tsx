@@ -129,7 +129,7 @@ const Basic: React.FC<BaseUserProps> = (props : BaseUserProps) => {
         const formData = new FormData();
         formData.append("file", image);
         await axios.post(`http://${window.location.hostname}:5000/users/upload`, formData, { withCredentials: true })
-        .catch((error) => { alert(error)});
+        .catch((error) => { alert(error + ': Invalid File!')});
         setUploadOpen(false);
         updateOtherUsers();
       }
