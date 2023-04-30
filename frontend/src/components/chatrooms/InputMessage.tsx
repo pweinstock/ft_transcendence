@@ -77,20 +77,17 @@ return (
 	<>
 		<div ref={container} className="message-list">
 			<MessageList user={props.user} chatidp={props.chatidp} chatName={props.chatName}/>
-			{messages.map((message, index) => {
-				return (
-					<>
-					{ !props.chatThisData.bannedUsers.includes(message.userId) &&
-						<Message key={index + props.chatidp}
-						content={message.content}
-						date={message.date}
-						displayName={message.displayName}
-						user={props.user.displayName}
-						/>
-						}
-					</>
-				);
-			})}
+			{messages.map((message, index) => (
+				!props.chatThisData.bannedUsers.includes(message.userId) && (
+				<Message
+					key={index + props.chatidp + "bob"}
+					content={message.content}
+					date={message.date}
+					displayName={message.displayName}
+					user={props.user.displayName}
+				/>
+				)
+			))}
 		</div>
 
 		<div className="inputgroup">
