@@ -1,4 +1,4 @@
-import { FormEventHandler, useEffect,useRef , useState, ChangeEvent, useContext } from 'react';
+import { useEffect,useRef , useState, ChangeEvent, useContext } from 'react';
 import axios from "axios";
 import {User} from "../BaseInterface";
 import { ChatSocketContext } from '../context/chat-socket';
@@ -52,15 +52,15 @@ function sendMassagetoBackend() {
 			});
 }
 
-const messageListener = (message: any) => {
-	setMessages([...messages, message])
-}
 useEffect(() => {
+	const messageListener = (message: any) => {
+		setMessages([...messages, message])
+	}
 	socket?.on('message', messageListener)
 	return () => {
 		socket?.off('message', messageListener)
 	}
-}, [messageListener])
+}, [socket, messages])
 
 const container = useRef<HTMLDivElement>(null);
 
