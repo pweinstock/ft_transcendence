@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import './chatstart.css';
 import axios from "axios";
 import {User} from "../BaseInterface";
 import Message from './Message';
@@ -13,8 +12,6 @@ interface ChatProps {
 const MessageList: React.FC<ChatProps> = (props : ChatProps) => {
 
 const [messages, setMessages] = useState<{content: string, chat: string, date: Date, id: string, displayName: string, user: string}[]>([]);
-const [msg, setmsg] = useState([]);
-
 
 useEffect(() => {
 async function printmessages() {

@@ -1,7 +1,6 @@
 import { FormEventHandler, useEffect,useRef , useState, ChangeEvent, useContext } from 'react';
 import axios from "axios";
 import {User} from "../BaseInterface";
-import {Socket, io} from "socket.io-client";
 import { ChatSocketContext } from '../context/chat-socket';
 import MessageList from './MessageList';
 import Message from './Message';

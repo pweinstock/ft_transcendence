@@ -61,7 +61,6 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 							.catch((reason) => {
 								console.log("Error while writing instruction maessage");
 								});
-
 				}
 				).catch(reason => {
 					console.log("failed to create game room")

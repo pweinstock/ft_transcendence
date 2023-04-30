@@ -1,9 +1,7 @@
 
 interface MassageStyle {
 	content: string;
-	// chat: string;
 	date: string;
-	// id: string;
 	displayName: string;
 	user: string;
 }
@@ -17,9 +15,6 @@ return (
 				<div className="datetime-date">{props.date}</div>
 			</div>
 			<div className="sender">
-			{/* <div className="sender-image">
-				<img src={props.photoURL} alt={props.displayName} title={props.displayName} />
-			</div> */}
 			<div className="sender-name d-none">{props.displayName}</div>
 			</div>
 			<div className="chattext">{props.content}</div>

@@ -17,7 +17,7 @@ import Game from "./game/Game";
 import {GameSocketProvider} from "./context/game-socket";
 import PublicProfile from './users/PublicProfile';
 import Friends from './users/Friends';
-import {UserSocketContext, UserSocketProvider} from "./context/user-socket";
+import {UserSocketContext} from "./context/user-socket";
 import {Socket} from "socket.io-client";
 import HighScore from './game/HighScore';
 
@@ -47,7 +47,7 @@ export default function App() {
     useEffect(() => {
         if (currentUsersData)
             socket?.emit('userConnect',  {userId: currentUsersData.id});
-    }, [currentUsersData])
+    }, [currentUsersData, socket])
 
     return (
         <>
