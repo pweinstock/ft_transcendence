@@ -26,8 +26,8 @@ async function printmessages() {
 		if (reason.response!.status !== 200) {
 		console.log("Error getting massages");
 		console.log(props.chatidp);
+		console.log(reason.message);
 	}
-	console.log(reason.message);
 	});
 }
 printmessages();

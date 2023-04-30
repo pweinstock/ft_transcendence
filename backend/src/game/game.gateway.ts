@@ -152,6 +152,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const clientRoom = this.gameService.getClientRoom(client.id);
         if (clientRoom) {
             this.gameService.setGameData(clientRoom.gameId, dto)
+            this.server.emit('userUpdate');
         }
     }
 
@@ -222,6 +223,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.gameService.deleteViewer(client.id);
             client.leave(viewerGameId);
         }
+        this.server.emit('userUpdate');
     }
 
     @SubscribeMessage('leave')
@@ -241,5 +243,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.gameService.deleteViewer(client.id);
             client.leave(viewerGameId);
         }
+        this.server.emit('userUpdate');
     }
 }

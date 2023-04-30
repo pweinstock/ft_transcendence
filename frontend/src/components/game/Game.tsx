@@ -26,14 +26,14 @@ export default function Game(props : GameProps) {
 
     useEffect(() => {
         socket.emit('checkCreated');
-    }, [])
+    }, [UIState])
 
 
     useEffect(() => {
         socket.emit('checkInGame');
-    }, [])
+    }, [UIState])
 
-    socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT))
+    socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT));
 
     const newGameClick = () => setGameUIState(GameUIState.NEW);
     const joinGameClick = () => setGameUIState(GameUIState.JOIN);

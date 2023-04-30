@@ -37,11 +37,6 @@ const PublicProfile: React.FC<BaseUserProps> = (props : BaseUserProps) => {
             }).catch((error) => {
               console.error(error);
             });
-            // gameHistory.forEach(game => {
-            //   axios.get(`http://${window.location.hostname}:5000/users/name/${game.firstPlayer}`)
-            //   .then(response => setUserMap(prevState => ({ ...prevState, [game.firstPlayer]: response.data })))
-            //   .catch(error => console.log(error));
-            // })
           })
           .catch((error) => {
             alert(error + ": User " + param.user + " does not exist!");

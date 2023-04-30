@@ -239,7 +239,6 @@ export default function PingPongReconnect(props : PingPongProps) {
         socket.on("left", (player : string) => {
             isEnded = true;
             playerLeft = player;
-            console.log('player left');
         });
 
 
