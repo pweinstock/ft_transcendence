@@ -3,7 +3,6 @@ import JoinGame from "./JoinGame";
 import {User} from "../BaseInterface";
 import CreateGame from "./CreateGame";
 import WatchGame from "./WatchGame";
-import HighScore from "./HighScore";
 import {GameSocketContext} from "../context/game-socket"
 import {Socket} from "socket.io-client";
 import ReconnectGame from "./ReconnectGame";
