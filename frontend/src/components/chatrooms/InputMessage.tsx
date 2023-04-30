@@ -52,15 +52,15 @@ function sendMassagetoBackend() {
 			});
 }
 
+const messageListener = (message: any) => {
+	setMessages([...messages, message])
+}
 useEffect(() => {
-	const messageListener = (message: any) => {
-		setMessages([...messages, message])
-	}
 	socket?.on('message', messageListener)
 	return () => {
 		socket?.off('message', messageListener)
 	}
-}, [socket, messages])
+}, [ messageListener])
 
 const container = useRef<HTMLDivElement>(null);
 

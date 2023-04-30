@@ -242,7 +242,7 @@ const handleParentStateUpdate = (newState: string) => {
 
 useEffect(() => {
 	props.onUpdate("", false);
-},[parentState, props]);
+},[parentState]);
 
 async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
 	event.preventDefault();

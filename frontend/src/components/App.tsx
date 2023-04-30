@@ -47,7 +47,7 @@ export default function App() {
     useEffect(() => {
         if (currentUsersData)
             socket?.emit('userConnect',  {userId: currentUsersData.id});
-    }, [currentUsersData, socket])
+    }, [currentUsersData])
 
     return (
         <>
