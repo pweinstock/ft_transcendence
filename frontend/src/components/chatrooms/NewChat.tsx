@@ -1,12 +1,8 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import astroman from '../img/littleman.png';
 import axios from "axios";
-import Chat from "../chat/Chat"
 import {User} from "../BaseInterface";
-import MessageList from './MessageList';
 import InputMessage from './InputMessage';
 import { ChatSocketProvider } from '../context/chat-socket';
-import { color } from '@mui/system';
 import { Link } from 'react-router-dom';
 
 interface ChatProps {

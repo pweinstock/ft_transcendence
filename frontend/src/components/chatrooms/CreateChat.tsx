@@ -42,21 +42,31 @@ const CreateChat: React.FC<ChatProps> = (props : ChatProps) => {
 
 	async function handleGameInviteOnClick (event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.DIRECT,  name : "Game "}, {withCredentials: true})
-			.then((response) => {
-				axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : gameWithThisUser,  chatId : response.data.id}, {withCredentials: true}).then( () => {
-					props.onUpdate("", true);
-					props.onUpdate("", false);
-				}).catch((reason) => {
-					console.log("Error while joing game chat, in chatid:");
-					console.log(gameWithThisUser);
+		if (gameWithThisUser) {
+			axios.post(`http://${window.location.hostname}:5000/chat/`,  { type : ChatType.DIRECT,  name : "Game "}, {withCredentials: true})
+				.then((response) => {
+						axios.post(`http://${window.location.hostname}:5000/chat/messages`,  { content : "Hey There, Let's play an awesome space-pong game. I click new Game. You click Join!" ,  chatId :response.data.id, date : new Date().toLocaleString("en-de")}, {withCredentials: true})
+							.then(() => {
+								axios.post(`http://${window.location.hostname}:5000/chat/addUser`,  { userId : gameWithThisUser,  chatId : response.data.id}, {withCredentials: true}).then( () => {
+									props.onUpdate("", true);
+									props.onUpdate("", false);
+									setgameWithThisUser("");
+								}).catch((reason) => {
+									console.log("Error while joing game chat, in chatid:");
+									console.log(gameWithThisUser);
+									console.log(reason.message);
+								});
+							}
+							)
+							.catch((reason) => {
+								console.log("Error while writing instruction maessage");
+								});
+				}
+				).catch(reason => {
+					console.log("failed to create game room")
 					console.log(reason.message);
-				});
-			}
-			).catch(reason => {
-				console.log("failed to create game room")
-				console.log(reason.message);
-		});
+			});
+		}
 	}
 
 	async function handOnClickSend (event: React.FormEvent<HTMLFormElement>) {
@@ -107,11 +117,10 @@ return (
 			<label>
 			Select User to play with:
 			<select value={gameWithThisUser}  onChange={handlegameWithThisUserChange} required>
+				<option key={-1} value={""}>non</option>
 			{props.usersData && props.usersData.map((item, index) => (
-				<>
-				{item.id !== props.userId && <option key={index} value={item.id}>{item.displayName}</option>}
-				</>
-				))}
+				 <option key={index} value={item.id} hidden={item.id === props.userId}>{item.displayName}</option>
+				 ))}
 			</select>
 			</label>
 			<button className='chatbutton' type="submit">Invite</button>
