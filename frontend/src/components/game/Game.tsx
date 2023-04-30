@@ -29,7 +29,7 @@ export default function Game(props : GameProps) {
 
 
     useEffect(() => {
-        socket.emit('checkInGame');
+        socket.emit('checkInGame', {displayName : props.user.displayName});
     }, [UIState])
 
     socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT));
