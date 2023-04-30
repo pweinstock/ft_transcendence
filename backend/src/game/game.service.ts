@@ -37,6 +37,21 @@ export class GameService {
         return game.id;
     }
 
+    reconnectToGame (clientId : string, playerName : string) : string {
+        for (const [gameId, gameData] of this.gameIdToGameData) {
+            if (gameData.players.firstPlayer === playerName) {
+                this.playerToGameId.set(clientId, {gameId: gameId, isFirst: true});
+                return gameId;
+            }
+            else if (gameData.players.secondPlayer === playerName) {
+                this.playerToGameId.set(clientId, {gameId: gameId, isFirst: false});
+                return gameId;
+            }
+        }
+        return null;
+
+    }
+
     getGameData (gameId :string) : GameDataDto {
         return this.gameIdToGameData.get(gameId);
     }
@@ -237,9 +252,9 @@ export class GameService {
         }
     }
 
-    async cancelGame(gameId : string) : Promise<void> {
+    async cancelGame(clientId : string, gameId : string) : Promise<void> {
         this.deleteGameOption(gameId);
-        this.deletePlayer(gameId);
+        this.deletePlayer(clientId);
         await this.gameRepository.delete(gameId);
     }
 }

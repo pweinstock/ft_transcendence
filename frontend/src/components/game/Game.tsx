@@ -3,7 +3,6 @@ import JoinGame from "./JoinGame";
 import {User} from "../BaseInterface";
 import CreateGame from "./CreateGame";
 import WatchGame from "./WatchGame";
-import HighScore from "./HighScore";
 import {GameSocketContext} from "../context/game-socket"
 import {Socket} from "socket.io-client";
 import ReconnectGame from "./ReconnectGame";
@@ -26,14 +25,14 @@ export default function Game(props : GameProps) {
 
     useEffect(() => {
         socket.emit('checkCreated');
-    }, [])
+    }, [UIState])
 
 
     useEffect(() => {
-        socket.emit('checkInGame');
-    }, [])
+        socket.emit('checkInGame', {displayName : props.user.displayName});
+    }, [UIState])
 
-    socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT))
+    socket.on("inGame", () => setGameUIState(GameUIState.RECONNECT));
 
     const newGameClick = () => setGameUIState(GameUIState.NEW);
     const joinGameClick = () => setGameUIState(GameUIState.JOIN);

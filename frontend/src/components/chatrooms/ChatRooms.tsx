@@ -20,7 +20,6 @@ const [chatNameValue, setchatNameValue] = useState<string>("");
 const [gamewithfreind, setgamewithfreind] = useState<boolean>(true);
 const [actualChatid, setactualChatid] = useState<string | undefined>(undefined);
 const [actualChatName, setactualChatName] = useState<string | undefined>(undefined);
-const [addThisUserId, setaddThisUserId] = useState<string>("");
 const [updateStatesGlobal, setaupdateStatesGlobal] = useState<number>(0);
 const [usersData, setUsersData] = useState<any[]>([]);
 
@@ -46,9 +45,11 @@ async function fetchChatrooms() {
 	.then((response) => {
 		setValue(response.data);
 		let chatInList : boolean = false;
+		if (response.data) {
 			response.data.map((item : any) => {
 				if (item.id == actualChatid)
-					chatInList = true;});
+				chatInList = true;});
+		}
 		if (chatInList == false)
 			setactualChatid("");
 	})
