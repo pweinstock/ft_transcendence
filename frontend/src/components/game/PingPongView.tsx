@@ -168,25 +168,26 @@ export default function PingPongView(props : PingPongProps) {
         };
 
         const update = () => {
-            const currentTime = new Date().getTime();
-            gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
-            moveBall();
-            checkWallCollision();
-            checkPaddleCollision(gameData.leftPaddle, true);
-            checkPaddleCollision(gameData.rightPaddle, false);
-            movePaddle(gameData.leftPaddle);
-            movePaddle(gameData.rightPaddle);
-            draw();
             if (gameData.isPaused)
                 drawPause()
             else if (isEnded)
                 drawEndGame();
-            else
-                requestAnimationFrame(update);
+            else {
+                const currentTime = new Date().getTime();
+                gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
+                moveBall();
+                checkWallCollision();
+                checkPaddleCollision(gameData.leftPaddle, true);
+                checkPaddleCollision(gameData.rightPaddle, false);
+                movePaddle(gameData.leftPaddle);
+                movePaddle(gameData.rightPaddle);
+                draw();
+            }
+            requestAnimationFrame(update);
         };
 
         draw();
-        socket.on("update", (data : GameData) => gameData = data);
+        socket.on("gameUpdate", (data : GameData) => gameData = data);
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;

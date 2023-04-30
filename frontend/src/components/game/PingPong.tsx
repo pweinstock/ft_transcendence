@@ -270,7 +270,7 @@ export default function PingPong(props : PingPongProps) {
         draw();
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
-        socket.on("update", (data : GameData) => gameData = data);
+        socket.on("gameUpdate", (data : GameData) => gameData = data);
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;

@@ -17,7 +17,7 @@ export default function ReconnectGame (props : ReconnectGameProps) {
         socket.emit("reconnect", {displayName : props.user.displayName});
     }
 
-    socket.on('reconnected', (gameData : GameData) => {
+    socket.on('gameUpdate', (gameData : GameData) => {
         setGameData(gameData);
     });
 
