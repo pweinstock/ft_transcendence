@@ -18,7 +18,6 @@ export default function PingPong(props : PingPongProps) {
     let isEnded : boolean = false;
 
     useEffect(() => {
-        let isPaused : boolean = false;
         let playerLeft : string = "";
 
         const initGame = (data : GameData) => socket.emit("init", data);
@@ -33,7 +32,7 @@ export default function PingPong(props : PingPongProps) {
 
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
-        let gameData = {
+        let gameData : GameData = {
             leftPaddle : {
                 x: grid * 2,
                 y: canvas.height / 2 - props.gameOption.paddleHeight / 2,
@@ -68,7 +67,9 @@ export default function PingPong(props : PingPongProps) {
             paddleSpeed : props.gameOption.paddleSpeed,
             ballSpeed : props.gameOption.ballSpeed,
             maxScore : props.gameOption.maxScore,
+            isPaused : false,
         }
+
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
@@ -226,22 +227,23 @@ export default function PingPong(props : PingPongProps) {
         };
 
         const update = () => {
-            const currentTime = new Date().getTime();
-            gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
-            moveBall();
-            checkScore();
-            checkWallCollision();
-            checkPaddleCollision(gameData.leftPaddle, true);
-            checkPaddleCollision(gameData.rightPaddle, false);
-            movePaddle(gameData.leftPaddle);
-            movePaddle(gameData.rightPaddle);
-            draw();
-            if (isPaused)
-                drawPause()
+            if (gameData.isPaused)
+                drawPause();
             else if (isEnded)
                 drawEndGame();
-            else
-                requestAnimationFrame(update);
+            else {
+                const currentTime = new Date().getTime();
+                gameData.timer = Math.floor((currentTime - startTime) / 1000 % 60);
+                moveBall();
+                checkScore();
+                checkWallCollision();
+                checkPaddleCollision(gameData.leftPaddle, true);
+                checkPaddleCollision(gameData.rightPaddle, false);
+                movePaddle(gameData.leftPaddle);
+                movePaddle(gameData.rightPaddle);
+                draw();
+            }
+            requestAnimationFrame(update);
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
@@ -269,8 +271,6 @@ export default function PingPong(props : PingPongProps) {
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("update", (data : GameData) => gameData = data);
-        socket.on("playerDisconnected", () => isPaused = true);
-        socket.on("reconnect", () => isPaused = false);
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;

@@ -33,4 +33,5 @@ export interface GameData {
     paddleSpeed :number;
     ballSpeed : number;
     maxScore : number;
+    isPaused : boolean;
 }

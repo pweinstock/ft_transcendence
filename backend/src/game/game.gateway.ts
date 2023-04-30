@@ -35,7 +35,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (this.gameService.isPlayer(client.id)) {
             const gameId : string = this.gameService.getPlayerGameId(client.id);
             if (gameId && this.gameService.isStarted(gameId))
-                this.server.to(gameId).emit("playerDisconnected", gameId);
+            {
+                const gameData : GameDataDto = this.gameService.getGameData(gameId);
+                gameData.isPaused = true;
+                if (gameData)
+                    this.server.to(gameId).emit("update", gameId);
+            }
             else {
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGameOption(gameId);
@@ -70,7 +75,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const clientRoom = this.gameService.getClientRoom(client.id);
         if (clientRoom) {
             const gameData : GameDataDto = this.gameService.getGameData(clientRoom.gameId);
-            this.server.to(clientRoom.gameId).emit("reconnected", gameData);
+            if (gameData) {
+                gameData.isPaused = false
+                client.join(clientRoom.gameId);
+                this.server.to(clientRoom.gameId).emit("reconnected", gameData);
+            }
         }
         else
             client.emit("notReconnected");
@@ -83,7 +92,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
             if (gameOptions && gameOptions.isStarted === false) {
                 client.leave(clientRoom.gameId);
-                await this.gameService.cancelGame(clientRoom.gameId);
+                await this.gameService.cancelGame(client.id, clientRoom.gameId);
             }
         }
     }
@@ -117,7 +126,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         else {
             if (this.gameService.isPlayer(client.id)) {
                 const clientRoom = this.gameService.getClientRoom(client.id);
-                this.gameService.cancelGame(clientRoom.gameId);
+                this.gameService.cancelGame(client.id, clientRoom.gameId);
             }
             const gameOption : GameOptionDto = await this.gameService.joinGame(client.id, dto);
             if (gameOption) {

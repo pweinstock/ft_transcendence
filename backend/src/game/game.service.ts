@@ -237,9 +237,9 @@ export class GameService {
         }
     }
 
-    async cancelGame(gameId : string) : Promise<void> {
+    async cancelGame(clientId : string, gameId : string) : Promise<void> {
         this.deleteGameOption(gameId);
-        this.deletePlayer(gameId);
+        this.deletePlayer(clientId);
         await this.gameRepository.delete(gameId);
     }
 }

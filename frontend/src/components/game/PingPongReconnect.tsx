@@ -17,7 +17,6 @@ export default function PingPongReconnect(props : PingPongProps) {
     let isEnded : boolean = false;
 
     useEffect(() => {
-        let isPaused : boolean = false;
         let playerLeft : string = "";
 
         const initGame = (data : GameData) => socket.emit("init", data);
@@ -32,7 +31,7 @@ export default function PingPongReconnect(props : PingPongProps) {
 
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
-        let gameData = props.gameData;
+        let gameData : GameData = props.gameData;
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
@@ -200,8 +199,8 @@ export default function PingPongReconnect(props : PingPongProps) {
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
-            if (isPaused)
-                drawPause()
+            if (gameData.isPaused)
+                drawPause();
             else if (isEnded)
                 drawEndGame();
             else
@@ -233,8 +232,6 @@ export default function PingPongReconnect(props : PingPongProps) {
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('keyup', onKeyUp);
         socket.on("update", (data : GameData) => gameData = data);
-        socket.on("playerDisconnected", () => isPaused = true);
-        socket.on("reconnect", () => isPaused = false);
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;

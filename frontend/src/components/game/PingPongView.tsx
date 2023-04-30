@@ -16,12 +16,11 @@ export default function PingPongView(props : PingPongProps) {
     let isEnded : boolean = false;
 
     useEffect(() => {
-        let isPaused : boolean = false;
         let playerLeft : string = "";
 
         const canvas = canvasRef.current!;
         const context = canvas.getContext("2d")!;
-        let gameData = props.gameData;
+        let gameData : GameData = props.gameData;
         const drawNet = () => {
             context.beginPath();
             context.setLineDash([7, 15]);
@@ -178,7 +177,7 @@ export default function PingPongView(props : PingPongProps) {
             movePaddle(gameData.leftPaddle);
             movePaddle(gameData.rightPaddle);
             draw();
-            if (isPaused)
+            if (gameData.isPaused)
                 drawPause()
             else if (isEnded)
                 drawEndGame();
@@ -188,11 +187,6 @@ export default function PingPongView(props : PingPongProps) {
 
         draw();
         socket.on("update", (data : GameData) => gameData = data);
-        socket.on("playerDisconnected", () => {
-
-            isPaused = true;
-        });
-        socket.on("reconnect", () => isPaused = false);
         socket.on("finished", () => isEnded = true);
         socket.on("left", (player : string) => {
             isEnded = true;
