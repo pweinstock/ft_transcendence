@@ -30,7 +30,6 @@ const Friends: React.FC<BaseUserProps> = (props: BaseUserProps) => {
         axios.get(`http://${window.location.hostname}:5000/users/id/${id}`, { withCredentials: true }).then((res) => res.data)
       );
       const friendsData = await Promise.all(promises);
-      console.log("friendsData: %s", friendsData);
       setFriends(friendsData);
     } catch (error) {
       console.error(error);

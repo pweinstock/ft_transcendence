@@ -33,4 +33,5 @@ export class GameDataDto {
     paddleSpeed :number;
     ballSpeed : number;
     maxScore : number;
+    isPaused : boolean;
 }

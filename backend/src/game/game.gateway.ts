@@ -35,23 +35,59 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (this.gameService.isPlayer(client.id)) {
             const gameId : string = this.gameService.getPlayerGameId(client.id);
             if (gameId && this.gameService.isStarted(gameId))
-                this.server.to(gameId).emit("playerDisconnected", gameId);
+            {
+                const gameData : GameDataDto = this.gameService.getGameData(gameId);
+                gameData.isPaused = true;
+                if (gameData)
+                    this.server.to(gameId).emit("gameUpdate", gameData);
+            }
+            else {
+                this.gameService.deleteGameOption(gameId);
+                this.gameService.deleteGameData(gameId);
+            }
+        }
+        this.gameService.deletePlayer(client.id);
+        this.gameService.deleteViewer(client.id);
+    }
+
+    @SubscribeMessage('playerDisconnected')
+    disconnectGame (@ConnectedSocket() client: Socket) : void {
+        if (this.gameService.isPlayer(client.id)) {
+            const gameId : string = this.gameService.getPlayerGameId(client.id);
+            if (gameId && this.gameService.isStarted(gameId))
+            {
+                const gameData : GameDataDto = this.gameService.getGameData(gameId);
+                gameData.isPaused = true;
+                if (gameData) {
+                    client.leave(gameId);
+                    this.server.to(gameId).emit("gameUpdate", gameData);
+                }
+            }
             else {
                 this.gameService.deletePlayer(client.id);
                 this.gameService.deleteGameOption(gameId);
                 this.gameService.deleteGameData(gameId);
             }
         }
-        this.gameService.deleteViewer(client.id);
     }
 
     @SubscribeMessage('checkInGame')
-    checkInGame (@ConnectedSocket() client: Socket) : void {
+    checkInGame (
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto : JoinGameDto) : void {
         const clientRoom = this.gameService.getClientRoom(client.id);
         if (clientRoom) {
             const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
             if (gameOptions && gameOptions.isStarted)
                 client.emit("inGame");
+        }
+        else {
+            const gameId : string = this.gameService.reconnectToGame(client.id, dto.displayName);
+            const gameData : GameDataDto = this.gameService.getGameData(gameId);
+            if (gameId) {
+                client.join(gameId);
+                this.server.to(gameId).emit("gameUpdate", gameData);
+            }
         }
     }
 
@@ -70,7 +106,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const clientRoom = this.gameService.getClientRoom(client.id);
         if (clientRoom) {
             const gameData : GameDataDto = this.gameService.getGameData(clientRoom.gameId);
-            this.server.to(clientRoom.gameId).emit("reconnected", gameData);
+            if (gameData) {
+                gameData.isPaused = false;
+                client.join(clientRoom.gameId);
+                this.server.to(clientRoom.gameId).emit("gameUpdate", gameData);
+            }
         }
         else
             client.emit("notReconnected");
@@ -83,7 +123,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const gameOptions = this.gameService.getGameOptions(clientRoom.gameId);
             if (gameOptions && gameOptions.isStarted === false) {
                 client.leave(clientRoom.gameId);
-                await this.gameService.cancelGame(clientRoom.gameId);
+                await this.gameService.cancelGame(client.id, clientRoom.gameId);
             }
         }
     }
@@ -117,7 +157,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         else {
             if (this.gameService.isPlayer(client.id)) {
                 const clientRoom = this.gameService.getClientRoom(client.id);
-                this.gameService.cancelGame(clientRoom.gameId);
+                this.gameService.cancelGame(client.id, clientRoom.gameId);
             }
             const gameOption : GameOptionDto = await this.gameService.joinGame(client.id, dto);
             if (gameOption) {
@@ -152,6 +192,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const clientRoom = this.gameService.getClientRoom(client.id);
         if (clientRoom) {
             this.gameService.setGameData(clientRoom.gameId, dto)
+            this.server.emit('userUpdate');
         }
     }
 
@@ -166,7 +207,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 dto.leftPaddle.dy = 0;
             else
                 dto.rightPaddle.dy = 0;
-            this.server.to(clientRoom.gameId).emit("update", dto);
+            this.server.to(clientRoom.gameId).emit("gameUpdate", dto);
             this.gameService.setGameData(clientRoom.gameId, dto);
         }
     }
@@ -182,7 +223,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 dto.leftPaddle.dy = -dto.paddleSpeed;
             else
                 dto.rightPaddle.dy = -dto.paddleSpeed;
-            this.server.to(clientRoom.gameId).emit("update", dto);
+            this.server.to(clientRoom.gameId).emit("gameUpdate", dto);
             this.gameService.setGameData(clientRoom.gameId, dto);
         }
     }
@@ -198,7 +239,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 dto.leftPaddle.dy = dto.paddleSpeed;
             else
                 dto.rightPaddle.dy = dto.paddleSpeed;
-            this.server.to(clientRoom.gameId).emit("update", dto);
+            this.server.to(clientRoom.gameId).emit("gameUpdate", dto);
             this.gameService.setGameData(clientRoom.gameId, dto);
         }
     }
@@ -222,6 +263,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.gameService.deleteViewer(client.id);
             client.leave(viewerGameId);
         }
+        this.server.emit('userUpdate');
     }
 
     @SubscribeMessage('leave')
@@ -241,5 +283,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.gameService.deleteViewer(client.id);
             client.leave(viewerGameId);
         }
+        this.server.emit('userUpdate');
     }
 }

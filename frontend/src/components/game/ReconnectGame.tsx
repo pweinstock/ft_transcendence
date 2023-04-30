@@ -14,16 +14,15 @@ export default function ReconnectGame (props : ReconnectGameProps) {
 
     const socket = useContext(GameSocketContext);
     const reconnectClick = () => {
-        socket.emit("reconnect", {displayName : props.user.displayName});
+        socket.emit("reconnect");
     }
 
-    socket.on('reconnected', (gameData : GameData) => {
+    socket.on('gameUpdate', (gameData : GameData) => {
+        console.log(gameData);
         setGameData(gameData);
     });
 
-    socket.on("notReconnected", () => {
-        //todo : handle error
-    });
+    socket.on("notReconnected", props.leaveGame);
 
     return (
         gameData ?
