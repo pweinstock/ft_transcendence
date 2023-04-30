@@ -49,10 +49,6 @@ export default function Game(props : GameProps) {
         setGameUIState(GameUIState.NOTHING);
     };
 
-    useEffect(() => {
-        socket.emit("playerDisconnected");
-    }, [UIState])
-
     return (
         UIState === GameUIState.NOTHING ?
         <>
